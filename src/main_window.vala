@@ -41,7 +41,7 @@ public class MainWindow : Gtk.Window
 
 			// Set Application Properties
 			this.set_title ("EasyRPG");
-			this.set_icon (new Gdk.Pixbuf.from_file ("share/easyrpg/icons/hicolor/48x48/apps/easyrpg.png"));
+			this.set_icon (new Gdk.Pixbuf.from_file ("./share/easyrpg/icons/hicolor/48x48/apps/easyrpg.png"));
 			this.set_default_size (500, 400);
 
 			//Generate actions
