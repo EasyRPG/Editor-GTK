@@ -41,7 +41,7 @@ public class MainWindow : Gtk.Window
 
 			// Set Application Properties
 			this.set_title ("EasyRPG");
-			this.set_icon (new Gdk.Pixbuf.from_file ("./share/easyrpg/icons/hicolor/48x48/apps/easyrpg.png"));
+			this.set_icon (new Gdk.Pixbuf.from_file ("share/easyrpg/icons/hicolor/48x48/apps/easyrpg.png"));
 			this.set_default_size (500, 400);
 
 			//Generate actions
@@ -487,7 +487,7 @@ public class MainWindow : Gtk.Window
 			this.box_main = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 			this.paned_palette_maptree = new Gtk.Paned (Gtk.Orientation.VERTICAL);
 
-			// Do Layaut
+			// Do Layout
 			this.paned_palette_maptree.pack1 (this.scrolled_palette, true, false);
 			this.paned_palette_maptree.pack2 (this.treeview_maptree, true, false);
 			this.box_sidebar.pack_start (this.toolbar_sidebar, false, true, 0);
@@ -498,7 +498,7 @@ public class MainWindow : Gtk.Window
 			this.scrolled_maprender.add_with_viewport (drawingarea_maprender);
 
 			this.box_central.pack_start (this.box_sidebar, false, false);
-			this.box_central.pack_start (this.scrolled_maprender, true, false);
+			this.box_central.pack_start (this.scrolled_maprender, true, true);
 
 
 			this.box_main.pack_start (this.menubar_main, false, true, 0);
@@ -531,5 +531,5 @@ public class MainWindow : Gtk.Window
 	public void on_close (Gtk.Widget window)
 	{
 		Gtk.main_quit ();
-	}              
+	}
 }
