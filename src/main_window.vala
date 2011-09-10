@@ -41,62 +41,38 @@ public class MainWindow : Gtk.Window
 			/* MainWindow */
 
 			/* Set Application Properties */
-			this.set_title ("EasyRPG");
+			this.set_title ("EasyRPG Editor");
 			this.set_icon (new Gdk.Pixbuf.from_file ("./share/easyrpg/icons/hicolor/48x48/apps/easyrpg.png"));
 			this.set_default_size (500, 400);
 
 			/* Generate actions */
 			var action_new = new Gtk.Action ("ActionNew", "_New", "Create a new project", null);
-			action_new.set_always_show_image (true);
 			var action_open = new Gtk.Action ("ActionOpen", "_Open", "Open a saved project", null);
-			action_open.set_always_show_image (true);
 			var action_close = new Gtk.Action ("ActionClose", "_Close", "Close current project", null);
-			action_close.set_always_show_image (true);
-			var	 action_makegamedisk = new Gtk.Action ("ActionMakeGameDisk", "_Make Game Disk", "", null);
-			action_makegamedisk.set_always_show_image (true);
+			var	action_makegamedisk = new Gtk.Action ("ActionMakeGameDisk", "_Make Game Disk", "", null);
 			var action_save = new Gtk.Action ("ActionSave", "_Save", "Save all maps changes", null);
-			action_save.set_always_show_image (true);
 			var action_revert = new Gtk.Action ("ActionRevert", "_Revert", "Revert maps to last saved state", null);
-			action_revert.set_always_show_image (true);
 			var action_lowerlayer = new Gtk.RadioAction ("ActionLowerLayer", "_Lower Layer", "Edit lower part of the maps", null, 0);
 			var action_upperlayer = new Gtk.RadioAction ("ActionUpperLayer", "_Upper Layer", "Edit upper part of the maps", null, 1);
 			var action_eventlayer = new Gtk.RadioAction ("ActionEventLayer", "_Event Layer", "Edit map events", null,2);
 			var action_11scale = new Gtk.RadioAction ("Action11scale", "Zoom 1/_1", "Map zoom 1/1 (Normal)", null, 0);
-			action_11scale.set_always_show_image (true);
 			var action_12scale = new Gtk.RadioAction ("Action12scale", "Zoom 1/_2", "Map zoom 1/2", null, 1);
-			action_12scale.set_always_show_image (true);
 			var action_14scale = new Gtk.RadioAction ("Action14scale", "Zoom 1/_4", "Map zoom 1/4", null, 2);
-			action_14scale.set_always_show_image (true);
 			var action_18scale = new Gtk.RadioAction ("Action18scale", "Zoom 1/_8", "Map zoom 1/8", null, 3);
-			action_18scale.set_always_show_image (true);
 			var action_database = new Gtk.Action ("ActionDataBase", "_Data Base", "Data Base", null);
-			action_database.set_always_show_image (true);
 			var action_material = new Gtk.Action ("ActionMaterial", "_Material", "Import, export and organize your game resources", null);
-			action_material.set_always_show_image (true);
 			var action_music = new Gtk.Action ("ActionMusic", "_Music", "Play music while you work", null);
-			action_music.set_always_show_image (true);
 			var action_playtest = new Gtk.Action ("ActionPlaytest", "_Play test", "Make a test of your game", null);
-			action_playtest.set_always_show_image (true);
 			var action_fullscreen = new Gtk.ToggleAction ("ActionFullScreen", "_Full Screen", "Use full screen in play test mode", null);
-			action_fullscreen.set_always_show_image (true);
 			var action_title = new Gtk.ToggleAction ("ActionTitle", "_Title", "Show title in play test mode", null);
-			action_title.set_always_show_image (true);
 			var action_content = new Gtk.Action ("ActionContent", "_Content", "View help contents", null);
-			action_content.set_always_show_image (true);
 			var action_undo = new Gtk.Action ("ActionUndo", "_Undo", "Undo last change", null);
-			action_undo.set_always_show_image (true);
 			var action_select = new Gtk.RadioAction ("ActionSelect", "_Select", "Select a part of the map", null, 0);
-			action_select.set_always_show_image (true);
-			var action_zoom = new Gtk.RadioAction ("ActionZoom", "_Zoom", "Increase or dicrese map zoom", null, 1);
-			action_zoom.set_always_show_image (true);
+			var action_zoom = new Gtk.RadioAction ("ActionZoom", "_Zoom", "Increase or decrease map zoom", null, 1);
 			var action_pen = new Gtk.RadioAction ("ActionPen", "_Pen", "Draw using a Pen tool (Normal)", null, 2);
-			action_pen.set_always_show_image (true);
 			var action_rectangle = new Gtk.RadioAction ("ActionRectangle", "_Rectangle", "Draw using a Rectangle tool", null, 3);
-			action_rectangle.set_always_show_image (true);
 			var action_circle = new Gtk.RadioAction ("ActionCircle", "_Circle", "Draw using a Circle tool", null, 4);
-			action_circle.set_always_show_image (true);
 			var action_fill = new Gtk.RadioAction ("ActionFill", "_Fill", "Fill a selected area", null, 5);
-			action_fill.set_always_show_image (true);
 			
 			/* Create Main Toolbar buttons and set properties */
 			var tbb_new = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/new.png") , null);
@@ -209,10 +185,8 @@ public class MainWindow : Gtk.Window
 			imgitem_makegamedisk.set_use_action_appearance (true);
 			var imgitem_quit = new Gtk.ImageMenuItem ();
 			imgitem_quit.set_image (new Gtk.Image.from_stock ("gtk-quit", Gtk.IconSize.MENU));
-			imgitem_quit.set_always_show_image (true);
-			imgitem_quit.set_use_underline (true);
-			imgitem_quit.set_tooltip_text ("Quit EasyRPG");
 			imgitem_quit.set_label ("_Quit");
+			imgitem_quit.use_underline = true;
 			var imgitem_save = new Gtk.ImageMenuItem ();
 			imgitem_save.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/save.png"));
 			imgitem_save.set_use_action_appearance (true);
@@ -236,10 +210,8 @@ public class MainWindow : Gtk.Window
 			imgitem_content.set_use_action_appearance (true);
 			var imgitem_about = new Gtk.ImageMenuItem ();
 			imgitem_about.set_image (new Gtk.Image.from_stock ("gtk-about", Gtk.IconSize.MENU));
-			imgitem_about.set_always_show_image (true);
-			imgitem_about.set_use_underline (true);
-			imgitem_about.set_tooltip_text ("Information about this program");
 			imgitem_about.set_label ("_About");
+			imgitem_about.use_underline = true;
 			/* Radio Items */
 			var raditem_lowerlayer = new Gtk.RadioMenuItem ((SList<Gtk.RadioMenuItem>) null);
 			raditem_lowerlayer.set_use_action_appearance (true);
@@ -262,7 +234,7 @@ public class MainWindow : Gtk.Window
 			chkitem_title.set_use_action_appearance (true);
 
 
-			/* Layaut menues */
+			/* Layout menus */
 			/* Menu Project */
 			menu_project.add (imgitem_new);
 			menu_project.add (imgitem_open);
@@ -307,11 +279,11 @@ public class MainWindow : Gtk.Window
 			mitem_help.set_submenu (menu_help);
 			/* Create and layaut Menu Bar */
 			this.menubar_main = new Gtk.MenuBar ();
-			menubar_main.add (mitem_project);
-			menubar_main.add (mitem_map);
-			menubar_main.add (mitem_tools);
-			menubar_main.add (mitem_test);
-			menubar_main.add (mitem_help);
+			this.menubar_main.add (mitem_project);
+			this.menubar_main.add (mitem_map);
+			this.menubar_main.add (mitem_tools);
+			this.menubar_main.add (mitem_test);
+			this.menubar_main.add (mitem_help);
 
 			/* Main Toolbar */
 			this.toolbar_main = new Gtk.Toolbar ();
@@ -395,11 +367,11 @@ public class MainWindow : Gtk.Window
 
 			/* Set Actions to Widgets */
 			/* MainMenubar */
-			/****************************************** 
-			 *IMPORTANT								  *
-			 * setting toolbar radioitems before menu *
-			 radioitems causes a crash with Gtk       *
-			 ******************************************/
+			/********************************************
+			 * IMPORTANT								*
+			 * setting toolbar radioitems before menu   *
+			 * radioitems causes a crash with Gtk       *
+			 ********************************************/
 			imgitem_new.set_related_action (action_new);
 			imgitem_open.set_related_action (action_open);
 			imgitem_close.set_related_action (action_close);
@@ -528,21 +500,27 @@ public class MainWindow : Gtk.Window
 
 	}
 
-	private void on_about()
+	private void on_about ()
 	{
 		var about_dialog = new Gtk.AboutDialog ();
+		about_dialog.set_transient_for (this);
 		about_dialog.set_modal (true);
-		about_dialog.set_title ("About EasyRPG");
-		about_dialog.set_version ("0.0.1");
-		about_dialog.set_license_type (Gtk.License.GPL_2_0);
-		about_dialog.set_program_name ("EasyRPG Game Editor");
+		about_dialog.set_version ("0.1.0");
+		about_dialog.set_license_type (Gtk.License.GPL_3_0);
+		about_dialog.set_program_name ("EasyRPG Editor");
+		about_dialog.set_comments ("A role playing game editor");
 		about_dialog.set_website ("http://easy-rpg.org/");
-		about_dialog.set_website_label ("EayRPG home page");
-		about_dialog.set_copyright ("Copyright (C) EasyRPG Project 2011");
-		about_dialog.set_position (Gtk.WindowPosition.CENTER_ON_PARENT);
-		about_dialog.set_resizable (false);
-		var logo = new Gdk.Pixbuf.from_file ("./share/easyrpg/icons/hicolor/48x48/apps/easyrpg.png");
-		about_dialog.set_logo (logo);
+		about_dialog.set_copyright ("© EasyRPG Project 2011");
+		about_dialog.set_authors ({"Héctor Barreiro", "Glynn Clements", "Francisco de la Peña", "Aitor García", "Gabriel Kind", "Alejandro Marzini http://vgvgf.com.ar/", "Shin-NiL", "Rikku2000 http://u-ac.net/rikku2000/gamedev/", "Mariano Suligoy", "Paulo Vizcaíno", "Takeshi Watanabe http://takecheeze.blog47.fc2.com/"});
+		about_dialog.set_artists ({"Ben Beltran http://nsovocal.com/", "Juan «Magnífico»", "Marina Navarro http://muerteatartajo.blogspot.com/"});
+		try {
+			var logo = new Gdk.Pixbuf.from_file ("./share/easyrpg/icons/hicolor/48x48/apps/easyrpg.png");
+			about_dialog.set_logo (logo);
+		}
+		catch (Error e)
+		{
+			stderr.printf ("Could not load about dialog logo: %s\n", e.message);
+		}
 		about_dialog.run ();
 		about_dialog.destroy ();
 	}
