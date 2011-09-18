@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project>
+	<title>Sample Game</title>
+	<party>
+		<map>1</map>
+		<x_coordinate>2</x_coordinate>
+		<y_coordinate>3</y_coordinate>
+	</party>
+	<boat>
+		<map>4</map>
+		<x_coordinate>5</x_coordinate>
+		<y_coordinate>6</y_coordinate>
+	</boat>
+	<ship>
+		<map>7</map>
+		<x_coordinate>8</x_coordinate>
+		<y_coordinate>9</y_coordinate>
+	</ship>
+	<airship>
+		<map>10</map>
+		<x_coordinate>11</x_coordinate>
+		<y_coordinate>12</y_coordinate>
+	</airship>
+</project>

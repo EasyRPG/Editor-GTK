@@ -15,13 +15,21 @@ AM_CFLAGS =\
 	 -g
 
 VALAFLAGS =  \
-	--pkg gtk+-3.0 --vapidir . --pkg config
+	--pkg gtk+-3.0 --pkg libxml-2.0 --pkg gio-2.0 --vapidir . --pkg config
 
 bin_PROGRAMS = editor
 
 editor_SOURCES = \
-	main_window.vala \
-	editor.vala
+	controller.vala \
+	controller_main.vala \
+	editor.vala \
+	model.vala \
+	model_party.vala \
+	model_vehicle.vala \
+	view_database_dialog.vala \
+	view_main_window.vala \
+	xml_node.vala \
+	xml_parser.vala
 
 editor_LDFLAGS = \
 	-Wl,--export-dynamic

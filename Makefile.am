@@ -19,3 +19,4 @@ EXTRA_DIST = $(editordoc_DATA)
 # Remove doc directory on uninstall
 uninstall-local:
 	-rm -r $(editordocdir)
+

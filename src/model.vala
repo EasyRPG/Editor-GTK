@@ -1,6 +1,6 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * editor.vala
+ * model.vala
  * Copyright (C) EasyRPG Project 2011
  *
  * EasyRPG is free software: you can redistribute it and/or modify it
@@ -17,37 +17,13 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class Editor {
-	/*
-	 * Properties
-	 */
-	MainController main_controller;
-
+public abstract class Model {
 	/*
 	 * Constructor
 	 */
-	public Editor () {
-		this.main_controller = new MainController ();
+	public Model () {
+
 	}
 
-	/*
-	 * Run
-	 */
-	public void run () {
-		this.main_controller.run ();
-	}
-
-	/*
-	 * Main
-	 */
-	static int main (string[] args) {
-		Gtk.init (ref args);
-
-		var app = new Editor ();
-		app.run ();
-
-		Gtk.main ();
-
-		return 0;
-	}
+	public abstract void load_data (XmlNode data);
 }

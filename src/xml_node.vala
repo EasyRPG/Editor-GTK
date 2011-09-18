@@ -1,6 +1,6 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * editor.vala
+ * xml_node.vala
  * Copyright (C) EasyRPG Project 2011
  *
  * EasyRPG is free software: you can redistribute it and/or modify it
@@ -17,37 +17,46 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class Editor {
+public class XmlNode {
 	/*
 	 * Properties
 	 */
-	MainController main_controller;
+	public string name;
+	public string content;
+	public weak XmlNode parent;
+	private XmlNode[] children;
+	public string[] attr_names;
+	public string[] attr_values;
 
 	/*
 	 * Constructor
 	 */
-	public Editor () {
-		this.main_controller = new MainController ();
+	public XmlNode () {
+		this.name = "";
+		this.content = "";
 	}
 
 	/*
-	 * Run
+	 * Add children
+	 * 
+	 * It is not possible to add items dinamically to an array from outside the
+	 * class. Workaround: make it private and use a public method.
 	 */
-	public void run () {
-		this.main_controller.run ();
+	public void add_children (XmlNode node) {
+		this.children += node;
 	}
 
 	/*
-	 * Main
+	 * Get children number
 	 */
-	static int main (string[] args) {
-		Gtk.init (ref args);
+	public int get_children_num () {
+		return this.children.length;
+	}
 
-		var app = new Editor ();
-		app.run ();
-
-		Gtk.main ();
-
-		return 0;
+	/*
+	 * Get child
+	 */
+	public XmlNode get_child (int i) {
+		return this.children[i];
 	}
 }
