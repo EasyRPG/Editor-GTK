@@ -84,102 +84,102 @@ public class MainWindow : Gtk.Window {
 		var action_rectangle = new Gtk.RadioAction ("ActionRectangle", "_Rectangle", "Draw using a Rectangle tool", null, 3);
 		var action_circle = new Gtk.RadioAction ("ActionCircle", "_Circle", "Draw using a Circle tool", null, 4);
 		var action_fill = new Gtk.RadioAction ("ActionFill", "_Fill", "Fill a selected area", null, 5);
-		
+
 		/*
 		 * Initialize main toolbar
 		 */
-		var tbb_new = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/new.png"), null);
-		tbb_new.set_use_action_appearance (true);
-		var tbb_open = new Gtk.ToolButton(new Gtk.Image.from_file ("./share/easyrpg/toolbar/open.png"), "Open");
-		tbb_open.set_use_action_appearance (true);
-		var tbb_close = new Gtk.ToolButton(new Gtk.Image.from_file ("./share/easyrpg/toolbar/close.png"), "Close");
-		tbb_close.set_use_action_appearance (true);
-		var tbb_create_game_disk = new Gtk.ToolButton(new Gtk.Image.from_file ("./share/easyrpg/toolbar/create_game_disk.png"), "Create Game Disk");
-		tbb_create_game_disk.set_use_action_appearance (true);
-		var tbb_save = new Gtk.ToolButton(new Gtk.Image.from_file ("./share/easyrpg/toolbar/save.png"), "Save all maps");
-		tbb_save.set_use_action_appearance (true);
-		var tbb_revert = new Gtk.ToolButton(new Gtk.Image.from_file ("./share/easyrpg/toolbar/revert.png"), "Revert maps");
-		tbb_revert.set_use_action_appearance (true);
-		var tbrb_lower_layer = new Gtk.RadioToolButton ((SList<Gtk.RadioToolButton>) null);
-		tbrb_lower_layer.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/lower_layer.png"));
-		var tbrb_upper_layer = new Gtk.RadioToolButton(tbrb_lower_layer.get_group ());
-		tbrb_upper_layer.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/upper_layer.png"));
-		var tbrb_event_layer = new Gtk.RadioToolButton(tbrb_lower_layer.get_group ());
-		tbrb_event_layer.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/event_layer.png"));
-		var tbrb_11_scale = new Gtk.RadioToolButton((SList<Gtk.RadioToolButton>) null);
-		tbrb_11_scale.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/11_scale.png"));
-		var tbrb_12_scale = new Gtk.RadioToolButton(tbrb_11_scale.get_group ());
-		tbrb_12_scale.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/12_scale.png"));
-		var tbrb_14_scale = new Gtk.RadioToolButton(tbrb_11_scale.get_group ());
-		tbrb_14_scale.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/14_scale.png"));
-		var tbrb_18_scale = new Gtk.RadioToolButton(tbrb_11_scale.get_group ());
-		tbrb_18_scale.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/18_scale.png"));
-		var tbb_database = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/database.png"), "Database");
-		tbb_database.set_use_action_appearance (true);
-		var tbb_material = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/material.png"), "Material");
-		tbb_material.set_use_action_appearance (true);
-		var tbb_music = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/music.png"), "Music");
-		tbb_music.set_use_action_appearance (true);
-		var tbb_playtest = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/playtest.png"), "Play Test");
-		tbb_playtest.set_use_action_appearance (true);
+		var toolitem_new = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/new.png"), "New");
+		toolitem_new.set_use_action_appearance (true);
+		var toolitem_open = new Gtk.ToolButton(new Gtk.Image.from_file ("./share/easyrpg/toolbar/open.png"), "Open");
+		toolitem_open.set_use_action_appearance (true);
+		var toolitem_close = new Gtk.ToolButton(new Gtk.Image.from_file ("./share/easyrpg/toolbar/close.png"), "Close");
+		toolitem_close.set_use_action_appearance (true);
+		var toolitem_create_game_disk = new Gtk.ToolButton(new Gtk.Image.from_file ("./share/easyrpg/toolbar/create_game_disk.png"), "Create Game Disk");
+		toolitem_create_game_disk.set_use_action_appearance (true);
+		var toolitem_save = new Gtk.ToolButton(new Gtk.Image.from_file ("./share/easyrpg/toolbar/save.png"), "Save all maps");
+		toolitem_save.set_use_action_appearance (true);
+		var toolitem_revert = new Gtk.ToolButton(new Gtk.Image.from_file ("./share/easyrpg/toolbar/revert.png"), "Revert maps");
+		toolitem_revert.set_use_action_appearance (true);
+		var toolitem_lower_layer = new Gtk.RadioToolButton ((SList<Gtk.RadioToolButton>) null);
+		toolitem_lower_layer.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/lower_layer.png"));
+		var toolitem_upper_layer = new Gtk.RadioToolButton(toolitem_lower_layer.get_group ());
+		toolitem_upper_layer.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/upper_layer.png"));
+		var toolitem_event_layer = new Gtk.RadioToolButton(toolitem_lower_layer.get_group ());
+		toolitem_event_layer.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/event_layer.png"));
+		var toolitem_11_scale = new Gtk.RadioToolButton((SList<Gtk.RadioToolButton>) null);
+		toolitem_11_scale.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/11_scale.png"));
+		var toolitem_12_scale = new Gtk.RadioToolButton(toolitem_11_scale.get_group ());
+		toolitem_12_scale.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/12_scale.png"));
+		var toolitem_14_scale = new Gtk.RadioToolButton(toolitem_11_scale.get_group ());
+		toolitem_14_scale.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/14_scale.png"));
+		var toolitem_18_scale = new Gtk.RadioToolButton(toolitem_11_scale.get_group ());
+		toolitem_18_scale.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/18_scale.png"));
+		var toolitem_database = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/database.png"), "Database");
+		toolitem_database.set_use_action_appearance (true);
+		var toolitem_material = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/material.png"), "Material");
+		toolitem_material.set_use_action_appearance (true);
+		var toolitem_music = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/music.png"), "Music");
+		toolitem_music.set_use_action_appearance (true);
+		var toolitem_playtest = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/playtest.png"), "Play Test");
+		toolitem_playtest.set_use_action_appearance (true);
 		var tbtb_fullscreen = new Gtk.ToggleToolButton ();
 		tbtb_fullscreen.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/fullscreen.png"));
 		tbtb_fullscreen.set_use_action_appearance (true);
 		var tbtb_title = new Gtk.ToggleToolButton ();
 		tbtb_title.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/title.png"));
 		tbtb_title.set_use_action_appearance (true);
-		var tbb_content = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/help.png"), "Contents");
-		tbb_content.set_use_action_appearance (true);
+		var toolitem_content = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/help.png"), "Contents");
+		toolitem_content.set_use_action_appearance (true);
 
 		/*
 		 * Initialize drawing toolbar
 		 */
-		var tbb_undo = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/undo.png"), "Undo");
-		tbb_undo.set_use_action_appearance (true);
-		var tbrb_select = new Gtk.RadioToolButton ((SList<Gtk.RadioToolButton>) null);
-		tbrb_select.set_icon_widget(new Gtk.Image.from_file ("./share/easyrpg/toolbar/select.png"));
-		tbrb_select.set_use_action_appearance (true);
-		var tbrb_zoom = new Gtk.RadioToolButton (tbrb_select.get_group());
-		tbrb_zoom.set_icon_widget(new Gtk.Image.from_file ("./share/easyrpg/toolbar/zoom.png"));
-		tbrb_zoom.set_use_action_appearance (true);
-		var tbrb_pen = new Gtk.RadioToolButton (tbrb_select.get_group());
-		tbrb_pen.set_icon_widget(new Gtk.Image.from_file ("./share/easyrpg/toolbar/pen.png"));
-		tbrb_pen.set_use_action_appearance (true);
-		var tbrb_rectangle = new Gtk.RadioToolButton (tbrb_select.get_group());
-		tbrb_rectangle.set_icon_widget(new Gtk.Image.from_file ("./share/easyrpg/toolbar/rectangle.png"));
-		tbrb_rectangle.set_use_action_appearance (true);
-		var tbrb_circle = new Gtk.RadioToolButton (tbrb_select.get_group());
-		tbrb_circle.set_icon_widget(new Gtk.Image.from_file ("./share/easyrpg/toolbar/circle.png"));
-		tbrb_circle.set_use_action_appearance (true);
-		var tbrb_fill = new Gtk.RadioToolButton (tbrb_select.get_group());
-		tbrb_fill.set_icon_widget(new Gtk.Image.from_file ("./share/easyrpg/toolbar/fill.png"));
-		tbrb_fill.set_use_action_appearance (true);
+		var toolitem_undo = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/undo.png"), "Undo");
+		toolitem_undo.set_use_action_appearance (true);
+		var toolitem_select = new Gtk.RadioToolButton ((SList<Gtk.RadioToolButton>) null);
+		toolitem_select.set_icon_widget(new Gtk.Image.from_file ("./share/easyrpg/toolbar/select.png"));
+		toolitem_select.set_use_action_appearance (true);
+		var toolitem_zoom = new Gtk.RadioToolButton (toolitem_select.get_group());
+		toolitem_zoom.set_icon_widget(new Gtk.Image.from_file ("./share/easyrpg/toolbar/zoom.png"));
+		toolitem_zoom.set_use_action_appearance (true);
+		var toolitem_pen = new Gtk.RadioToolButton (toolitem_select.get_group());
+		toolitem_pen.set_icon_widget(new Gtk.Image.from_file ("./share/easyrpg/toolbar/pen.png"));
+		toolitem_pen.set_use_action_appearance (true);
+		var toolitem_rectangle = new Gtk.RadioToolButton (toolitem_select.get_group());
+		toolitem_rectangle.set_icon_widget(new Gtk.Image.from_file ("./share/easyrpg/toolbar/rectangle.png"));
+		toolitem_rectangle.set_use_action_appearance (true);
+		var toolitem_circle = new Gtk.RadioToolButton (toolitem_select.get_group());
+		toolitem_circle.set_icon_widget(new Gtk.Image.from_file ("./share/easyrpg/toolbar/circle.png"));
+		toolitem_circle.set_use_action_appearance (true);
+		var toolitem_fill = new Gtk.RadioToolButton (toolitem_select.get_group());
+		toolitem_fill.set_icon_widget(new Gtk.Image.from_file ("./share/easyrpg/toolbar/fill.png"));
+		toolitem_fill.set_use_action_appearance (true);
 
 		/*
 		 * Initialize menu
 		 */
 		// Menu items
-		var mitem_project = new Gtk.MenuItem ();
-		mitem_project.use_underline = true;
-		mitem_project.set_label ("_Project");
-		var mitem_map = new Gtk.MenuItem ();
-		mitem_map.use_underline = true;
-		mitem_map.set_label ("_Map");
-		var mitem_tools = new Gtk.MenuItem ();
-		mitem_tools.use_underline = true;
-		mitem_tools.set_label ("_Tools");
-		var mitem_test = new Gtk.MenuItem ();
-		mitem_test.use_underline = true;
-		mitem_test.set_label ("_Test");
-		var mitem_help = new Gtk.MenuItem ();
-		mitem_help.use_underline = true;
-		mitem_help.set_label ("_Help");
-		var mitem_edit = new Gtk.MenuItem ();
-		mitem_edit.use_underline = true;
-		mitem_edit.set_label ("_Edit");
-		var mitem_scale = new Gtk.MenuItem ();
-		mitem_scale.use_underline = true;
-		mitem_scale.set_label ("_Scale");
+		var menuitem_project = new Gtk.MenuItem ();
+		menuitem_project.use_underline = true;
+		menuitem_project.set_label ("_Project");
+		var menuitem_map = new Gtk.MenuItem ();
+		menuitem_map.use_underline = true;
+		menuitem_map.set_label ("_Map");
+		var menuitem_tools = new Gtk.MenuItem ();
+		menuitem_tools.use_underline = true;
+		menuitem_tools.set_label ("_Tools");
+		var menuitem_test = new Gtk.MenuItem ();
+		menuitem_test.use_underline = true;
+		menuitem_test.set_label ("_Test");
+		var menuitem_help = new Gtk.MenuItem ();
+		menuitem_help.use_underline = true;
+		menuitem_help.set_label ("_Help");
+		var menuitem_edit = new Gtk.MenuItem ();
+		menuitem_edit.use_underline = true;
+		menuitem_edit.set_label ("_Edit");
+		var menuitem_scale = new Gtk.MenuItem ();
+		menuitem_scale.use_underline = true;
+		menuitem_scale.set_label ("_Scale");
 
 		// Submenus
 		var menu_project = new Gtk.Menu ();
@@ -191,154 +191,153 @@ public class MainWindow : Gtk.Window {
 		var menu_help = new Gtk.Menu ();
 
 		// Submenu items
-		var imgitem_new = new Gtk.ImageMenuItem ();
-		imgitem_new.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/new.png"));
-		imgitem_new.set_use_action_appearance (true);
-		var imgitem_open = new Gtk.ImageMenuItem ();
-		imgitem_open.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/open.png"));
-		imgitem_open.set_use_action_appearance (true);
-		var imgitem_close = new Gtk.ImageMenuItem ();
-		imgitem_close.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/close.png"));
-		imgitem_close.set_use_action_appearance (true);
-		var imgitem_create_game_disk = new Gtk.ImageMenuItem ();
-		imgitem_create_game_disk.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/create_game_disk.png"));
-		imgitem_create_game_disk.set_use_action_appearance (true);
-		var imgitem_quit = new Gtk.ImageMenuItem ();
-		imgitem_quit.set_image (new Gtk.Image.from_stock ("gtk-quit", Gtk.IconSize.MENU));
-		imgitem_quit.set_label ("_Quit");
-		imgitem_quit.use_underline = true;
-		var imgitem_save = new Gtk.ImageMenuItem ();
-		imgitem_save.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/save.png"));
-		imgitem_save.set_use_action_appearance (true);
-		var imgitem_revert = new Gtk.ImageMenuItem ();
-		imgitem_revert.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/revert.png"));
-		imgitem_revert.set_use_action_appearance (true);
-		var imgitem_database = new Gtk.ImageMenuItem ();
-		imgitem_database.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/database.png"));
-		imgitem_database.set_use_action_appearance (true);
-		var imgitem_material = new Gtk.ImageMenuItem ();
-		imgitem_material.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/material.png"));
-		imgitem_material.set_use_action_appearance (true);
-		var imgitem_music = new Gtk.ImageMenuItem ();
-		imgitem_music.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/music.png"));
-		imgitem_music.set_use_action_appearance (true);
-		var imgitem_playtest = new Gtk.ImageMenuItem ();
-		imgitem_playtest.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/playtest.png"));
-		imgitem_playtest.set_use_action_appearance (true);
-		var imgitem_content = new Gtk.ImageMenuItem ();
-		imgitem_content.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/help.png"));
-		imgitem_content.set_use_action_appearance (true);
-		var imgitem_about = new Gtk.ImageMenuItem ();
-		imgitem_about.set_image (new Gtk.Image.from_stock ("gtk-about", Gtk.IconSize.MENU));
-		imgitem_about.set_label ("_About");
-		imgitem_about.use_underline = true;
+		var menuitem_new = new Gtk.ImageMenuItem ();
+		menuitem_new.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/new.png"));
+		menuitem_new.set_use_action_appearance (true);
+		var menuitem_open = new Gtk.ImageMenuItem ();
+		menuitem_open.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/open.png"));
+		menuitem_open.set_use_action_appearance (true);
+		var menuitem_close = new Gtk.ImageMenuItem ();
+		menuitem_close.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/close.png"));
+		menuitem_close.set_use_action_appearance (true);
+		var menuitem_create_game_disk = new Gtk.ImageMenuItem ();
+		menuitem_create_game_disk.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/create_game_disk.png"));
+		menuitem_create_game_disk.set_use_action_appearance (true);
+		var menuitem_quit = new Gtk.ImageMenuItem ();
+		menuitem_quit.set_image (new Gtk.Image.from_stock ("gtk-quit", Gtk.IconSize.MENU));
+		menuitem_quit.set_label ("_Quit");
+		menuitem_quit.use_underline = true;
+		var menuitem_save = new Gtk.ImageMenuItem ();
+		menuitem_save.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/save.png"));
+		menuitem_save.set_use_action_appearance (true);
+		var menuitem_revert = new Gtk.ImageMenuItem ();
+		menuitem_revert.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/revert.png"));
+		menuitem_revert.set_use_action_appearance (true);
+		var menuitem_database = new Gtk.ImageMenuItem ();
+		menuitem_database.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/database.png"));
+		menuitem_database.set_use_action_appearance (true);
+		var menuitem_material = new Gtk.ImageMenuItem ();
+		menuitem_material.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/material.png"));
+		menuitem_material.set_use_action_appearance (true);
+		var menuitem_music = new Gtk.ImageMenuItem ();
+		menuitem_music.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/music.png"));
+		menuitem_music.set_use_action_appearance (true);
+		var menuitem_playtest = new Gtk.ImageMenuItem ();
+		menuitem_playtest.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/playtest.png"));
+		menuitem_playtest.set_use_action_appearance (true);
+		var menuitem_content = new Gtk.ImageMenuItem ();
+		menuitem_content.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/help.png"));
+		menuitem_content.set_use_action_appearance (true);
+		var menuitem_about = new Gtk.ImageMenuItem ();
+		menuitem_about.set_image (new Gtk.Image.from_stock ("gtk-about", Gtk.IconSize.MENU));
+		menuitem_about.set_label ("_About");
+		menuitem_about.use_underline = true;
 
 		// Radio items
-		var raditem_lower_layer = new Gtk.RadioMenuItem ((SList<Gtk.RadioMenuItem>) null);
-		raditem_lower_layer.set_use_action_appearance (true);
-		var raditem_upper_layer = new Gtk.RadioMenuItem(raditem_lower_layer.get_group ());
-		raditem_upper_layer.set_use_action_appearance (true);
-		var raditem_event_layer = new Gtk.RadioMenuItem(raditem_lower_layer.get_group ());
-		raditem_event_layer.set_use_action_appearance (true);
-		var raditem_11_scale = new Gtk.RadioMenuItem ((SList<Gtk.RadioMenuItem>) null);
-		raditem_11_scale.set_use_action_appearance (true);
-		var raditem_12_scale = new Gtk.RadioMenuItem(raditem_11_scale.get_group ());
-		raditem_12_scale.set_use_action_appearance (true);
-		var raditem_14_scale = new Gtk.RadioMenuItem(raditem_11_scale.get_group ());
-		raditem_14_scale.set_use_action_appearance (true);
-		var raditem_18_scale = new Gtk.RadioMenuItem(raditem_11_scale.get_group ());
-		raditem_18_scale.set_use_action_appearance (true);
+		var menuitem_lower_layer = new Gtk.RadioMenuItem ((SList<Gtk.RadioMenuItem>) null);
+		menuitem_lower_layer.set_use_action_appearance (true);
+		var menuitem_upper_layer = new Gtk.RadioMenuItem(menuitem_lower_layer.get_group ());
+		menuitem_upper_layer.set_use_action_appearance (true);
+		var menuitem_event_layer = new Gtk.RadioMenuItem(menuitem_lower_layer.get_group ());
+		menuitem_event_layer.set_use_action_appearance (true);
+		var menuitem_11_scale = new Gtk.RadioMenuItem ((SList<Gtk.RadioMenuItem>) null);
+		menuitem_11_scale.set_use_action_appearance (true);
+		var menuitem_12_scale = new Gtk.RadioMenuItem(menuitem_11_scale.get_group ());
+		menuitem_12_scale.set_use_action_appearance (true);
+		var menuitem_14_scale = new Gtk.RadioMenuItem(menuitem_11_scale.get_group ());
+		menuitem_14_scale.set_use_action_appearance (true);
+		var menuitem_18_scale = new Gtk.RadioMenuItem(menuitem_11_scale.get_group ());
+		menuitem_18_scale.set_use_action_appearance (true);
 
 		// Toggle items
-		var chkitem_fullscreen = new Gtk.CheckMenuItem();
-		chkitem_fullscreen.set_use_action_appearance (true);
-		var chkitem_title = new Gtk.CheckMenuItem();
-		chkitem_title.set_use_action_appearance (true);
+		var menuitem_fullscreen = new Gtk.CheckMenuItem();
+		menuitem_fullscreen.set_use_action_appearance (true);
+		var menuitem_title = new Gtk.CheckMenuItem();
+		menuitem_title.set_use_action_appearance (true);
 
 		/*
 		 * Menu layout
 		 */
-		menu_project.add (imgitem_new);
-		menu_project.add (imgitem_open);
-		menu_project.add (imgitem_close);
+		menu_project.add (menuitem_new);
+		menu_project.add (menuitem_open);
+		menu_project.add (menuitem_close);
 		menu_project.add (new Gtk.SeparatorMenuItem());
-		menu_project.add (imgitem_quit);
-		menu_map.add (imgitem_save);
-		menu_map.add (imgitem_revert);
+		menu_project.add (menuitem_quit);
+		menu_map.add (menuitem_save);
+		menu_map.add (menuitem_revert);
 		menu_map.add (new Gtk.SeparatorMenuItem());
-		menu_map.add (mitem_edit);
-		menu_map.add (mitem_scale);
-		menu_edit.add (raditem_lower_layer);
-		menu_edit.add (raditem_upper_layer);
-		menu_edit.add (raditem_event_layer);
-		menu_scale.add (raditem_11_scale);
-		menu_scale.add (raditem_12_scale);
-		menu_scale.add (raditem_14_scale);
-		menu_scale.add (raditem_18_scale);
-		menu_tools.add (imgitem_database);
-		menu_tools.add (imgitem_material);
-		menu_tools.add (imgitem_music);
-		menu_test.add (imgitem_playtest);
+		menu_map.add (menuitem_edit);
+		menu_map.add (menuitem_scale);
+		menu_edit.add (menuitem_lower_layer);
+		menu_edit.add (menuitem_upper_layer);
+		menu_edit.add (menuitem_event_layer);
+		menu_scale.add (menuitem_11_scale);
+		menu_scale.add (menuitem_12_scale);
+		menu_scale.add (menuitem_14_scale);
+		menu_scale.add (menuitem_18_scale);
+		menu_tools.add (menuitem_database);
+		menu_tools.add (menuitem_material);
+		menu_tools.add (menuitem_music);
+		menu_test.add (menuitem_playtest);
 		menu_test.add (new Gtk.SeparatorMenuItem ());
-		menu_test.add (chkitem_fullscreen);
-		menu_test.add (chkitem_title);
-		menu_help.add (imgitem_content);
+		menu_test.add (menuitem_fullscreen);
+		menu_test.add (menuitem_title);
+		menu_help.add (menuitem_content);
 		menu_help.add (new Gtk.SeparatorMenuItem ());
-		menu_help.add (imgitem_about);
+		menu_help.add (menuitem_about);
 
 		// Submenus
-		mitem_project.set_submenu (menu_project);
-		mitem_map.set_submenu (menu_map);
-		mitem_edit.set_submenu (menu_edit);
-		mitem_scale.set_submenu (menu_scale);
-		mitem_tools.set_submenu (menu_tools);
-		mitem_test.set_submenu (menu_test);
-		mitem_help.set_submenu (menu_help);
+		menuitem_project.set_submenu (menu_project);
+		menuitem_map.set_submenu (menu_map);
+		menuitem_edit.set_submenu (menu_edit);
+		menuitem_scale.set_submenu (menu_scale);
+		menuitem_tools.set_submenu (menu_tools);
+		menuitem_test.set_submenu (menu_test);
+		menuitem_help.set_submenu (menu_help);
 
 		// Toplevel
 		this.menubar_main = new Gtk.MenuBar ();
-		this.menubar_main.add (mitem_project);
-		this.menubar_main.add (mitem_map);
-		this.menubar_main.add (mitem_tools);
-		this.menubar_main.add (mitem_test);
-		this.menubar_main.add (mitem_help);
+		this.menubar_main.add (menuitem_project);
+		this.menubar_main.add (menuitem_map);
+		this.menubar_main.add (menuitem_tools);
+		this.menubar_main.add (menuitem_test);
+		this.menubar_main.add (menuitem_help);
 
 		/*
 		 * Main toolbar layout
 		 */
 		this.toolbar_main = new Gtk.Toolbar ();
-		this.toolbar_main.set_show_arrow (false);
 		this.toolbar_main.get_style_context ().add_class (Gtk.STYLE_CLASS_INLINE_TOOLBAR);
 
 		// Add buttons
-		this.toolbar_main.add (tbb_new);
-		this.toolbar_main.add (tbb_open);
-		this.toolbar_main.add (tbb_close);
+		this.toolbar_main.add (toolitem_new);
+		this.toolbar_main.add (toolitem_open);
+		this.toolbar_main.add (toolitem_close);
 		this.toolbar_main.add (new Gtk.SeparatorToolItem());
-		this.toolbar_main.add (tbb_create_game_disk);
+		this.toolbar_main.add (toolitem_create_game_disk);
 		this.toolbar_main.add (new Gtk.SeparatorToolItem());
-		this.toolbar_main.add (tbb_save);
-		this.toolbar_main.add (tbb_revert);
+		this.toolbar_main.add (toolitem_save);
+		this.toolbar_main.add (toolitem_revert);
 		this.toolbar_main.add (new Gtk.SeparatorToolItem());
-		this.toolbar_main.add (tbrb_lower_layer);
-		this.toolbar_main.add (tbrb_upper_layer);
-		this.toolbar_main.add (tbrb_event_layer);
+		this.toolbar_main.add (toolitem_lower_layer);
+		this.toolbar_main.add (toolitem_upper_layer);
+		this.toolbar_main.add (toolitem_event_layer);
 		this.toolbar_main.add (new Gtk.SeparatorToolItem());
-		this.toolbar_main.add (tbrb_11_scale);
-		this.toolbar_main.add (tbrb_12_scale);
-		this.toolbar_main.add (tbrb_14_scale);
-		this.toolbar_main.add (tbrb_18_scale);
+		this.toolbar_main.add (toolitem_11_scale);
+		this.toolbar_main.add (toolitem_12_scale);
+		this.toolbar_main.add (toolitem_14_scale);
+		this.toolbar_main.add (toolitem_18_scale);
 		this.toolbar_main.add (new Gtk.SeparatorToolItem());
-		this.toolbar_main.add (tbb_database);
-		this.toolbar_main.add (tbb_material);
-		this.toolbar_main.add (tbb_music);
+		this.toolbar_main.add (toolitem_database);
+		this.toolbar_main.add (toolitem_material);
+		this.toolbar_main.add (toolitem_music);
 		this.toolbar_main.add (new Gtk.SeparatorToolItem());
-		this.toolbar_main.add (tbb_playtest);
+		this.toolbar_main.add (toolitem_playtest);
 		this.toolbar_main.add (new Gtk.SeparatorToolItem());
 		this.toolbar_main.add (tbtb_fullscreen);
 		this.toolbar_main.add (tbtb_title);
 		this.toolbar_main.add (new Gtk.SeparatorToolItem());
-		this.toolbar_main.add (tbb_content);
+		this.toolbar_main.add (toolitem_content);
 
 		/*
 		 * Drawing toolbar layout
@@ -348,15 +347,15 @@ public class MainWindow : Gtk.Window {
 		this.toolbar_sidebar.get_style_context ().add_class (Gtk.STYLE_CLASS_INLINE_TOOLBAR);
 
 		// Add buttons
-		this.toolbar_sidebar.add (tbb_undo);
+		this.toolbar_sidebar.add (toolitem_undo);
 		this.toolbar_sidebar.add (new Gtk.SeparatorToolItem());
-		this.toolbar_sidebar.add (tbrb_select);
-		this.toolbar_sidebar.add (tbrb_zoom);
-		this.toolbar_sidebar.add (tbrb_pen);
-		this.toolbar_sidebar.add (tbrb_rectangle);
-		this.toolbar_sidebar.add (tbrb_circle);
-		this.toolbar_sidebar.add (tbrb_fill);
-		tbrb_pen.set_active (true);
+		this.toolbar_sidebar.add (toolitem_select);
+		this.toolbar_sidebar.add (toolitem_zoom);
+		this.toolbar_sidebar.add (toolitem_pen);
+		this.toolbar_sidebar.add (toolitem_rectangle);
+		this.toolbar_sidebar.add (toolitem_circle);
+		this.toolbar_sidebar.add (toolitem_fill);
+		toolitem_pen.set_active (true);
 
 		/*
 		 * Initialize widgets
@@ -408,57 +407,57 @@ public class MainWindow : Gtk.Window {
 		 * Connect toolbar radioitems before menu radioitems causes a Gtk crash
 		 */
 		// Menu
-		imgitem_new.set_related_action (action_new);
-		imgitem_open.set_related_action (action_open);
-		imgitem_close.set_related_action (action_close);
-		imgitem_create_game_disk.set_related_action (action_create_game_disk);
-		imgitem_save.set_related_action (action_save);
-		imgitem_revert.set_related_action (action_revert);
-		raditem_lower_layer.set_related_action (action_lower_layer);
-		raditem_upper_layer.set_related_action (action_upper_layer);
-		raditem_event_layer.set_related_action (action_event_layer);
-		raditem_11_scale.set_related_action (action_11_scale);
-		raditem_12_scale.set_related_action (action_12_scale);
-		raditem_14_scale.set_related_action (action_14_scale);
-		raditem_18_scale.set_related_action (action_18_scale);
-		imgitem_database.set_related_action (action_database);
-		imgitem_material.set_related_action (action_material);
-		imgitem_music.set_related_action (action_music);
-		imgitem_playtest.set_related_action (action_playtest);
-		imgitem_content.set_related_action (action_content);
-		chkitem_fullscreen.set_related_action (action_fullscreen);
-		chkitem_title.set_related_action (action_title);
+		menuitem_new.set_related_action (action_new);
+		menuitem_open.set_related_action (action_open);
+		menuitem_close.set_related_action (action_close);
+		menuitem_create_game_disk.set_related_action (action_create_game_disk);
+		menuitem_save.set_related_action (action_save);
+		menuitem_revert.set_related_action (action_revert);
+		menuitem_lower_layer.set_related_action (action_lower_layer);
+		menuitem_upper_layer.set_related_action (action_upper_layer);
+		menuitem_event_layer.set_related_action (action_event_layer);
+		menuitem_11_scale.set_related_action (action_11_scale);
+		menuitem_12_scale.set_related_action (action_12_scale);
+		menuitem_14_scale.set_related_action (action_14_scale);
+		menuitem_18_scale.set_related_action (action_18_scale);
+		menuitem_database.set_related_action (action_database);
+		menuitem_material.set_related_action (action_material);
+		menuitem_music.set_related_action (action_music);
+		menuitem_playtest.set_related_action (action_playtest);
+		menuitem_content.set_related_action (action_content);
+		menuitem_fullscreen.set_related_action (action_fullscreen);
+		menuitem_title.set_related_action (action_title);
 
 		// Main toolbar
-		tbb_new.set_related_action (action_new);
-		tbb_open.set_related_action (action_open);
-		tbb_close.set_related_action (action_close);
-		tbb_create_game_disk.set_related_action (action_create_game_disk);
-		tbb_save.set_related_action (action_save);
-		tbb_revert.set_related_action (action_revert);
-		tbrb_lower_layer.set_related_action (action_lower_layer);
-		tbrb_upper_layer.set_related_action (action_upper_layer);
-		tbrb_event_layer.set_related_action (action_event_layer);
-		tbrb_11_scale.set_related_action (action_11_scale);
-		tbrb_12_scale.set_related_action (action_12_scale);
-		tbrb_14_scale.set_related_action (action_14_scale);
-		tbrb_18_scale.set_related_action (action_18_scale);
-		tbb_database.set_related_action (action_database);
-		tbb_material.set_related_action (action_material);
-		tbb_music.set_related_action (action_music);
-		tbb_playtest.set_related_action (action_playtest);
+		toolitem_new.set_related_action (action_new);
+		toolitem_open.set_related_action (action_open);
+		toolitem_close.set_related_action (action_close);
+		toolitem_create_game_disk.set_related_action (action_create_game_disk);
+		toolitem_save.set_related_action (action_save);
+		toolitem_revert.set_related_action (action_revert);
+		toolitem_lower_layer.set_related_action (action_lower_layer);
+		toolitem_upper_layer.set_related_action (action_upper_layer);
+		toolitem_event_layer.set_related_action (action_event_layer);
+		toolitem_11_scale.set_related_action (action_11_scale);
+		toolitem_12_scale.set_related_action (action_12_scale);
+		toolitem_14_scale.set_related_action (action_14_scale);
+		toolitem_18_scale.set_related_action (action_18_scale);
+		toolitem_database.set_related_action (action_database);
+		toolitem_material.set_related_action (action_material);
+		toolitem_music.set_related_action (action_music);
+		toolitem_playtest.set_related_action (action_playtest);
 		tbtb_fullscreen.set_related_action (action_fullscreen);
 		tbtb_title.set_related_action (action_title);
-		tbb_content.set_related_action (action_content);
+		toolitem_content.set_related_action (action_content);
 
 		// Drawing toolbar
-		tbb_undo.set_related_action (action_undo);
-		tbrb_select.set_related_action (action_select);
-		tbrb_zoom.set_related_action (action_zoom);
-		tbrb_pen.set_related_action (action_pen);
-		tbrb_rectangle.set_related_action (action_rectangle);
-		tbrb_circle.set_related_action (action_circle);
-		tbrb_fill.set_related_action (action_fill);
+		toolitem_undo.set_related_action (action_undo);
+		toolitem_select.set_related_action (action_select);
+		toolitem_zoom.set_related_action (action_zoom);
+		toolitem_pen.set_related_action (action_pen);
+		toolitem_rectangle.set_related_action (action_rectangle);
+		toolitem_circle.set_related_action (action_circle);
+		toolitem_fill.set_related_action (action_fill);
 
 		/*
 		 * Create RadioActions Groups
@@ -525,16 +524,15 @@ public class MainWindow : Gtk.Window {
 		action_select.changed.connect (on_tool_change);
 
 		// Close application
-		imgitem_quit.activate.connect (on_close);
+		menuitem_quit.activate.connect (on_close);
 		this.destroy.connect (on_close);
 
 		// Show database dialog
 		// FIXME: action signals don't work properly
-		imgitem_database.activate.connect (show_database);
-		//action_database.activate.connect (show_database);
+		action_database.activate.connect (show_database);
 
 		// Show about dialog
-		imgitem_about.activate.connect (on_about);
+		menuitem_about.activate.connect (on_about);
 	}
 
 	/*
