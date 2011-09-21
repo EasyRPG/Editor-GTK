@@ -55,6 +55,8 @@ public class XmlParser {
 	 * Parse file
 	 */
 	public void parse_file (string path) {
+		this.root = null;
+
 		try {
 			File file = File.new_for_path (path);
 			

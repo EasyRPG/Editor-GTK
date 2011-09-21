@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<project>
+<game>
 	<title>Sample Game</title>
 	<party>
 		<map>1</map>
@@ -21,4 +21,4 @@
 		<x_coordinate>11</x_coordinate>
 		<y_coordinate>12</y_coordinate>
 	</airship>
-</project>
+</game>

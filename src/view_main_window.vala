@@ -22,8 +22,8 @@ public class MainWindow : Gtk.Window {
 	 * Properties
 	 */
 	private weak MainController controller;
-	private Gtk.ActionGroup actiongroup_project_open;
-	private Gtk.ActionGroup actiongroup_project_closed;
+	public Gtk.ActionGroup actiongroup_project_open;
+	public Gtk.ActionGroup actiongroup_project_closed;
 	private Gtk.DrawingArea drawingarea_maprender;
 	private Gtk.DrawingArea drawingarea_palette;
 	private Gtk.MenuBar menubar_main;
@@ -34,6 +34,12 @@ public class MainWindow : Gtk.Window {
 	private Gtk.Toolbar toolbar_main;
 	private Gtk.Toolbar toolbar_sidebar;
 	private Gtk.TreeView treeview_maptree;
+
+	private Gtk.RadioAction group_layer;
+	private Gtk.RadioAction group_scale;
+	private Gtk.RadioAction group_drawing_tool;
+	public Gtk.ToggleAction action_fullscreen;
+	public Gtk.ToggleAction action_title;	
 
 	/*
 	 * Constructor
@@ -74,8 +80,8 @@ public class MainWindow : Gtk.Window {
 		var action_material = new Gtk.Action ("ActionMaterial", "_Material", "Import, export and organize your game resources", null);
 		var action_music = new Gtk.Action ("ActionMusic", "_Music", "Play music while you work", null);
 		var action_playtest = new Gtk.Action ("ActionPlaytest", "_Play test", "Make a test of your game", null);
-		var action_fullscreen = new Gtk.ToggleAction ("ActionFullScreen", "_Full Screen", "Use full screen in play test mode", null);
-		var action_title = new Gtk.ToggleAction ("ActionTitle", "_Title", "Show title in play test mode", null);
+		this.action_fullscreen = new Gtk.ToggleAction ("ActionFullScreen", "_Full Screen", "Use full screen in play test mode", null);
+		this.action_title = new Gtk.ToggleAction ("ActionTitle", "_Title", "Show title in play test mode", null);
 		var action_content = new Gtk.Action ("ActionContent", "_Content", "View help contents", null);
 		var action_undo = new Gtk.Action ("ActionUndo", "_Undo", "Undo last change", null);
 		var action_select = new Gtk.RadioAction ("ActionSelect", "_Select", "Select a part of the map", null, 0);
@@ -355,7 +361,6 @@ public class MainWindow : Gtk.Window {
 		this.toolbar_sidebar.add (toolitem_rectangle);
 		this.toolbar_sidebar.add (toolitem_circle);
 		this.toolbar_sidebar.add (toolitem_fill);
-		toolitem_pen.set_active (true);
 
 		/*
 		 * Initialize widgets
@@ -425,8 +430,8 @@ public class MainWindow : Gtk.Window {
 		menuitem_music.set_related_action (action_music);
 		menuitem_playtest.set_related_action (action_playtest);
 		menuitem_content.set_related_action (action_content);
-		menuitem_fullscreen.set_related_action (action_fullscreen);
-		menuitem_title.set_related_action (action_title);
+		menuitem_fullscreen.set_related_action (this.action_fullscreen);
+		menuitem_title.set_related_action (this.action_title);
 
 		// Main toolbar
 		toolitem_new.set_related_action (action_new);
@@ -446,8 +451,8 @@ public class MainWindow : Gtk.Window {
 		toolitem_material.set_related_action (action_material);
 		toolitem_music.set_related_action (action_music);
 		toolitem_playtest.set_related_action (action_playtest);
-		tbtb_fullscreen.set_related_action (action_fullscreen);
-		tbtb_title.set_related_action (action_title);
+		tbtb_fullscreen.set_related_action (this.action_fullscreen);
+		tbtb_title.set_related_action (this.action_title);
 		toolitem_content.set_related_action (action_content);
 
 		// Drawing toolbar
@@ -503,8 +508,8 @@ public class MainWindow : Gtk.Window {
 		this.actiongroup_project_open.add_action (action_material);
 		this.actiongroup_project_open.add_action (action_music);
 		this.actiongroup_project_open.add_action (action_playtest);
-		this.actiongroup_project_open.add_action (action_fullscreen);
-		this.actiongroup_project_open.add_action (action_title);
+		this.actiongroup_project_open.add_action (this.action_fullscreen);
+		this.actiongroup_project_open.add_action (this.action_title);
 		this.actiongroup_project_open.add_action (action_undo);
 		this.actiongroup_project_open.add_action (action_select);
 		this.actiongroup_project_open.add_action (action_zoom);
@@ -518,35 +523,77 @@ public class MainWindow : Gtk.Window {
 		this.actiongroup_project_closed.add_action (action_open);
 
 		/*
+		 * Extra references to a Gtk.RadioAction for each group of RadioActions.
+		 * This allows to use group-range methods like get_current_value()
+		 */
+		this.group_layer = action_lower_layer;
+		this.group_scale = action_11_scale;
+		this.group_drawing_tool = action_select;
+
+		/*
+		 * Default values
+		 */
+		this.actiongroup_project_open.set_sensitive (false);
+		this.group_drawing_tool.set_current_value (2); // Pencil
+
+		/*
 		 * Connect signals
 		 */
-		// Change drawing tool
-		action_select.changed.connect (on_tool_change);
+		// Open/Close project
+		action_open.activate.connect (this.controller.open_project);
+		action_close.activate.connect (this.controller.close_project);
+
+		// Show database dialog
+		action_database.activate.connect (this.controller.show_database);
+
+		// Show about dialog
+		menuitem_about.activate.connect (this.controller.on_about);
 
 		// Close application
 		menuitem_quit.activate.connect (on_close);
 		this.destroy.connect (on_close);
-
-		// Show database dialog
-		// FIXME: action signals don't work properly
-		action_database.activate.connect (show_database);
-
-		// Show about dialog
-		menuitem_about.activate.connect (on_about);
 	}
 
 	/*
-	 * Show database
+	 * Get current layer
 	 */
-	private void show_database () {
-		this.controller.show_database ();
+	public int get_current_layer () {
+		return this.group_layer.get_current_value ();
 	}
 
 	/*
-	 * On tool change
+	 * Set current layer
 	 */
-	private void on_tool_change () {
+	public void set_current_layer (int value) {
+		this.group_layer.set_current_value (value);
+	}
 
+	/*
+	 * Get current scale
+	 */
+	public int get_current_scale () {
+		return this.group_scale.get_current_value ();
+	}
+
+	/*
+	 * Set current scale
+	 */
+	public void set_current_scale (int value) {
+		this.group_scale.set_current_value (value);
+	}
+
+	/*
+	 * Get current drawing tool
+	 */
+	public int get_current_drawing_tool () {
+		return this.group_drawing_tool.get_current_value ();
+	}
+
+	/*
+	 * Set current drawing tool
+	 */
+	public void set_current_drawing_tool (int value) {
+		this.group_drawing_tool.set_current_value (value);
 	}
 
 	/*
@@ -555,36 +602,5 @@ public class MainWindow : Gtk.Window {
 	[CCode (instance_pos = -1)]
 	public void on_close () {
 		Gtk.main_quit ();
-	}
-
-	/*
-	 * On about
-	 */
-	private void on_about () {
-		var about_dialog = new Gtk.AboutDialog ();
-		about_dialog.set_transient_for (this);
-		about_dialog.set_modal (true);
-		about_dialog.set_version ("0.1.0");
-		about_dialog.set_license_type (Gtk.License.GPL_3_0);
-		about_dialog.set_program_name ("EasyRPG Editor");
-		about_dialog.set_comments ("A role playing game editor");
-		about_dialog.set_website ("http://easy-rpg.org/");
-		about_dialog.set_copyright ("© EasyRPG Project 2011");
-
-		const string authors[] = {"Héctor Barreiro", "Glynn Clements", "Francisco de la Peña", "Aitor García", "Gabriel Kind", "Alejandro Marzini http://vgvgf.com.ar/", "Shin-NiL", "Rikku2000 http://u-ac.net/rikku2000/gamedev/", "Mariano Suligoy", "Paulo Vizcaíno", "Takeshi Watanabe http://takecheeze.blog47.fc2.com/"};
-		const string artists[] = {"Ben Beltran http://nsovocal.com/", "Juan «Magnífico»", "Marina Navarro http://muerteatartajo.blogspot.com/"};
-		about_dialog.set_authors (authors);
-		about_dialog.set_artists (artists);
-
-		try {
-			var logo = new Gdk.Pixbuf.from_file ("./share/easyrpg/icons/hicolor/48x48/apps/easyrpg.png");
-			about_dialog.set_logo (logo);
-		}
-		catch (Error e) {
-			stderr.printf ("Could not load about dialog logo: %s\n", e.message);
-		}
-
-		about_dialog.run ();
-		about_dialog.destroy ();
 	}
 }
