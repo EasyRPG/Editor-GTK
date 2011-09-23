@@ -179,8 +179,10 @@ public class MainController : Controller {
 		this.main_view.set_current_layer (0);
 		this.main_view.set_current_scale (0);
 		this.main_view.set_current_drawing_tool (2);
-		this.main_view.action_fullscreen.set_active (false);
-		this.main_view.action_title.set_active (false);
+		var action_fullscreen = main_view.get_action_from_name("OpenGroup", "ActionFullScreen") as Gtk.ToggleAction;
+		var action_title = main_view.get_action_from_name("OpenGroup", "ActionTitle") as Gtk.ToggleAction;
+		action_fullscreen.set_active (false);
+		action_title.set_active (false);
 
 		/*
 		 * Test: project is closed?

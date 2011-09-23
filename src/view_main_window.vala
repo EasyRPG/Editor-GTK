@@ -38,8 +38,6 @@ public class MainWindow : Gtk.Window {
 	private Gtk.RadioAction group_layer;
 	private Gtk.RadioAction group_scale;
 	private Gtk.RadioAction group_drawing_tool;
-	public Gtk.ToggleAction action_fullscreen;
-	public Gtk.ToggleAction action_title;	
 
 	/*
 	 * Constructor
@@ -80,8 +78,8 @@ public class MainWindow : Gtk.Window {
 		var action_material = new Gtk.Action ("ActionMaterial", "_Material", "Import, export and organize your game resources", null);
 		var action_music = new Gtk.Action ("ActionMusic", "_Music", "Play music while you work", null);
 		var action_playtest = new Gtk.Action ("ActionPlaytest", "_Play test", "Make a test of your game", null);
-		this.action_fullscreen = new Gtk.ToggleAction ("ActionFullScreen", "_Full Screen", "Use full screen in play test mode", null);
-		this.action_title = new Gtk.ToggleAction ("ActionTitle", "_Title", "Show title in play test mode", null);
+		var action_fullscreen = new Gtk.ToggleAction ("ActionFullScreen", "_Full Screen", "Use full screen in play test mode", null);
+		var action_title = new Gtk.ToggleAction ("ActionTitle", "_Title", "Show title in play test mode", null);
 		var action_content = new Gtk.Action ("ActionContent", "_Content", "View help contents", null);
 		var action_undo = new Gtk.Action ("ActionUndo", "_Undo", "Undo last change", null);
 		var action_select = new Gtk.RadioAction ("ActionSelect", "_Select", "Select a part of the map", null, 0);
@@ -430,8 +428,8 @@ public class MainWindow : Gtk.Window {
 		menuitem_music.set_related_action (action_music);
 		menuitem_playtest.set_related_action (action_playtest);
 		menuitem_content.set_related_action (action_content);
-		menuitem_fullscreen.set_related_action (this.action_fullscreen);
-		menuitem_title.set_related_action (this.action_title);
+		menuitem_fullscreen.set_related_action (action_fullscreen);
+		menuitem_title.set_related_action (action_title);
 
 		// Main toolbar
 		toolitem_new.set_related_action (action_new);
@@ -451,8 +449,8 @@ public class MainWindow : Gtk.Window {
 		toolitem_material.set_related_action (action_material);
 		toolitem_music.set_related_action (action_music);
 		toolitem_playtest.set_related_action (action_playtest);
-		tbtb_fullscreen.set_related_action (this.action_fullscreen);
-		tbtb_title.set_related_action (this.action_title);
+		tbtb_fullscreen.set_related_action (action_fullscreen);
+		tbtb_title.set_related_action (action_title);
 		toolitem_content.set_related_action (action_content);
 
 		// Drawing toolbar
@@ -508,8 +506,8 @@ public class MainWindow : Gtk.Window {
 		this.actiongroup_project_open.add_action (action_material);
 		this.actiongroup_project_open.add_action (action_music);
 		this.actiongroup_project_open.add_action (action_playtest);
-		this.actiongroup_project_open.add_action (this.action_fullscreen);
-		this.actiongroup_project_open.add_action (this.action_title);
+		this.actiongroup_project_open.add_action (action_fullscreen);
+		this.actiongroup_project_open.add_action (action_title);
 		this.actiongroup_project_open.add_action (action_undo);
 		this.actiongroup_project_open.add_action (action_select);
 		this.actiongroup_project_open.add_action (action_zoom);
@@ -582,6 +580,26 @@ public class MainWindow : Gtk.Window {
 		this.group_scale.set_current_value (value);
 	}
 
+	/*
+	 * Get action
+	 * 
+	 * Usage: this method returns a Gtk.Action, so to get other class call it this way:
+	 *	  MainWindow.get_action_from_name (actiongroup_name, action_name) as Gtk.ToggleAction;
+	 *	  MainWindow.get_action_from_name (actiongroup_name, action_name) as Gtk.RadioAction;
+	 */
+	public Gtk.Action? get_action_from_name (string actiongroup_name, string action_name)
+	{
+		Gtk.Action action = null;
+		switch (actiongroup_name) {
+			case "OpenGroup":
+				action = actiongroup_project_open.get_action (action_name);
+				break;
+			case "ClosedGroup":
+				action = actiongroup_project_closed.get_action (action_name);
+				break;
+		}
+		return action;
+	}
 	/*
 	 * Get current drawing tool
 	 */
