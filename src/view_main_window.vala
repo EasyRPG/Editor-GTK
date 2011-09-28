@@ -17,13 +17,15 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * The main window view.
+ */
 public class MainWindow : Gtk.Window {
 	/*
 	 * Properties
 	 */
 	private weak MainController controller;
-	public Gtk.ActionGroup actiongroup_project_open;
-	public Gtk.ActionGroup actiongroup_project_closed;
+
 	private Gtk.DrawingArea drawingarea_maprender;
 	private Gtk.DrawingArea drawingarea_palette;
 	private Gtk.MenuBar menubar_main;
@@ -34,13 +36,23 @@ public class MainWindow : Gtk.Window {
 	private Gtk.Toolbar toolbar_main;
 	private Gtk.Toolbar toolbar_sidebar;
 	private Gtk.TreeView treeview_maptree;
-
+	
 	private Gtk.RadioAction group_layer;
 	private Gtk.RadioAction group_scale;
 	private Gtk.RadioAction group_drawing_tool;
 
-	/*
-	 * Constructor
+	// FIXME: These should be replaced by an easy-to-use method.
+	public Gtk.ToggleAction action_fullscreen;
+	public Gtk.ToggleAction action_title;
+
+	// FIXME: These should be replaced by an easy-to-use method.
+	public Gtk.ActionGroup actiongroup_project_open;
+	public Gtk.ActionGroup actiongroup_project_closed;
+
+	/**
+	 * Builds the main interface.
+	 * 
+	 * @param controller A reference to the controller that launched this view.
 	 */
 	public MainWindow (MainController controller) {
 		/*
@@ -78,8 +90,8 @@ public class MainWindow : Gtk.Window {
 		var action_material = new Gtk.Action ("ActionMaterial", "_Material", "Import, export and organize your game resources", null);
 		var action_music = new Gtk.Action ("ActionMusic", "_Music", "Play music while you work", null);
 		var action_playtest = new Gtk.Action ("ActionPlaytest", "_Play test", "Make a test of your game", null);
-		var action_fullscreen = new Gtk.ToggleAction ("ActionFullScreen", "_Full Screen", "Use full screen in play test mode", null);
-		var action_title = new Gtk.ToggleAction ("ActionTitle", "_Title", "Show title in play test mode", null);
+		this.action_fullscreen = new Gtk.ToggleAction ("ActionFullScreen", "_Full Screen", "Use full screen in play test mode", null);
+		this.action_title = new Gtk.ToggleAction ("ActionTitle", "_Title", "Show title in play test mode", null);
 		var action_content = new Gtk.Action ("ActionContent", "_Content", "View help contents", null);
 		var action_undo = new Gtk.Action ("ActionUndo", "_Undo", "Undo last change", null);
 		var action_select = new Gtk.RadioAction ("ActionSelect", "_Select", "Select a part of the map", null, 0);
@@ -405,9 +417,8 @@ public class MainWindow : Gtk.Window {
 
 		/*
 		 * Connect actions and widgets
-		 *
-		 * IMPORTANT:
-		 * Connect toolbar radioitems before menu radioitems causes a Gtk crash
+		 * 
+		 * IMPORTANT: Connect toolbar radioitems before menu radioitems causes a Gtk crash
 		 */
 		// Menu
 		menuitem_new.set_related_action (action_new);
@@ -428,8 +439,8 @@ public class MainWindow : Gtk.Window {
 		menuitem_music.set_related_action (action_music);
 		menuitem_playtest.set_related_action (action_playtest);
 		menuitem_content.set_related_action (action_content);
-		menuitem_fullscreen.set_related_action (action_fullscreen);
-		menuitem_title.set_related_action (action_title);
+		menuitem_fullscreen.set_related_action (this.action_fullscreen);
+		menuitem_title.set_related_action (this.action_title);
 
 		// Main toolbar
 		toolitem_new.set_related_action (action_new);
@@ -449,8 +460,8 @@ public class MainWindow : Gtk.Window {
 		toolitem_material.set_related_action (action_material);
 		toolitem_music.set_related_action (action_music);
 		toolitem_playtest.set_related_action (action_playtest);
-		tbtb_fullscreen.set_related_action (action_fullscreen);
-		tbtb_title.set_related_action (action_title);
+		tbtb_fullscreen.set_related_action (this.action_fullscreen);
+		tbtb_title.set_related_action (this.action_title);
 		toolitem_content.set_related_action (action_content);
 
 		// Drawing toolbar
@@ -506,8 +517,8 @@ public class MainWindow : Gtk.Window {
 		this.actiongroup_project_open.add_action (action_material);
 		this.actiongroup_project_open.add_action (action_music);
 		this.actiongroup_project_open.add_action (action_playtest);
-		this.actiongroup_project_open.add_action (action_fullscreen);
-		this.actiongroup_project_open.add_action (action_title);
+		this.actiongroup_project_open.add_action (this.action_fullscreen);
+		this.actiongroup_project_open.add_action (this.action_title);
 		this.actiongroup_project_open.add_action (action_undo);
 		this.actiongroup_project_open.add_action (action_select);
 		this.actiongroup_project_open.add_action (action_zoom);
@@ -552,72 +563,63 @@ public class MainWindow : Gtk.Window {
 		this.destroy.connect (on_close);
 	}
 
-	/*
-	 * Get current layer
+	/**
+	 * Returns an int that represents the active layer.
+	 * 
+	 * @return 0 for lower layer; 1 for upper layer; 2 for event layer.
 	 */
 	public int get_current_layer () {
 		return this.group_layer.get_current_value ();
 	}
 
-	/*
-	 * Set current layer
+	/**
+	 * Sets the active layer.
+	 * 
+	 * @param value 0 for lower layer; 1 for upper layer; 2 for event layer.
 	 */
 	public void set_current_layer (int value) {
 		this.group_layer.set_current_value (value);
 	}
 
-	/*
-	 * Get current scale
+	/**
+	 * Returns an int that represents the active layer.
+	 * 
+	 * @return 0 for 1/1; 1 for 1/2; 2 for 1/4; 3 for 1/8.
 	 */
 	public int get_current_scale () {
 		return this.group_scale.get_current_value ();
 	}
 
-	/*
-	 * Set current scale
+	/**
+	 * Sets the active scale.
+	 * 
+	 * @param 0 for 1/1; 1 for 1/2; 2 for 1/4; 3 for 1/8.
 	 */
 	public void set_current_scale (int value) {
 		this.group_scale.set_current_value (value);
 	}
 
-	/*
-	 * Get action
+	/**
+	 * Returns an int that represents the active drawing tool.
 	 * 
-	 * Usage: this method returns a Gtk.Action, so to get other class call it this way:
-	 *	  MainWindow.get_action_from_name (actiongroup_name, action_name) as Gtk.ToggleAction;
-	 *	  MainWindow.get_action_from_name (actiongroup_name, action_name) as Gtk.RadioAction;
-	 */
-	public Gtk.Action? get_action_from_name (string actiongroup_name, string action_name)
-	{
-		Gtk.Action action = null;
-		switch (actiongroup_name) {
-			case "OpenGroup":
-				action = actiongroup_project_open.get_action (action_name);
-				break;
-			case "ClosedGroup":
-				action = actiongroup_project_closed.get_action (action_name);
-				break;
-		}
-		return action;
-	}
-	/*
-	 * Get current drawing tool
+	 * @return 0 for select; 1 for zoom; 2 for pen; 3 for rectangle; 4 for circle; 5 for fill.
 	 */
 	public int get_current_drawing_tool () {
 		return this.group_drawing_tool.get_current_value ();
 	}
 
 	/*
-	 * Set current drawing tool
+	 * Sets the active drawing tool
+	 * 
+	 * @param 0 for select; 1 for zoom; 2 for pen; 3 for rectangle; 4 for circle; 5 for fill.
 	 */
 	public void set_current_drawing_tool (int value) {
 		this.group_drawing_tool.set_current_value (value);
 	}
 
-	/*
-	 * On close
+	/**
+	 * Closes this view, and quits since it is the main window.
 	 */
-	[CCode (instance_pos = -1)]
 	public void on_close () {
 		Gtk.main_quit ();
 	}

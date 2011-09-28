@@ -19,21 +19,32 @@
 
 using GLib;
 
+/**
+ * XmlServer is a tool that uses GLib.MarkupParser to parse XML files and convert their
+ * string-formatted content to XmlNode instances.
+ */
 public class XmlParser {
 	/*
 	 * Properties
 	 */
-	public MarkupParser parser;
-	public MarkupParseContext context;
-	public XmlNode root;
-	public XmlNode current_ref;
+	private MarkupParser parser;
+	private MarkupParseContext context;
 	private int nesting_level = 0;
 
+	/**
+	 * A reference to the root XmlNode of the last parsed file.
+	 */
+	public XmlNode root; // FIXME: replace by a public get_root and make root private
+
 	/*
-	 * Constructor
+	 * An auxiliar reference used to point at XmlNodes when parsing.
+	 */
+	private XmlNode current_ref;
+
+	/**
+	 * Instantiates the parser context, the parser and its callback methods.
 	 */
 	public XmlParser () {
-		// Initialize the parser and its callback methods
 		this.parser = {
 			opening_tag_callback,
 			closing_tag_callback,
@@ -42,7 +53,6 @@ public class XmlParser {
 			error_callback
 		};
 
-		// Initialize the parse context
 		this.context = new MarkupParseContext (
 			this.parser, // MarkupParser instance
 			0,		// MarkupParseFlags
@@ -51,8 +61,10 @@ public class XmlParser {
 		);
 	}
 
-	/*
-	 * Parse file
+	/**
+	 * Converts the XML file to a hierarchically organized list of XmlNodes.
+	 * 
+	 * @param path The path to the XML file.
 	 */
 	public void parse_file (string path) {
 		this.root = null;
@@ -75,7 +87,9 @@ public class XmlParser {
 	}
 
 	/*
-	 * Opening tag callback
+	 * This method is called each time the parser finds an opening tag.
+	 * 
+	 * The parser defines some parameters containing the information related to the tag.
 	 */
 	private void opening_tag_callback (MarkupParseContext ctx, string tag_name,
 	                                   string[] at_names, string[] at_values)
@@ -108,7 +122,7 @@ public class XmlParser {
 			node.attr_values = at_values;
 
 			// Add the node as child and update current_ref
-			this.current_ref.add_children (node);
+			this.current_ref.add_child (node);
 			node.parent = this.current_ref;
 			this.current_ref = node;
 		}
@@ -117,7 +131,9 @@ public class XmlParser {
 	}
 
 	/*
-	 * Closing tag callback
+	 * This method is called each time the parser finds a closing tag.
+	 * 
+	 * The parser defines some parameters containing the information related to the tag.
 	 */
 	private void closing_tag_callback (MarkupParseContext ctx, string tag_name)
                                       throws MarkupError {
@@ -126,7 +142,7 @@ public class XmlParser {
 	}
 
 	/*
-	 * Tag content callback
+	 * This method is called each time the parser finds content inside tags.
 	 */
 	private void tag_content_callback (MarkupParseContext ctx, string content,
 	                                   size_t content_len) throws MarkupError {
@@ -134,7 +150,8 @@ public class XmlParser {
 	}
 
 	/*
-	 * Passthrough callback
+	 * This method is called each time the parser finds comments, processing instructions
+	 * and doctype declarations.
 	 */
 	private void passthrough_callback (MarkupParseContext ctx,
 	                                   string passthrough_text, size_t text_len)
@@ -143,16 +160,18 @@ public class XmlParser {
 	}
 
 	/*
-	 * Error callback
+	 * This method is called when the parser finds an error.
 	 */
 	private void error_callback (MarkupParseContext ctx, Error error) {
 		// Not used yet
 	}
 
-	/*
-	 * Get node
+	/**
+	 * Searchs recursively for the wanted node and returns it if found or null if not.
 	 * 
-	 * A recursive method that returns the wanted node if found or null if not.
+	 * @param name The name of the wanted XmlNode.
+	 * @param node_ref A reference used to track the nodes while searching.
+	 * @return The XmlNode with name "name" if found or null if not. 
 	 */
 	public XmlNode get_node (string name, XmlNode? node_ref = null) {
 		XmlNode? wanted_node = null;

@@ -17,10 +17,11 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * Manages the database dialog and the main window views, and some project-related data
+ * like the game title or the party and vehicle models.
+ */
 public class MainController : Controller {
-	/*
-	 * Properties
-	 */
 	// Views
 	private MainWindow main_view;
 
@@ -37,22 +38,22 @@ public class MainController : Controller {
 	private XmlNode project_data;
 	private XmlNode game_data;
 
-	/*
-	 * Constructor
+	/**
+	 * Instantiantes the MainWindow view.
 	 */
 	public MainController () {
 		this.main_view = new MainWindow (this);
 	}
 
-	/*
-	 * Run
+	/**
+	 * Shows the main view. 
 	 */
 	public override void run () {
 		this.main_view.show_all ();
 	}
 
-	/*
-	 * Open project
+	/**
+	 * Opens a project, loads its data and change the status of some widgets. 
 	 */
 	public void open_project () {
 		var open_project_dialog = new Gtk.FileChooserDialog ("Open Project", this.main_view,
@@ -115,8 +116,8 @@ public class MainController : Controller {
 		open_project_dialog.destroy ();
 	}
 
-	/*
-	 * Load project data
+	/**
+	 * Loads XML data from the .rproject and game.xml files.
 	 */
 	private void load_project_data () {
 		XmlParser parser = new XmlParser ();
@@ -155,8 +156,8 @@ public class MainController : Controller {
 		this.airship.load_data (airship_node);
 	}
 
-	/*
-	 * Close project
+	/**
+	 * Closes the current project and restores the default status of some widgets.
 	 */
 	public void close_project () {
 		// Properties change to null
@@ -179,10 +180,8 @@ public class MainController : Controller {
 		this.main_view.set_current_layer (0);
 		this.main_view.set_current_scale (0);
 		this.main_view.set_current_drawing_tool (2);
-		var action_fullscreen = main_view.get_action_from_name("OpenGroup", "ActionFullScreen") as Gtk.ToggleAction;
-		var action_title = main_view.get_action_from_name("OpenGroup", "ActionTitle") as Gtk.ToggleAction;
-		action_fullscreen.set_active (false);
-		action_title.set_active (false);
+		this.main_view.action_fullscreen.set_active (false);
+		this.main_view.action_title.set_active (false);
 
 		/*
 		 * Test: project is closed?
@@ -203,8 +202,8 @@ public class MainController : Controller {
 		print ("Current drawing tool: %i (should be 2, pencil)\n", this.main_view.get_current_drawing_tool ());
 	}
 
-	/*
-	 * Show database
+	/**
+	 * Instantiates and shows the database dialog.
 	 */
 	public void show_database () {
 		var database_dialog = new DatabaseDialog (this);
@@ -212,8 +211,8 @@ public class MainController : Controller {
 		database_dialog.destroy ();
 	}
 
-	/*
-	 * On about
+	/**
+	 * Instantiates and shows the about dialog.
 	 */
 	public void on_about () {
 		var about_dialog = new Gtk.AboutDialog ();

@@ -17,25 +17,30 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * Represents the party object in the editor. 
+ */
 public class Party : Model {
 	/*
 	 * Properties
 	 */
-	// FIXME - Not int, just a temporary type
-	public int characters {get; set; default = 0;}
+	public int characters {get; set; default = 0;} // FIXME - Not int, just a temporary type
 	public int map_id {get; set; default = 0;}
+
+	/**
+	 * Object X coordinate in tile units. Default is 0.
+	 */
 	public int x {get; set; default = 0;}
+
+	/**
+	 * Object Y coordinate in tile units. Default is 0.
+	 */
 	public int y {get; set; default = 0;}
 
-	/*
-	 * Constructor
-	 */
-	public Party () {
-
-	}
-
-	/*
-	 * Load data
+	/**
+	 * Loads the party data from an XmlNode object.
+	 * 
+	 * @param data An XmlNode that contains the party data.
 	 */
 	public override void load_data (XmlNode data) {
 		int map_id = 0;

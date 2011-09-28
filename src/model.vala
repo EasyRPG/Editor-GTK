@@ -17,13 +17,15 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * The parent class for models.
+ */
 public abstract class Model {
-	/*
-	 * Constructor
+
+	/**
+	 * Every model must have its load data method, with a XmlNode data parameter.
+	 * 
+	 * @param data An XmlNode that represents some XML data. 
 	 */
-	public Model () {
-
-	}
-
 	public abstract void load_data (XmlNode data);
 }

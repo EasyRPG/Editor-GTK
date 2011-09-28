@@ -17,13 +17,13 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * The parent class for controllers.
+ */
 public abstract class Controller {
-	/*
-	 * Constructor
+
+	/**
+	 * Every controller must have its run method, where at least one view must be instantiated.
 	 */
-	public Controller () {
-
-	}
-
 	public abstract void run ();
 }

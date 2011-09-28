@@ -17,6 +17,9 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * The database window view.
+ */
 public class DatabaseDialog : Gtk.Dialog {
 	/*
 	 * Properties
@@ -29,7 +32,12 @@ public class DatabaseDialog : Gtk.Dialog {
 	private Gtk.ListStore actor_list;
 	private Gtk.Notebook notebook;
 	private Gtk.TreeView actorlist_view;
-	
+
+	/**
+	 * Builds the database interface.
+	 * 
+	 * @param controller A reference to the controller that launched this view.
+	 */
 	public DatabaseDialog (MainController controller) {
 		/*
 		 * Initialize properties
@@ -76,10 +84,9 @@ public class DatabaseDialog : Gtk.Dialog {
 		//this.close.connect (on_close);
 	}
 
-	/*
-	 * On close
+	/**
+	 * Closes this view.
 	 */
-	[CCode (instance_pos = -1)]
 	public void on_close (Gtk.Dialog dialog) {
 		dialog.destroy ();
 	}

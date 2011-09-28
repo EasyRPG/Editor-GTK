@@ -17,25 +17,30 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * Represents a vehicle object in the editor. 
+ */
 public class Vehicle : Model {
 	/*
 	 * Properties
 	 */
-	// FIXME - Not int, just a temporary type
-	public int image {get; set; default = 0;}
+	public int image {get; set; default = 0;} // FIXME - Not int, just a temporary type
 	public int map_id {get; set; default = 0;}
+
+	/**
+	 * Object X coordinate in tile units. Default is 0.
+	 */
 	public int x {get; set; default = 0;}
+
+	/**
+	 * Object Y coordinate in tile units. Default is 0
+	 */
 	public int y {get; set; default = 0;}
 
-	/*
-	 * Constructor
-	 */	
-	public Vehicle () {
-
-	}
-
-	/*
-	 * Load data
+	/**
+	 * Loads the vehicle data from an XmlNode object.
+	 * 
+	 * @param data An XmlNode that contains the vehicle data.
 	 */
 	public override void load_data (XmlNode data) {
 		int map_id = 0;

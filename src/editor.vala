@@ -17,28 +17,28 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * Editor is the application class, the starting point for the app.
+ */
 public class Editor {
-	/*
-	 * Properties
-	 */
-	MainController main_controller;
+	private MainController main_controller;
 
-	/*
-	 * Constructor
+	/**
+	 * Instantiates the main controller.
 	 */
 	public Editor () {
 		this.main_controller = new MainController ();
 	}
 
-	/*
-	 * Run
+	/**
+	 * Launches the main_controller's run method.
 	 */
 	public void run () {
 		this.main_controller.run ();
 	}
 
-	/*
-	 * Main
+	/**
+	 * The application entry point.
 	 */
 	static int main (string[] args) {
 		Gtk.init (ref args);
