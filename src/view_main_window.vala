@@ -25,7 +25,6 @@ public class MainWindow : Gtk.Window {
 	 * Properties
 	 */
 	private weak MainController controller;
-
 	private Gtk.DrawingArea drawingarea_maprender;
 	private Gtk.DrawingArea drawingarea_palette;
 	private Gtk.MenuBar menubar_main;
@@ -36,18 +35,16 @@ public class MainWindow : Gtk.Window {
 	private Gtk.Toolbar toolbar_main;
 	private Gtk.Toolbar toolbar_sidebar;
 	private Gtk.TreeView treeview_maptree;
-	
-	private Gtk.RadioAction group_layer;
-	private Gtk.RadioAction group_scale;
-	private Gtk.RadioAction group_drawing_tool;
 
-	// FIXME: These should be replaced by an easy-to-use method.
-	public Gtk.ToggleAction action_fullscreen;
-	public Gtk.ToggleAction action_title;
+	private Gtk.RadioAction radio_layer;
+	private Gtk.RadioAction radio_scale;
+	private Gtk.RadioAction radio_drawing_tool;
 
-	// FIXME: These should be replaced by an easy-to-use method.
-	public Gtk.ActionGroup actiongroup_project_open;
-	public Gtk.ActionGroup actiongroup_project_closed;
+	private Gtk.ToggleAction toggle_fullscreen;
+	private Gtk.ToggleAction toggle_show_title;
+
+	private Gtk.ActionGroup actiongroup_project_open;
+	private Gtk.ActionGroup actiongroup_project_closed;
 
 	/**
 	 * Builds the main interface.
@@ -90,8 +87,8 @@ public class MainWindow : Gtk.Window {
 		var action_material = new Gtk.Action ("ActionMaterial", "_Material", "Import, export and organize your game resources", null);
 		var action_music = new Gtk.Action ("ActionMusic", "_Music", "Play music while you work", null);
 		var action_playtest = new Gtk.Action ("ActionPlaytest", "_Play test", "Make a test of your game", null);
-		this.action_fullscreen = new Gtk.ToggleAction ("ActionFullScreen", "_Full Screen", "Use full screen in play test mode", null);
-		this.action_title = new Gtk.ToggleAction ("ActionTitle", "_Title", "Show title in play test mode", null);
+		var action_fullscreen = new Gtk.ToggleAction ("ActionFullScreen", "_Full Screen", "Use full screen in play test mode", null);
+		var action_show_title = new Gtk.ToggleAction ("ActionShowTitle", "_Show Title", "Show title in play test mode", null);
 		var action_content = new Gtk.Action ("ActionContent", "_Content", "View help contents", null);
 		var action_undo = new Gtk.Action ("ActionUndo", "_Undo", "Undo last change", null);
 		var action_select = new Gtk.RadioAction ("ActionSelect", "_Select", "Select a part of the map", null, 0);
@@ -100,6 +97,13 @@ public class MainWindow : Gtk.Window {
 		var action_rectangle = new Gtk.RadioAction ("ActionRectangle", "_Rectangle", "Draw using a Rectangle tool", null, 3);
 		var action_circle = new Gtk.RadioAction ("ActionCircle", "_Circle", "Draw using a Circle tool", null, 4);
 		var action_fill = new Gtk.RadioAction ("ActionFill", "_Fill", "Fill a selected area", null, 5);
+
+		/*
+		 * Extra references to a Gtk.RadioAction for each group of RadioActions.
+		 * This allows to use group-range methods like get_current_value()
+		 */
+		this.toggle_fullscreen = action_fullscreen;
+		this.toggle_show_title = action_show_title;
 
 		/*
 		 * Initialize main toolbar
@@ -141,9 +145,9 @@ public class MainWindow : Gtk.Window {
 		var tbtb_fullscreen = new Gtk.ToggleToolButton ();
 		tbtb_fullscreen.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/fullscreen.png"));
 		tbtb_fullscreen.set_use_action_appearance (true);
-		var tbtb_title = new Gtk.ToggleToolButton ();
-		tbtb_title.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/title.png"));
-		tbtb_title.set_use_action_appearance (true);
+		var tbtb_show_title = new Gtk.ToggleToolButton ();
+		tbtb_show_title.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/title.png"));
+		tbtb_show_title.set_use_action_appearance (true);
 		var toolitem_content = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/help.png"), "Contents");
 		toolitem_content.set_use_action_appearance (true);
 
@@ -268,8 +272,8 @@ public class MainWindow : Gtk.Window {
 		// Toggle items
 		var menuitem_fullscreen = new Gtk.CheckMenuItem();
 		menuitem_fullscreen.set_use_action_appearance (true);
-		var menuitem_title = new Gtk.CheckMenuItem();
-		menuitem_title.set_use_action_appearance (true);
+		var menuitem_show_title = new Gtk.CheckMenuItem();
+		menuitem_show_title.set_use_action_appearance (true);
 
 		/*
 		 * Menu layout
@@ -297,7 +301,7 @@ public class MainWindow : Gtk.Window {
 		menu_test.add (menuitem_playtest);
 		menu_test.add (new Gtk.SeparatorMenuItem ());
 		menu_test.add (menuitem_fullscreen);
-		menu_test.add (menuitem_title);
+		menu_test.add (menuitem_show_title);
 		menu_help.add (menuitem_content);
 		menu_help.add (new Gtk.SeparatorMenuItem ());
 		menu_help.add (menuitem_about);
@@ -351,7 +355,7 @@ public class MainWindow : Gtk.Window {
 		this.toolbar_main.add (toolitem_playtest);
 		this.toolbar_main.add (new Gtk.SeparatorToolItem());
 		this.toolbar_main.add (tbtb_fullscreen);
-		this.toolbar_main.add (tbtb_title);
+		this.toolbar_main.add (tbtb_show_title);
 		this.toolbar_main.add (new Gtk.SeparatorToolItem());
 		this.toolbar_main.add (toolitem_content);
 
@@ -439,8 +443,8 @@ public class MainWindow : Gtk.Window {
 		menuitem_music.set_related_action (action_music);
 		menuitem_playtest.set_related_action (action_playtest);
 		menuitem_content.set_related_action (action_content);
-		menuitem_fullscreen.set_related_action (this.action_fullscreen);
-		menuitem_title.set_related_action (this.action_title);
+		menuitem_fullscreen.set_related_action (action_fullscreen);
+		menuitem_show_title.set_related_action (action_show_title);
 
 		// Main toolbar
 		toolitem_new.set_related_action (action_new);
@@ -460,8 +464,8 @@ public class MainWindow : Gtk.Window {
 		toolitem_material.set_related_action (action_material);
 		toolitem_music.set_related_action (action_music);
 		toolitem_playtest.set_related_action (action_playtest);
-		tbtb_fullscreen.set_related_action (this.action_fullscreen);
-		tbtb_title.set_related_action (this.action_title);
+		tbtb_fullscreen.set_related_action (action_fullscreen);
+		tbtb_show_title.set_related_action (action_show_title);
 		toolitem_content.set_related_action (action_content);
 
 		// Drawing toolbar
@@ -517,8 +521,8 @@ public class MainWindow : Gtk.Window {
 		this.actiongroup_project_open.add_action (action_material);
 		this.actiongroup_project_open.add_action (action_music);
 		this.actiongroup_project_open.add_action (action_playtest);
-		this.actiongroup_project_open.add_action (this.action_fullscreen);
-		this.actiongroup_project_open.add_action (this.action_title);
+		this.actiongroup_project_open.add_action (action_fullscreen);
+		this.actiongroup_project_open.add_action (action_show_title);
 		this.actiongroup_project_open.add_action (action_undo);
 		this.actiongroup_project_open.add_action (action_select);
 		this.actiongroup_project_open.add_action (action_zoom);
@@ -535,15 +539,15 @@ public class MainWindow : Gtk.Window {
 		 * Extra references to a Gtk.RadioAction for each group of RadioActions.
 		 * This allows to use group-range methods like get_current_value()
 		 */
-		this.group_layer = action_lower_layer;
-		this.group_scale = action_11_scale;
-		this.group_drawing_tool = action_select;
+		this.radio_layer = action_lower_layer;
+		this.radio_scale = action_11_scale;
+		this.radio_drawing_tool = action_select;
 
 		/*
 		 * Default values
 		 */
 		this.actiongroup_project_open.set_sensitive (false);
-		this.group_drawing_tool.set_current_value (2); // Pencil
+		this.radio_drawing_tool.set_current_value (2); // Pencil
 
 		/*
 		 * Connect signals
@@ -569,7 +573,7 @@ public class MainWindow : Gtk.Window {
 	 * @return 0 for lower layer; 1 for upper layer; 2 for event layer.
 	 */
 	public int get_current_layer () {
-		return this.group_layer.get_current_value ();
+		return this.radio_layer.get_current_value ();
 	}
 
 	/**
@@ -578,7 +582,7 @@ public class MainWindow : Gtk.Window {
 	 * @param value 0 for lower layer; 1 for upper layer; 2 for event layer.
 	 */
 	public void set_current_layer (int value) {
-		this.group_layer.set_current_value (value);
+		this.radio_layer.set_current_value (value);
 	}
 
 	/**
@@ -587,7 +591,7 @@ public class MainWindow : Gtk.Window {
 	 * @return 0 for 1/1; 1 for 1/2; 2 for 1/4; 3 for 1/8.
 	 */
 	public int get_current_scale () {
-		return this.group_scale.get_current_value ();
+		return this.radio_scale.get_current_value ();
 	}
 
 	/**
@@ -596,7 +600,7 @@ public class MainWindow : Gtk.Window {
 	 * @param 0 for 1/1; 1 for 1/2; 2 for 1/4; 3 for 1/8.
 	 */
 	public void set_current_scale (int value) {
-		this.group_scale.set_current_value (value);
+		this.radio_scale.set_current_value (value);
 	}
 
 	/**
@@ -605,20 +609,68 @@ public class MainWindow : Gtk.Window {
 	 * @return 0 for select; 1 for zoom; 2 for pen; 3 for rectangle; 4 for circle; 5 for fill.
 	 */
 	public int get_current_drawing_tool () {
-		return this.group_drawing_tool.get_current_value ();
+		return this.radio_drawing_tool.get_current_value ();
 	}
 
-	/*
+	/**
 	 * Sets the active drawing tool
 	 * 
 	 * @param 0 for select; 1 for zoom; 2 for pen; 3 for rectangle; 4 for circle; 5 for fill.
 	 */
 	public void set_current_drawing_tool (int value) {
-		this.group_drawing_tool.set_current_value (value);
+		this.radio_drawing_tool.set_current_value (value);
 	}
 
 	/**
-	 * Closes this view, and quits since it is the main window.
+	 * Returns whether the fullscreen option is active or not.
+	 */
+	public bool get_fullscreen_status () {
+		return this.toggle_fullscreen.get_active ();
+	}
+
+	/**
+	 * Sets the fullscreen option status.
+	 */
+	public void set_fullscreen_status (bool status) {
+		this.toggle_fullscreen.set_active (status);
+	}
+
+	/**
+	 * Returns whether the show title option is active or not.
+	 */
+	public bool get_show_title_status () {
+		return this.toggle_show_title.get_active ();
+	}
+
+	/**
+	 * Sets the show title option status.
+	 */
+	public void set_show_title_status (bool status) {
+		this.toggle_show_title.set_active (status);
+	}
+
+	/**
+	 * Sets the project status (open or closed).
+	 *
+	 * @param status A string containing "open" or "closed".
+	 */
+	public void set_project_status (string status) {
+		switch (status) {
+			case "open":
+				this.actiongroup_project_open.set_sensitive (true);
+				this.actiongroup_project_closed.set_sensitive (false);
+				break;
+			case "closed":
+				this.actiongroup_project_closed.set_sensitive (true);
+				this.actiongroup_project_open.set_sensitive (false);
+				break;
+			default:
+				return;
+		}
+	}	
+
+	/**
+	 * Closes this view and quit the application.
 	 */
 	public void on_close () {
 		Gtk.main_quit ();

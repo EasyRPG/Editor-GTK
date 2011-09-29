@@ -109,9 +109,8 @@ public class MainController : Controller {
 			print ("  y: %i\n", this.airship.y);
 			print ("Current scale: %i\n\n", this.main_view.get_current_scale ());
 
-			// Enable/disable some ToolItems and MenuItems
-			this.main_view.actiongroup_project_closed.set_sensitive (false);
-			this.main_view.actiongroup_project_open.set_sensitive (true);
+			// Enable/disable some widgets
+			this.main_view.set_project_status ("open");
 		}
 		open_project_dialog.destroy ();
 	}
@@ -124,7 +123,7 @@ public class MainController : Controller {
 		
 		// Load data from the .rproject file
 		parser.parse_file (this.base_path + this.project_filename);
-		this.project_data = parser.root;
+		this.project_data = parser.get_root ();
 
 		int current_map = int.parse (parser.get_node ("current_map").content);
 		int current_scale = int.parse (parser.get_node ("current_scale").content);
@@ -134,7 +133,7 @@ public class MainController : Controller {
 
 		// Load data from game.xml and instantiate the party and vehicles
 		parser.parse_file (this.base_path + "data/game.xml");
-		this.game_data = parser.root;
+		this.game_data = parser.get_root ();
 
 		XmlNode title_node = parser.get_node ("title");
 		this.game_title = title_node.content;
@@ -172,16 +171,15 @@ public class MainController : Controller {
 		this.ship = null;
 		this.airship = null;
 
-		// Enable/disable some ToolItems and MenuItems
-		this.main_view.actiongroup_project_open.set_sensitive (false);
-		this.main_view.actiongroup_project_closed.set_sensitive (true);
+		// Enable/disable some widgets
+		this.main_view.set_project_status ("closed");
 
 		// Set default values for RadioActions and ToggleActions
 		this.main_view.set_current_layer (0);
 		this.main_view.set_current_scale (0);
 		this.main_view.set_current_drawing_tool (2);
-		this.main_view.action_fullscreen.set_active (false);
-		this.main_view.action_title.set_active (false);
+		this.main_view.set_fullscreen_status (false);
+		this.main_view.set_show_title_status (false);
 
 		/*
 		 * Test: project is closed?

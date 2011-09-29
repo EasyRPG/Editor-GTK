@@ -17,8 +17,6 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using GLib;
-
 /**
  * XmlServer is a tool that uses GLib.MarkupParser to parse XML files and convert their
  * string-formatted content to XmlNode instances.
@@ -27,14 +25,14 @@ public class XmlParser {
 	/*
 	 * Properties
 	 */
-	private MarkupParser parser;
-	private MarkupParseContext context;
+	private GLib.MarkupParser parser;
+	private GLib.MarkupParseContext context;
 	private int nesting_level = 0;
 
 	/**
 	 * A reference to the root XmlNode of the last parsed file.
 	 */
-	public XmlNode root; // FIXME: replace by a public get_root and make root private
+	private XmlNode root;
 
 	/*
 	 * An auxiliar reference used to point at XmlNodes when parsing.
@@ -53,7 +51,7 @@ public class XmlParser {
 			error_callback
 		};
 
-		this.context = new MarkupParseContext (
+		this.context = new GLib.MarkupParseContext (
 			this.parser, // MarkupParser instance
 			0,		// MarkupParseFlags
 			this,   // User data
@@ -70,7 +68,7 @@ public class XmlParser {
 		this.root = null;
 
 		try {
-			File file = File.new_for_path (path);
+			GLib.File file = GLib.File.new_for_path (path);
 			
 			string file_content;
 			file.load_contents (null, out file_content);
@@ -81,7 +79,7 @@ public class XmlParser {
 
 			this.context.parse (file_content, -1);
 		}
-		catch (Error e) {
+		catch (GLib.Error e) {
 			stderr.printf ("File '%s' not found", path);
 		}	
 	}
@@ -91,9 +89,9 @@ public class XmlParser {
 	 * 
 	 * The parser defines some parameters containing the information related to the tag.
 	 */
-	private void opening_tag_callback (MarkupParseContext ctx, string tag_name,
+	private void opening_tag_callback (GLib.MarkupParseContext ctx, string tag_name,
 	                                   string[] at_names, string[] at_values)
-                                      throws MarkupError {
+                                      throws GLib.MarkupError {
 		/*
 		 * Root Node
 		 *
@@ -135,8 +133,8 @@ public class XmlParser {
 	 * 
 	 * The parser defines some parameters containing the information related to the tag.
 	 */
-	private void closing_tag_callback (MarkupParseContext ctx, string tag_name)
-                                      throws MarkupError {
+	private void closing_tag_callback (GLib.MarkupParseContext ctx, string tag_name)
+                                      throws GLib.MarkupError {
 		this.current_ref = this.current_ref.parent;
 		this.nesting_level--;
 	}
@@ -144,8 +142,8 @@ public class XmlParser {
 	/*
 	 * This method is called each time the parser finds content inside tags.
 	 */
-	private void tag_content_callback (MarkupParseContext ctx, string content,
-	                                   size_t content_len) throws MarkupError {
+	private void tag_content_callback (GLib.MarkupParseContext ctx, string content, size_t content_len)
+                                      throws GLib.MarkupError {
 		this.current_ref.content = content;
 	}
 
@@ -153,17 +151,20 @@ public class XmlParser {
 	 * This method is called each time the parser finds comments, processing instructions
 	 * and doctype declarations.
 	 */
-	private void passthrough_callback (MarkupParseContext ctx,
-	                                   string passthrough_text, size_t text_len)
-                                      throws MarkupError {
+	private void passthrough_callback (GLib.MarkupParseContext ctx, string passthrough_text, size_t text_len)
+                                      throws GLib.MarkupError {
 		// Not used yet
 	}
 
 	/*
 	 * This method is called when the parser finds an error.
 	 */
-	private void error_callback (MarkupParseContext ctx, Error error) {
+	private void error_callback (GLib.MarkupParseContext ctx, GLib.Error error) {
 		// Not used yet
+	}
+
+	public XmlNode get_root () {
+		return this.root;
 	}
 
 	/**
