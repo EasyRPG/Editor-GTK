@@ -1,6 +1,6 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * party_model.vala
+ * model_party.vala
  * Copyright (C) EasyRPG Project 2011
  *
  * EasyRPG is free software: you can redistribute it and/or modify it

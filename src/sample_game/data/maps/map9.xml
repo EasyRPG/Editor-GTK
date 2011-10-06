@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<map>
+	<name>Mapa9</name>
+	<parent_id>3</parent_id>
+	<order>0</order>
+	<width>20</width>
+	<height>15</height>
+	<tileset>basis.png</tileset>
+	<scroll_type>0</scroll_type>
+	<panorama>
+		<filename></filename>
+		<horizontal_loop>false</horizontal_loop>
+		<horizontal_autoscroll>false</horizontal_autoscroll>
+		<horizontal_autoscroll_speed>0</horizontal_autoscroll_speed>
+		<vertical_loop>false</vertical_loop>
+		<vertical_autoscroll>false</vertical_autoscroll>
+		<vertical_autoscroll_speed>0</vertical_autoscroll_speed>
+	</panorama>
+	<bgm>
+		<type>1</type>
+		<filename></filename>
+	</bgm>
+	<backdrop>
+		<type>1</type>
+		<filename></filename>
+	</backdrop>
+	<teleport>
+		<type>1</type>
+		<allow>true</allow>
+	</teleport>
+	<escape>
+		<type>1</type>
+		<allow>true</allow>
+	</escape>
+	<save>
+		<type>1</type>
+		<allow>true</allow>
+	</save>
+	<layers>
+		<layer>
+			<tiles>1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</tiles>
+		</layer>
+		<layer>
+			<tiles>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</tiles>
+		</layer>
+	</layers>
+	<enemy_encounter_steps>25</enemy_encounter_steps>
+	<save_time>0</save_time>
+</map>

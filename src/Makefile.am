@@ -24,6 +24,8 @@ editor_SOURCES = \
 	controller_main.vala \
 	editor.vala \
 	model.vala \
+	model_layer.vala \
+	model_map.vala \
 	model_party.vala \
 	model_vehicle.vala \
 	view_database_dialog.vala \

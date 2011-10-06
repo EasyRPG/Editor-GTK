@@ -83,31 +83,7 @@ public class MainController : Controller {
 
 			// Manages all the XML read stuff
 			this.load_project_data ();
-
-			/*
-			 * Test: XML data loaded successfully?
-			 */
-			print ("********************************\n");
-			print ("OPEN\n");
-			print ("********************************\n");
-			print ("Game title: %s\n", this.game_title);
-			print ("Party data:\n");
-			print ("  map_id: %i\n", this.party.map_id);
-			print ("  x: %i\n", this.party.x);
-			print ("  y: %i\n", this.party.y);
-			print ("Boat data:\n");
-			print ("  map_id: %i\n", this.boat.map_id);
-			print ("  x: %i\n", this.boat.x);
-			print ("  y: %i\n", this.boat.y);
-			print ("Ship data:\n");
-			print ("  map_id: %i\n", this.ship.map_id);
-			print ("  x: %i\n", this.ship.x);
-			print ("  y: %i\n", this.ship.y);
-			print ("Airship data:\n");
-			print ("  map_id: %i\n", this.airship.map_id);
-			print ("  x: %i\n", this.airship.x);
-			print ("  y: %i\n", this.airship.y);
-			print ("Current scale: %i\n\n", this.main_view.get_current_scale ());
+			this.load_maps_data ();
 
 			// Enable/disable some widgets
 			this.main_view.set_project_status ("open");
@@ -156,10 +132,28 @@ public class MainController : Controller {
 	}
 
 	/**
+	 * Loads XML data from the map files.
+	 */
+	public void load_maps_data () {
+		XmlParser parser = new XmlParser ();
+
+		/*
+		 * Load example
+		 * 
+		 * The next goal is to load all the maps
+		 */
+		parser.parse_file (this.base_path + "data/maps/map1.xml");
+		XmlNode map_node = parser.get_root ();
+		
+		Map test_map = new Map ();
+		test_map.load_data (map_node);
+	}
+
+	/**
 	 * Closes the current project and restores the default status of some widgets.
 	 */
 	public void close_project () {
-		// Properties change to null
+		// Properties are set to null
 		this.game_title = null;
 		this.project_filename = null;
 		this.base_path = null;
@@ -180,24 +174,6 @@ public class MainController : Controller {
 		this.main_view.set_current_drawing_tool (2);
 		this.main_view.set_fullscreen_status (false);
 		this.main_view.set_show_title_status (false);
-
-		/*
-		 * Test: project is closed?
-		 * 
-		 * When a project is closed, all the data changes to null and the RadioActions
-		 * change to the default value: Lower layer, 1/1 scale and Pencil tool. 
-		 */
-		print ("********************************\n");
-		print ("CLOSED\n");
-		print ("********************************\n");
-		print ("Game title: %s\n", this.game_title ?? "null");		
-		print ("Party: %s\n", this.party == null ? "null" : "exists");
-		print ("Boat data: %s\n", this.boat == null ? "null" : "exists");
-		print ("Ship data: %s\n", this.ship == null ? "null" : "exists");
-		print ("Airship data: %s\n", this.airship == null ? "null" : "exists");
-		print ("Current layer: %i (should be 0, lower layer)\n", this.main_view.get_current_layer ());
-		print ("Current scale: %i (should be 0, 1/1 scale)\n", this.main_view.get_current_scale ());
-		print ("Current drawing tool: %i (should be 2, pencil)\n", this.main_view.get_current_drawing_tool ());
 	}
 
 	/**
