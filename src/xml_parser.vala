@@ -22,16 +22,18 @@
  * string-formatted content to XmlNode instances.
  */
 public class XmlParser {
+	// Since Vala 0.14 parser started to crash. The solution is declare it as const
+	const GLib.MarkupParser parser = {
+		opening_tag_callback,
+		closing_tag_callback,
+		tag_content_callback,
+		passthrough_callback,
+		error_callback
+	};
+
 	/*
 	 * Properties
 	 */
-	const GLib.MarkupParser parser = {
-			opening_tag_callback,
-			closing_tag_callback,
-			tag_content_callback,
-			passthrough_callback,
-			error_callback
-		};
 	private GLib.MarkupParseContext context;
 	private int nesting_level = 0;
 
@@ -46,7 +48,7 @@ public class XmlParser {
 	private XmlNode current_ref;
 
 	/**
-	 * Instantiates the parser context, the parser and its callback methods.
+	 * Instantiates the parse context.
 	 */
 	public XmlParser () {
 		this.context = new GLib.MarkupParseContext (
@@ -67,11 +69,16 @@ public class XmlParser {
 
 		try {
 			GLib.File file = GLib.File.new_for_path (path);
+
 			string file_content;
-			
-			load_file_content (file, out file_content);
-			
-			this.context.parse (file_content, -1);
+
+			if (GLib.FileUtils.get_contents (path, out file_content)) {
+				// Delete blank spaces
+				file_content = file_content.replace ("\t", "");
+				file_content = file_content.replace ("\n", "");
+
+				this.context.parse (file_content, -1);
+			}
 		}
 		catch (GLib.Error e) {
 			stderr.printf ("File '%s' not found", path);
@@ -121,22 +128,7 @@ public class XmlParser {
 
 		this.nesting_level++;
 	}
-	
-	/**
-	 * Loads the content of a file to a string as plain text.
-	 * 
-	 * @param file The file to be load.
-	 * @param the string where content will be saved.
-	 */
-	private void load_file_content (GLib.File file, out string file_content) {
-		uint8[] raw_content;
-		file.load_contents (null, out raw_content);
-		file_content = (string) (owned) raw_content;
 
-		// Delete blank spaces
-		file_content = file_content.replace ("\t", "");
-		file_content = file_content.replace ("\n", "");
-	}
 	/*
 	 * This method is called each time the parser finds a closing tag.
 	 * 
