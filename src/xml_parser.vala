@@ -25,7 +25,13 @@ public class XmlParser {
 	/*
 	 * Properties
 	 */
-	private GLib.MarkupParser parser;
+	const GLib.MarkupParser parser = {
+			opening_tag_callback,
+			closing_tag_callback,
+			tag_content_callback,
+			passthrough_callback,
+			error_callback
+		};
 	private GLib.MarkupParseContext context;
 	private int nesting_level = 0;
 
@@ -43,14 +49,6 @@ public class XmlParser {
 	 * Instantiates the parser context, the parser and its callback methods.
 	 */
 	public XmlParser () {
-		this.parser = {
-			opening_tag_callback,
-			closing_tag_callback,
-			tag_content_callback,
-			passthrough_callback,
-			error_callback
-		};
-
 		this.context = new GLib.MarkupParseContext (
 			this.parser, // MarkupParser instance
 			0,		// MarkupParseFlags
@@ -58,7 +56,7 @@ public class XmlParser {
 			null	// User data destroy notifier
 		);
 	}
-
+	
 	/**
 	 * Converts the XML file to a hierarchically organized list of XmlNodes.
 	 * 
@@ -69,14 +67,10 @@ public class XmlParser {
 
 		try {
 			GLib.File file = GLib.File.new_for_path (path);
-			
 			string file_content;
-			file.load_contents (null, out file_content);
-
-			// FIXME: Move these replaces to our own replace method?
-			file_content = file_content.replace ("\t", "");
-			file_content = file_content.replace ("\n", "");
-
+			
+			load_file_content (file, out file_content);
+			
 			this.context.parse (file_content, -1);
 		}
 		catch (GLib.Error e) {
@@ -127,7 +121,22 @@ public class XmlParser {
 
 		this.nesting_level++;
 	}
+	
+	/**
+	 * Loads the content of a file to a string as plain text.
+	 * 
+	 * @param file The file to be load.
+	 * @param the string where content will be saved.
+	 */
+	private void load_file_content (GLib.File file, out string file_content) {
+		uint8[] raw_content;
+		file.load_contents (null, out raw_content);
+		file_content = (string) (owned) raw_content;
 
+		// Delete blank spaces
+		file_content = file_content.replace ("\t", "");
+		file_content = file_content.replace ("\n", "");
+	}
 	/*
 	 * This method is called each time the parser finds a closing tag.
 	 * 
