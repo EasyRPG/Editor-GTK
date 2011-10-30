@@ -327,7 +327,7 @@ public class MainWindow : Gtk.Window {
 		 * Main toolbar layout
 		 */
 		this.toolbar_main = new Gtk.Toolbar ();
-		this.toolbar_main.get_style_context ().add_class (Gtk.STYLE_CLASS_INLINE_TOOLBAR);
+		this.toolbar_main.get_style_context ().add_class (Gtk.STYLE_CLASS_PRIMARY_TOOLBAR);
 
 		// Add buttons
 		this.toolbar_main.add (toolitem_new);
@@ -364,7 +364,7 @@ public class MainWindow : Gtk.Window {
 		 */
 		this.toolbar_sidebar = new Gtk.Toolbar ();
 		this.toolbar_sidebar.set_show_arrow (false);
-		this.toolbar_sidebar.get_style_context ().add_class (Gtk.STYLE_CLASS_INLINE_TOOLBAR);
+		this.toolbar_sidebar.get_style_context ().add_class (Gtk.STYLE_CLASS_PRIMARY_TOOLBAR);
 
 		// Add buttons
 		this.toolbar_sidebar.add (toolitem_undo);
