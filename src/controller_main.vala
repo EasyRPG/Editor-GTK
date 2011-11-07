@@ -81,12 +81,13 @@ public class MainController : Controller {
 			this.project_filename = path_tokens[path_tokens.length - 1];
 			this.base_path = full_path.replace (this.project_filename, "");
 
+			// Enable/disable some widgets
+			this.main_view.set_project_status ("open");
+			
 			// Manages all the XML read stuff
 			this.load_project_data ();
 			this.load_maps_data ();
 
-			// Enable/disable some widgets
-			this.main_view.set_project_status ("open");
 		}
 		open_project_dialog.destroy ();
 	}
@@ -100,12 +101,16 @@ public class MainController : Controller {
 		// Load data from the .rproject file
 		parser.parse_file (this.base_path + this.project_filename);
 		this.project_data = parser.get_root ();
-
 		int current_map = int.parse (parser.get_node ("current_map").content);
 		int current_scale = int.parse (parser.get_node ("current_scale").content);
+		int current_layer = int.parse (parser.get_node ("current_layer").content);
 		if (current_scale > 0 && current_scale < 4) {
 			this.main_view.set_current_scale (current_scale);
 		}
+		if (current_layer > 0 && current_layer < 3) {
+			this.main_view.set_current_layer (current_layer);
+		}
+		this.main_view.update_statusbar_current_frame();
 
 		// Load data from game.xml and instantiate the party and vehicles
 		parser.parse_file (this.base_path + "data/game.xml");
@@ -129,6 +134,7 @@ public class MainController : Controller {
 		this.airship = new Vehicle ();
 		XmlNode airship_node = parser.get_node ("airship");
 		this.airship.load_data (airship_node);
+
 	}
 
 	/**
@@ -174,6 +180,7 @@ public class MainController : Controller {
 		this.main_view.set_current_drawing_tool (2);
 		this.main_view.set_fullscreen_status (false);
 		this.main_view.set_show_title_status (false);
+		this.main_view.update_statusbar_current_frame();
 	}
 
 	/**
@@ -215,6 +222,30 @@ public class MainController : Controller {
 		about_dialog.run ();
 		about_dialog.destroy ();
 	}
+	
+	public void on_frame_change(){
+		this.main_view.update_statusbar_current_frame();
+	}
+
+	enum Layer{
+		LOWER,
+		UPPER,
+		EVENT
+	}
+	
+	enum DrawingTool{
+		SELECT,
+		ZOOM,
+		PEN,
+		ERASER_NORMAL,
+		ERASER_RECTANGLE,
+		ERASER_CIRCLE,
+		ERASER_FILL,
+		RECTANGLE,
+		CIRCLE,
+		FILL
+	}
+	
 }
 
 // Workaround

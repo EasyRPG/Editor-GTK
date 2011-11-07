@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<skill>
+	<absorb_damage>false</absorb_damage>
+	<affect_agility>false</affect_agility>
+	<affect_agility>false</affect_agility>
+	<affect_attr_defence>false</affect_attr_defence>
+	<affect_defense>false</affect_defense>
+	<affect_hp>true</affect_hp>
+	<affect_sp>false</affect_sp>
+	<affect_sp>false</affect_sp>
+	<animation_id>1</animation_id>
+	<attribute_effects>false false false false false false false false false false false false false false false false false</attribute_effects>
+	<battler_animation>3</battler_animation>
+	<battler_animation_data>
+		<after_image>1</after_image>
+		<ID>0</ID>
+		<move>0</move>
+		<pose>3</pose>
+	</battler_animation_data>
+	<description>Heal some HP</description>
+	<failure_message>0</failure_message>
+	<hit>100</hit>
+	<ignore_defense>false</ignore_defense>
+	<mdef_f>3</mdef_f>
+	<name>Cure</name>
+	<occasion_battle>true</occasion_battle>
+	<occasion_field>true</occasion_field>
+	<pdef_f>0</pdef_f>
+	<power>25</power>
+	<scope>3</scope>
+	<sound_effect>
+		<name>null</name>
+		<balance>50</balance>
+		<tempo>100</tempo>
+		<volume>100</volume>
+	</sound_effect>
+	<sp_cost>5</sp_cost>
+	<sp_percent>1</sp_percent>
+	<sp_type>0</sp_type>
+	<state_effect>0</state_effect>
+	<state_effects>false false false false false false false false false false</state_effects>
+	<switch_id>0</switch_id>
+	<type>0</type>
+	<using_message1> casts Cure</using_message1>
+	<using_message2></using_message2>
+	<variance>4</variance>
+</skill>
