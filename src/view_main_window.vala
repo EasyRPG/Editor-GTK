@@ -37,11 +37,9 @@ public class MainWindow : Gtk.Window {
 	private Gtk.Toolbar toolbar_main;
 	private Gtk.Toolbar toolbar_sidebar;
 	private Gtk.TreeView treeview_maptree;
+
 	private Gtk.Menu menu_eraser;
-	private Gtk.RadioMenuItem menuitem_lower_layer;
-	private Gtk.RadioMenuItem menuitem_upper_layer;
-	private Gtk.RadioMenuItem menuitem_event_layer;
-	private Gtk.RadioToolButton toolitem_eraser;
+	private Gtk.ToolButton toolitem_eraser;
 
 	private Gtk.RadioAction radio_layer;
 	private Gtk.RadioAction radio_scale;
@@ -84,9 +82,9 @@ public class MainWindow : Gtk.Window {
 		var action_quit = new Gtk.Action ("ActionQuit", "_Quit", "Quit EasyRPG Game Editor", Gtk.Stock.QUIT);
 		var action_save = new Gtk.Action ("ActionSave", "_Save", "Save all maps changes", null);
 		var action_revert = new Gtk.Action ("ActionRevert", "_Revert", "Revert maps to last saved state", null);
-		var action_lower_layer = new Gtk.RadioAction ("ActionLowerLayer", "_Lower Layer", "Edit lower layer", null, MainController.Layer.LOWER);
-		var action_upper_layer = new Gtk.RadioAction ("ActionUpperLayer", "_Upper Layer", "Edit upper layer", null, MainController.Layer.UPPER);
-		var action_event_layer = new Gtk.RadioAction ("ActionEventLayer", "_Event Layer", "Edit map events", null, MainController.Layer.EVENT);
+		var action_lower_layer = new Gtk.RadioAction ("ActionLowerLayer", "_Lower Layer", "Edit lower layer", null, LayerType.LOWER);
+		var action_upper_layer = new Gtk.RadioAction ("ActionUpperLayer", "_Upper Layer", "Edit upper layer", null, LayerType.UPPER);
+		var action_event_layer = new Gtk.RadioAction ("ActionEventLayer", "_Event Layer", "Edit map events", null, LayerType.EVENT);
 		var action_11_scale = new Gtk.RadioAction ("Action11Scale", "Zoom 1/_1", "Map zoom 1/1 (Normal)", null, 0);
 		var action_12_scale = new Gtk.RadioAction ("Action12Scale", "Zoom 1/_2", "Map zoom 1/2", null, 1);
 		var action_14_scale = new Gtk.RadioAction ("Action14Scale", "Zoom 1/_4", "Map zoom 1/4", null, 2);
@@ -100,90 +98,135 @@ public class MainWindow : Gtk.Window {
 		var action_content = new Gtk.Action ("ActionContent", "_Content", "View help contents", null);
 		var action_about = new Gtk.Action ("ActionAbout", "_About", "See information about this program's current version", Gtk.Stock.ABOUT);
 		var action_undo = new Gtk.Action ("ActionUndo", "_Undo", "Undo last change", null);
-		var action_select = new Gtk.RadioAction ("ActionSelect", "_Select", "Select a part of the map", null, MainController.DrawingTool.SELECT);
-		var action_zoom = new Gtk.RadioAction ("ActionZoom", "_Zoom", "Increase or decrease map zoom", null, MainController.DrawingTool.ZOOM);
-		var action_pen = new Gtk.RadioAction ("ActionPen", "_Pen", "Draw using a Pen tool (Normal)", null, MainController.DrawingTool.PEN);
-		var action_eraser = new Gtk.RadioAction ("ActionEraserNormal", "_Eraser (Normal)", "Delete tiles with a Pen tool (Normal)", null, MainController.DrawingTool.ERASER_NORMAL);
-		var action_menu_eraser = new Gtk.Action ("ActionMenuEraser", "Eraser", "Select the eraser shape", null);
-		var action_eraser_rectangle = new Gtk.RadioAction ("ActionEraserRectangle", "Eraser R_ectangle", "Delete tiles with a Rectangle tool", null, MainController.DrawingTool.ERASER_RECTANGLE);
-		var action_eraser_circle = new Gtk.RadioAction ("ActionEraserCircle", "Eraser C_ircle", "Delete tiles with a Circle tool", null, MainController.DrawingTool.ERASER_CIRCLE);
-		var action_eraser_fill = new Gtk.RadioAction ("ActionEraserFill", "Eraser Fi_ll", "Delete tiles with a Fill tool", null, MainController.DrawingTool.ERASER_FILL);
-		var action_rectangle = new Gtk.RadioAction ("ActionRectangle", "_Rectangle", "Draw using a Rectangle tool", null, MainController.DrawingTool.RECTANGLE);
-		var action_circle = new Gtk.RadioAction ("ActionCircle", "_Circle", "Draw using a Circle tool", null, MainController.DrawingTool.CIRCLE);
-		var action_fill = new Gtk.RadioAction ("ActionFill", "_Fill", "Fill a selected area", null, MainController.DrawingTool.FILL);
+		var action_select = new Gtk.RadioAction ("ActionSelect", "_Select", "Select a part of the map", null, DrawingTool.SELECT);
+		var action_zoom = new Gtk.RadioAction ("ActionZoom", "_Zoom", "Increase or decrease map zoom", null, DrawingTool.ZOOM);
+		var action_pen = new Gtk.RadioAction ("ActionPen", "_Pen", "Draw using a Pen tool (Normal)", null, DrawingTool.PEN);
+		var action_eraser = new Gtk.RadioAction ("ActionEraserNormal", "_Eraser (Normal)", "Delete tiles with a Pen tool (Normal)", null, DrawingTool.ERASER_NORMAL);
+		var action_menu_eraser = new Gtk.ToggleAction ("ActionMenuEraser", "Eraser", "Select the eraser shape", null);
+		var action_eraser_rectangle = new Gtk.RadioAction ("ActionEraserRectangle", "Eraser R_ectangle", "Delete tiles with a Rectangle tool", null, DrawingTool.ERASER_RECTANGLE);
+		var action_eraser_circle = new Gtk.RadioAction ("ActionEraserCircle", "Eraser C_ircle", "Delete tiles with a Circle tool", null, DrawingTool.ERASER_CIRCLE);
+		var action_eraser_fill = new Gtk.RadioAction ("ActionEraserFill", "Eraser Fi_ll", "Delete tiles with a Fill tool", null, DrawingTool.ERASER_FILL);
+		var action_rectangle = new Gtk.RadioAction ("ActionRectangle", "_Rectangle", "Draw using a Rectangle tool", null, DrawingTool.RECTANGLE);
+		var action_circle = new Gtk.RadioAction ("ActionCircle", "_Circle", "Draw using a Circle tool", null, DrawingTool.CIRCLE);
+		var action_fill = new Gtk.RadioAction ("ActionFill", "_Fill", "Fill a selected area", null, DrawingTool.FILL);
+
+		/*
+		 * Create RadioActions Groups
+		 */
+		var group_action_layer = new GLib.SList<Gtk.RadioAction> ();
+		action_lower_layer.set_group (group_action_layer);
+		action_upper_layer.join_group (action_lower_layer);
+		action_event_layer.join_group (action_lower_layer);
+
+		var group_action_scale = new GLib.SList<Gtk.RadioAction> ();
+		action_11_scale.set_group (group_action_scale);
+		action_12_scale.join_group (action_11_scale);
+		action_14_scale.join_group (action_11_scale);
+		action_18_scale.join_group (action_11_scale);
+
+		var group_action_drawing_tools = new GLib.SList<Gtk.RadioAction> ();
+		action_select.set_group (group_action_drawing_tools);
+		action_zoom.join_group (action_select);
+		action_pen.join_group (action_select);
+		action_eraser.join_group (action_select);
+		action_eraser_rectangle.join_group (action_select);
+		action_eraser_circle.join_group (action_select);
+		action_eraser_fill.join_group (action_select);
+		action_rectangle.join_group (action_select);
+		action_circle.join_group (action_select);
+		action_fill.join_group (action_select);
 		
 		/*
 		 * Extra references to a Gtk.RadioAction for each group of RadioActions.
 		 * This allows to use group-range methods like get_current_value()
 		 */
+		this.radio_layer = action_lower_layer;
+		this.radio_scale = action_11_scale;
+		this.radio_drawing_tool = action_select;
+
 		this.toggle_fullscreen = action_fullscreen;
 		this.toggle_show_title = action_show_title;
 
 		/*
 		 * Initialize main toolbar
 		 */
-		var toolitem_new = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/new.png"), "New");
+		var toolitem_new = action_new.create_tool_item () as Gtk.ToolButton;
+		toolitem_new.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/new.png"));
 		toolitem_new.set_use_action_appearance (true);
-		var toolitem_open = new Gtk.ToolButton(new Gtk.Image.from_file ("./share/easyrpg/toolbar/open.png"), "Open");
+		var toolitem_open = action_open.create_tool_item () as Gtk.ToolButton;
+		toolitem_open.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/open.png"));
 		toolitem_open.set_use_action_appearance (true);
-		var toolitem_close = new Gtk.ToolButton(new Gtk.Image.from_file ("./share/easyrpg/toolbar/close.png"), "Close");
+		var toolitem_close = action_close.create_tool_item () as Gtk.ToolButton;
+		toolitem_close.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/close.png"));
 		toolitem_close.set_use_action_appearance (true);
-		var toolitem_create_game_disk = new Gtk.ToolButton(new Gtk.Image.from_file ("./share/easyrpg/toolbar/create_game_disk.png"), "Create Game Disk");
+		var toolitem_create_game_disk = action_create_game_disk.create_tool_item () as Gtk.ToolButton;
+		toolitem_create_game_disk.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/create_game_disk.png"));
 		toolitem_create_game_disk.set_use_action_appearance (true);
-		var toolitem_save = new Gtk.ToolButton(new Gtk.Image.from_file ("./share/easyrpg/toolbar/save.png"), "Save all maps");
+		var toolitem_save = action_save.create_tool_item () as Gtk.ToolButton;
+		toolitem_save.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/save.png"));
 		toolitem_save.set_use_action_appearance (true);
-		var toolitem_revert = new Gtk.ToolButton(new Gtk.Image.from_file ("./share/easyrpg/toolbar/revert.png"), "Revert maps");
+		var toolitem_revert = action_revert.create_tool_item () as Gtk.ToolButton;
+		toolitem_revert.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/revert.png"));
 		toolitem_revert.set_use_action_appearance (true);
-		var toolitem_lower_layer = new Gtk.RadioToolButton ((SList<Gtk.RadioToolButton>) null);
+		var toolitem_lower_layer = action_lower_layer.create_tool_item () as Gtk.ToggleToolButton;
 		toolitem_lower_layer.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/lower_layer.png"));
-		var toolitem_upper_layer = new Gtk.RadioToolButton(toolitem_lower_layer.get_group ());
+		toolitem_lower_layer.set_use_action_appearance (true);
+		var toolitem_upper_layer = action_upper_layer.create_tool_item () as Gtk.ToggleToolButton;
 		toolitem_upper_layer.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/upper_layer.png"));
-		var toolitem_event_layer = new Gtk.RadioToolButton(toolitem_lower_layer.get_group ());
+		toolitem_upper_layer.set_use_action_appearance (true);
+		var toolitem_event_layer = action_event_layer.create_tool_item () as Gtk.ToggleToolButton;
 		toolitem_event_layer.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/event_layer.png"));
-		var toolitem_11_scale = new Gtk.RadioToolButton((SList<Gtk.RadioToolButton>) null);
+		toolitem_event_layer.set_use_action_appearance (true);
+		var toolitem_11_scale = action_11_scale.create_tool_item () as Gtk.ToggleToolButton;
 		toolitem_11_scale.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/11_scale.png"));
-		var toolitem_12_scale = new Gtk.RadioToolButton(toolitem_11_scale.get_group ());
+		toolitem_11_scale.set_use_action_appearance (true);
+		var toolitem_12_scale = action_12_scale.create_tool_item () as Gtk.ToggleToolButton;
 		toolitem_12_scale.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/12_scale.png"));
-		var toolitem_14_scale = new Gtk.RadioToolButton(toolitem_11_scale.get_group ());
+		var toolitem_14_scale = action_14_scale.create_tool_item () as Gtk.ToggleToolButton;
 		toolitem_14_scale.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/14_scale.png"));
-		var toolitem_18_scale = new Gtk.RadioToolButton(toolitem_11_scale.get_group ());
+		var toolitem_18_scale = action_18_scale.create_tool_item () as Gtk.ToggleToolButton;
 		toolitem_18_scale.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/18_scale.png"));
-		var toolitem_database = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/database.png"), "Database");
+		var toolitem_database = action_database.create_tool_item () as Gtk.ToolButton;
+		toolitem_database.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/database.png"));
 		toolitem_database.set_use_action_appearance (true);
-		var toolitem_material = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/material.png"), "Material");
+		var toolitem_material = action_material.create_tool_item () as Gtk.ToolButton;
+		toolitem_material.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/material.png"));
 		toolitem_material.set_use_action_appearance (true);
-		var toolitem_music = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/music.png"), "Music");
+		var toolitem_music = action_music.create_tool_item () as Gtk.ToolButton;
+		toolitem_music.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/music.png"));
 		toolitem_music.set_use_action_appearance (true);
-		var toolitem_playtest = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/playtest.png"), "Play Test");
+		var toolitem_playtest = action_playtest.create_tool_item () as Gtk.ToolButton;
+		toolitem_playtest.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/playtest.png"));
 		toolitem_playtest.set_use_action_appearance (true);
-		var tbtb_fullscreen = new Gtk.ToggleToolButton ();
-		tbtb_fullscreen.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/fullscreen.png"));
-		tbtb_fullscreen.set_use_action_appearance (true);
-		var tbtb_show_title = new Gtk.ToggleToolButton ();
-		tbtb_show_title.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/title.png"));
-		tbtb_show_title.set_use_action_appearance (true);
-		var toolitem_content = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/help.png"), "Contents");
+		var toolitem_fullscreen = action_fullscreen.create_tool_item () as Gtk.ToolButton;
+		toolitem_fullscreen.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/fullscreen.png"));
+		toolitem_fullscreen.set_use_action_appearance (true);
+		var toolitem_show_title = action_show_title.create_tool_item () as Gtk.ToolButton;
+		toolitem_show_title.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/title.png"));
+		toolitem_show_title.set_use_action_appearance (true);
+		var toolitem_content = action_content.create_tool_item () as Gtk.ToolButton;
+		toolitem_content.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/help.png"));
 		toolitem_content.set_use_action_appearance (true);
 
 		/*
 		 * Initialize drawing toolbar
 		 */
-		var toolitem_undo = new Gtk.ToolButton (new Gtk.Image.from_file ("./share/easyrpg/toolbar/undo.png"), "Undo");
+		var toolitem_undo = action_undo.create_tool_item () as Gtk.ToolButton;
+		toolitem_undo.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/undo.png"));
 		toolitem_undo.set_use_action_appearance (true);
-		var toolitem_select = new Gtk.RadioToolButton ((SList<Gtk.RadioToolButton>) null);
+		var toolitem_select = action_select.create_tool_item () as Gtk.ToolButton;
 		toolitem_select.set_icon_widget(new Gtk.Image.from_file ("./share/easyrpg/toolbar/select.png"));
 		toolitem_select.set_use_action_appearance (true);
-		var toolitem_zoom = new Gtk.RadioToolButton (toolitem_select.get_group());
+		var toolitem_zoom = action_zoom.create_tool_item () as Gtk.ToolButton;
 		toolitem_zoom.set_icon_widget(new Gtk.Image.from_file ("./share/easyrpg/toolbar/zoom.png"));
 		toolitem_zoom.set_use_action_appearance (true);
-		var toolitem_pen = new Gtk.RadioToolButton (toolitem_select.get_group());
+		var toolitem_pen = action_pen.create_tool_item () as Gtk.ToolButton;
 		toolitem_pen.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/pen.png"));
 		toolitem_pen.set_use_action_appearance (true);
-		
-		this.toolitem_eraser = new Gtk.RadioToolButton(toolitem_select.get_group());
+		this.toolitem_eraser = action_eraser.create_tool_item () as Gtk.ToolButton;
 		this.toolitem_eraser.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/eraser.png"));
 		this.toolitem_eraser.set_use_action_appearance (true);
-		var toolitem_menu_eraser = new Gtk.ToggleToolButton ();
+		var toolitem_menu_eraser = action_menu_eraser.create_tool_item () as Gtk.ToggleToolButton;
 		toolitem_menu_eraser.set_icon_widget(new Gtk.Arrow(Gtk.ArrowType.DOWN, Gtk.ShadowType.IN));
 		toolitem_menu_eraser.set_label ("Eraser");
 		toolitem_menu_eraser.set_size_request(15, -1);
@@ -205,14 +248,13 @@ public class MainWindow : Gtk.Window {
 		menuitem_eraser_fill.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/eraser_fill.png"));
 		menuitem_eraser_fill.set_use_action_appearance (true);
 		menuitem_eraser_fill.set_always_show_image(true);
-		
-		var toolitem_rectangle = new Gtk.RadioToolButton (toolitem_select.get_group());
+		var toolitem_rectangle = action_rectangle.create_tool_item () as Gtk.ToolButton;		
 		toolitem_rectangle.set_icon_widget(new Gtk.Image.from_file ("./share/easyrpg/toolbar/rectangle.png"));
 		toolitem_rectangle.set_use_action_appearance (true);
-		var toolitem_circle = new Gtk.RadioToolButton (toolitem_select.get_group());
+		var toolitem_circle = action_circle.create_tool_item () as Gtk.ToolButton;
 		toolitem_circle.set_icon_widget(new Gtk.Image.from_file ("./share/easyrpg/toolbar/circle.png"));
 		toolitem_circle.set_use_action_appearance (true);
-		var toolitem_fill = new Gtk.RadioToolButton (toolitem_select.get_group());
+		var toolitem_fill = action_fill.create_tool_item () as Gtk.ToolButton;
 		toolitem_fill.set_icon_widget(new Gtk.Image.from_file ("./share/easyrpg/toolbar/fill.png"));
 		toolitem_fill.set_use_action_appearance (true);
 
@@ -252,66 +294,66 @@ public class MainWindow : Gtk.Window {
 		var menu_help = new Gtk.Menu ();
 
 		// Submenu items
-		var menuitem_new = new Gtk.ImageMenuItem ();
+		var menuitem_new = action_new.create_menu_item () as Gtk.ImageMenuItem;
 		menuitem_new.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/new.png"));
 		menuitem_new.set_use_action_appearance (true);
-		var menuitem_open = new Gtk.ImageMenuItem ();
+		var menuitem_open = action_open.create_menu_item () as Gtk.ImageMenuItem;
 		menuitem_open.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/open.png"));
 		menuitem_open.set_use_action_appearance (true);
-		var menuitem_close = new Gtk.ImageMenuItem ();
+		var menuitem_close = action_close.create_menu_item () as Gtk.ImageMenuItem;
 		menuitem_close.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/close.png"));
 		menuitem_close.set_use_action_appearance (true);
-		var menuitem_create_game_disk = new Gtk.ImageMenuItem ();
+		var menuitem_create_game_disk = action_create_game_disk.create_menu_item () as Gtk.ImageMenuItem;
 		menuitem_create_game_disk.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/create_game_disk.png"));
 		menuitem_create_game_disk.set_use_action_appearance (true);
-		var menuitem_quit = new Gtk.ImageMenuItem ();
+		var menuitem_quit = action_quit.create_menu_item () as Gtk.ImageMenuItem;
 		menuitem_quit.set_image (new Gtk.Image.from_stock ("gtk-quit", Gtk.IconSize.MENU));
 		menuitem_quit.set_use_action_appearance(true);
-		var menuitem_save = new Gtk.ImageMenuItem ();
+		var menuitem_save = action_save.create_menu_item () as Gtk.ImageMenuItem;
 		menuitem_save.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/save.png"));
 		menuitem_save.set_use_action_appearance (true);
-		var menuitem_revert = new Gtk.ImageMenuItem ();
+		var menuitem_revert = action_revert.create_menu_item () as Gtk.ImageMenuItem;
 		menuitem_revert.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/revert.png"));
 		menuitem_revert.set_use_action_appearance (true);
-		var menuitem_database = new Gtk.ImageMenuItem ();
+		var menuitem_database = action_database.create_menu_item () as Gtk.ImageMenuItem;
 		menuitem_database.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/database.png"));
 		menuitem_database.set_use_action_appearance (true);
-		var menuitem_material = new Gtk.ImageMenuItem ();
+		var menuitem_material = action_material.create_menu_item () as Gtk.ImageMenuItem;
 		menuitem_material.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/material.png"));
 		menuitem_material.set_use_action_appearance (true);
-		var menuitem_music = new Gtk.ImageMenuItem ();
+		var menuitem_music = action_music.create_menu_item () as Gtk.ImageMenuItem;
 		menuitem_music.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/music.png"));
 		menuitem_music.set_use_action_appearance (true);
-		var menuitem_playtest = new Gtk.ImageMenuItem ();
+		var menuitem_playtest = action_playtest.create_menu_item () as Gtk.ImageMenuItem;
 		menuitem_playtest.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/playtest.png"));
 		menuitem_playtest.set_use_action_appearance (true);
-		var menuitem_content = new Gtk.ImageMenuItem ();
+		var menuitem_content = action_content.create_menu_item () as Gtk.ImageMenuItem;
 		menuitem_content.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/help.png"));
 		menuitem_content.set_use_action_appearance (true);
-		var menuitem_about = new Gtk.ImageMenuItem ();
+		var menuitem_about = action_about.create_menu_item () as Gtk.ImageMenuItem;
 		menuitem_about.set_image (new Gtk.Image.from_stock ("gtk-about", Gtk.IconSize.MENU));
 		menuitem_about.set_use_action_appearance (true);
 
 		// Radio items
-		this.menuitem_lower_layer = new Gtk.RadioMenuItem ((SList<Gtk.RadioMenuItem>) null);
-		this.menuitem_lower_layer.set_use_action_appearance (true);
-		this.menuitem_upper_layer = new Gtk.RadioMenuItem(this.menuitem_lower_layer.get_group ());
-		this.menuitem_upper_layer.set_use_action_appearance (true);
-		this.menuitem_event_layer = new Gtk.RadioMenuItem(this.menuitem_lower_layer.get_group ());
-		this.menuitem_event_layer.set_use_action_appearance (true);
-		var menuitem_11_scale = new Gtk.RadioMenuItem ((SList<Gtk.RadioMenuItem>) null);
+		var menuitem_lower_layer = action_lower_layer.create_menu_item () as Gtk.CheckMenuItem;
+		menuitem_lower_layer.set_use_action_appearance (true);
+		var menuitem_upper_layer = action_upper_layer.create_menu_item () as Gtk.CheckMenuItem;
+		menuitem_upper_layer.set_use_action_appearance (true);
+		var menuitem_event_layer = action_event_layer.create_menu_item () as Gtk.CheckMenuItem;
+		menuitem_event_layer.set_use_action_appearance (true);
+		var menuitem_11_scale = action_11_scale.create_menu_item () as Gtk.CheckMenuItem;
 		menuitem_11_scale.set_use_action_appearance (true);
-		var menuitem_12_scale = new Gtk.RadioMenuItem(menuitem_11_scale.get_group ());
+		var menuitem_12_scale = action_12_scale.create_menu_item () as Gtk.CheckMenuItem;
 		menuitem_12_scale.set_use_action_appearance (true);
-		var menuitem_14_scale = new Gtk.RadioMenuItem(menuitem_11_scale.get_group ());
+		var menuitem_14_scale = action_14_scale.create_menu_item () as Gtk.CheckMenuItem;
 		menuitem_14_scale.set_use_action_appearance (true);
-		var menuitem_18_scale = new Gtk.RadioMenuItem(menuitem_11_scale.get_group ());
+		var menuitem_18_scale = action_18_scale.create_menu_item () as Gtk.CheckMenuItem;
 		menuitem_18_scale.set_use_action_appearance (true);
 
 		// Toggle items
-		var menuitem_fullscreen = new Gtk.CheckMenuItem();
+		var menuitem_fullscreen = action_fullscreen.create_menu_item () as Gtk.CheckMenuItem;
 		menuitem_fullscreen.set_use_action_appearance (true);
-		var menuitem_show_title = new Gtk.CheckMenuItem();
+		var menuitem_show_title = action_show_title.create_menu_item () as Gtk.CheckMenuItem;
 		menuitem_show_title.set_use_action_appearance (true);
 
 		/*
@@ -327,9 +369,9 @@ public class MainWindow : Gtk.Window {
 		menu_map.add (new Gtk.SeparatorMenuItem());
 		menu_map.add (menuitem_edit);
 		menu_map.add (menuitem_scale);
-		menu_edit.add (this.menuitem_lower_layer);
-		menu_edit.add (this.menuitem_upper_layer);
-		menu_edit.add (this.menuitem_event_layer);
+		menu_edit.add (menuitem_lower_layer);
+		menu_edit.add (menuitem_upper_layer);
+		menu_edit.add (menuitem_event_layer);
 		menu_scale.add (menuitem_11_scale);
 		menu_scale.add (menuitem_12_scale);
 		menu_scale.add (menuitem_14_scale);
@@ -393,8 +435,8 @@ public class MainWindow : Gtk.Window {
 		this.toolbar_main.add (new Gtk.SeparatorToolItem());
 		this.toolbar_main.add (toolitem_playtest);
 		this.toolbar_main.add (new Gtk.SeparatorToolItem());
-		this.toolbar_main.add (tbtb_fullscreen);
-		this.toolbar_main.add (tbtb_show_title);
+		this.toolbar_main.add (toolitem_fullscreen);
+		this.toolbar_main.add (toolitem_show_title);
 		this.toolbar_main.add (new Gtk.SeparatorToolItem());
 		this.toolbar_main.add (toolitem_content);
 
@@ -482,57 +524,6 @@ public class MainWindow : Gtk.Window {
 		 * 
 		 * IMPORTANT: Connect toolbar radioitems before menu radioitems causes a Gtk crash
 		 */
-		// Menu
-		menuitem_new.set_related_action (action_new);
-		menuitem_open.set_related_action (action_open);
-		menuitem_close.set_related_action (action_close);
-		menuitem_create_game_disk.set_related_action (action_create_game_disk);
-		menuitem_quit.set_related_action(action_quit);
-		menuitem_save.set_related_action (action_save);
-		menuitem_revert.set_related_action (action_revert);
-		this.menuitem_lower_layer.set_related_action (action_lower_layer);
-		this.menuitem_upper_layer.set_related_action (action_upper_layer);
-		this.menuitem_event_layer.set_related_action (action_event_layer);
-		menuitem_11_scale.set_related_action (action_11_scale);
-		menuitem_12_scale.set_related_action (action_12_scale);
-		menuitem_14_scale.set_related_action (action_14_scale);
-		menuitem_18_scale.set_related_action (action_18_scale);
-		menuitem_database.set_related_action (action_database);
-		menuitem_material.set_related_action (action_material);
-		menuitem_music.set_related_action (action_music);
-		menuitem_playtest.set_related_action (action_playtest);
-		menuitem_content.set_related_action (action_content);
-		menuitem_fullscreen.set_related_action (action_fullscreen);
-		menuitem_show_title.set_related_action (action_show_title);
-		menuitem_about.set_related_action (action_about);
-		
-		// Main toolbar
-		toolitem_new.set_related_action (action_new);
-		toolitem_open.set_related_action (action_open);
-		toolitem_close.set_related_action (action_close);
-		toolitem_create_game_disk.set_related_action (action_create_game_disk);
-		toolitem_save.set_related_action (action_save);
-		toolitem_revert.set_related_action (action_revert);
-		toolitem_lower_layer.set_related_action (action_lower_layer);
-		toolitem_upper_layer.set_related_action (action_upper_layer);
-		toolitem_event_layer.set_related_action (action_event_layer);
-		toolitem_11_scale.set_related_action (action_11_scale);
-		toolitem_12_scale.set_related_action (action_12_scale);
-		toolitem_14_scale.set_related_action (action_14_scale);
-		toolitem_18_scale.set_related_action (action_18_scale);
-		toolitem_database.set_related_action (action_database);
-		toolitem_material.set_related_action (action_material);
-		toolitem_music.set_related_action (action_music);
-		toolitem_playtest.set_related_action (action_playtest);
-		tbtb_fullscreen.set_related_action (action_fullscreen);
-		tbtb_show_title.set_related_action (action_show_title);
-		toolitem_content.set_related_action (action_content);
-
-		// Drawing toolbar
-		toolitem_undo.set_related_action (action_undo);
-		toolitem_select.set_related_action (action_select);
-		toolitem_zoom.set_related_action (action_zoom);
-		toolitem_pen.set_related_action (action_pen);
 		this.toolitem_eraser.set_related_action (action_eraser);
 		toolitem_menu_eraser.set_related_action (action_menu_eraser);
 		menu_eraser.attach_to_widget(toolitem_menu_eraser, null);
@@ -540,40 +531,7 @@ public class MainWindow : Gtk.Window {
 		menuitem_eraser_rectangle.set_related_action (action_eraser_rectangle);
 		menuitem_eraser_circle.set_related_action (action_eraser_circle);
 		menuitem_eraser_fill.set_related_action (action_eraser_fill);
-		
-		toolitem_rectangle.set_related_action (action_rectangle);
-		toolitem_circle.set_related_action (action_circle);
-		toolitem_fill.set_related_action (action_fill);
 
-		/*
-		 * Create RadioActions Groups
-		 */
-		// Layer actions
-		unowned SList<Gtk.RadioAction> layer_actiongroup = null;
-		action_lower_layer.set_group (layer_actiongroup);
-		action_upper_layer.set_group (action_lower_layer.get_group ());
-		action_event_layer.set_group (action_lower_layer.get_group ());
-
-		// Scale actions
-		unowned SList<Gtk.RadioAction> scale_actiongroup = null;
-		action_11_scale.set_group (scale_actiongroup);
-		action_12_scale.set_group (action_11_scale.get_group ());
-		action_14_scale.set_group (action_11_scale.get_group ());
-		action_18_scale.set_group (action_11_scale.get_group ());
-
-		// Edition tools actions
-		unowned SList<Gtk.RadioAction> editiontools_actiongroup = null;
-		action_select.set_group (editiontools_actiongroup);
-		action_zoom.set_group (action_select.get_group ());
-		action_pen.set_group (action_select.get_group ());
-		action_eraser.set_group (action_select.get_group ());
-		action_eraser_rectangle.set_group (action_select.get_group ());
-		action_eraser_circle.set_group (action_select.get_group ());
-		action_eraser_fill.set_group (action_select.get_group ());
-		action_rectangle.set_group (action_select.get_group ());
-		action_circle.set_group (action_select.get_group ());
-		action_fill.set_group (action_select.get_group ());
-		
 		/*
 		 * Create ActionGroups
 		 */
@@ -612,18 +570,11 @@ public class MainWindow : Gtk.Window {
 		this.actiongroup_project_closed.add_action (action_open);
 
 		/*
-		 * Extra references to a Gtk.RadioAction for each group of RadioActions.
-		 * This allows to use group-range methods like get_current_value()
-		 */
-		this.radio_layer = action_lower_layer;
-		this.radio_scale = action_11_scale;
-		this.radio_drawing_tool = action_select;
-
-		/*
 		 * Default values
 		 */
 		this.actiongroup_project_open.set_sensitive (false);
-		this.radio_drawing_tool.set_current_value (MainController.DrawingTool.PEN); // Pencil
+		this.set_current_layer (LayerType.LOWER);
+		this.set_current_drawing_tool (DrawingTool.PEN);
 
 		/*
 		 * Connect signals
@@ -636,74 +587,55 @@ public class MainWindow : Gtk.Window {
 		action_database.activate.connect (this.controller.show_database);
 
 		// Show about dialog
-		menuitem_about.activate.connect (this.controller.on_about);
+		action_about.activate.connect (this.controller.on_about);
 
 		// Change edition mode
-		this.radio_layer.changed.connect (this.controller.on_frame_change);
+		this.radio_layer.changed.connect (this.controller.on_layer_change);
 
 		// Eraser menu callbacks
 		toolitem_menu_eraser.clicked.connect (menu_eraser_popup);
-		menuitem_eraser_normal.activate.connect		(() => {set_current_drawing_tool(MainController.DrawingTool.ERASER_NORMAL);});
-		menuitem_eraser_rectangle.activate.connect  (() => {set_current_drawing_tool(MainController.DrawingTool.ERASER_RECTANGLE);});
-		menuitem_eraser_circle.activate.connect		(() => {set_current_drawing_tool(MainController.DrawingTool.ERASER_CIRCLE);});
-		menuitem_eraser_fill.activate.connect		(() => {set_current_drawing_tool(MainController.DrawingTool.ERASER_FILL);});
-		this.menu_eraser.deactivate.connect				(() => {toolitem_menu_eraser.set_active(false);
+		menuitem_eraser_normal.activate.connect		(() => {set_current_drawing_tool(DrawingTool.ERASER_NORMAL);});
+		menuitem_eraser_rectangle.activate.connect  (() => {set_current_drawing_tool(DrawingTool.ERASER_RECTANGLE);});
+		menuitem_eraser_circle.activate.connect		(() => {set_current_drawing_tool(DrawingTool.ERASER_CIRCLE);});
+		menuitem_eraser_fill.activate.connect		(() => {set_current_drawing_tool(DrawingTool.ERASER_FILL);});
+		this.menu_eraser.deactivate.connect			(() => {toolitem_menu_eraser.set_active(false);
 															var icon = toolitem_menu_eraser.get_icon_widget() as Gtk.Arrow;
 															icon.set(Gtk.ArrowType.DOWN, Gtk.ShadowType.IN);});
 
-		// Connect statusbar_tooltip to toolbar and menu items
-		//FIXME: Gtk.ToolItem's doesn't connect because of a missing signal
-		this.connect_proxy_cb (toolitem_new);
-		this.connect_proxy_cb (toolitem_open);
-		this.connect_proxy_cb (toolitem_close);
-		this.connect_proxy_cb (toolitem_create_game_disk);
-		this.connect_proxy_cb (toolitem_save);
-		this.connect_proxy_cb (toolitem_revert);
-		this.connect_proxy_cb (toolitem_lower_layer);
-		this.connect_proxy_cb (toolitem_upper_layer);
-		this.connect_proxy_cb (toolitem_event_layer);
-		this.connect_proxy_cb (toolitem_11_scale);
-		this.connect_proxy_cb (toolitem_12_scale);
-		this.connect_proxy_cb (toolitem_14_scale);
-		this.connect_proxy_cb (toolitem_18_scale);
-		this.connect_proxy_cb (toolitem_database);
-		this.connect_proxy_cb (toolitem_material);
-		this.connect_proxy_cb (toolitem_music);
-		this.connect_proxy_cb (toolitem_playtest);
-		this.connect_proxy_cb (tbtb_fullscreen);
-		this.connect_proxy_cb (tbtb_show_title);
-		this.connect_proxy_cb (toolitem_content);
-		
-		this.connect_proxy_cb (menuitem_new);
-		this.connect_proxy_cb (menuitem_open);
-		this.connect_proxy_cb (menuitem_close);
-		this.connect_proxy_cb (menuitem_create_game_disk);
-		this.connect_proxy_cb (menuitem_save);
-		this.connect_proxy_cb (menuitem_revert);
-		this.connect_proxy_cb (this.menuitem_lower_layer);
-		this.connect_proxy_cb (this.menuitem_upper_layer);
-		this.connect_proxy_cb (this.menuitem_event_layer);
-		this.connect_proxy_cb (menuitem_11_scale);
-		this.connect_proxy_cb (menuitem_12_scale);
-		this.connect_proxy_cb (menuitem_14_scale);
-		this.connect_proxy_cb (menuitem_18_scale);
-		this.connect_proxy_cb (menuitem_database);
-		this.connect_proxy_cb (menuitem_material);
-		this.connect_proxy_cb (menuitem_music);
-		this.connect_proxy_cb (menuitem_playtest);
-		this.connect_proxy_cb (menuitem_content);
-		this.connect_proxy_cb (menuitem_fullscreen);
-		this.connect_proxy_cb (menuitem_show_title);
-		this.connect_proxy_cb (menuitem_about);
-		this.connect_proxy_cb (menuitem_quit);
-
-		this.connect_proxy_cb (menuitem_eraser_normal);
-		this.connect_proxy_cb (menuitem_eraser_rectangle);
-		this.connect_proxy_cb (menuitem_eraser_circle);
-		this.connect_proxy_cb (menuitem_eraser_fill);
+		/*
+		 * Connect menuitem labels to the statusbar
+		 * 
+		 * Toolitem tooltips shouldn't be connected. They work in a different way.
+		 */
+		this.connect_menuitem_to_statusbar (menuitem_new);
+		this.connect_menuitem_to_statusbar (menuitem_open);
+		this.connect_menuitem_to_statusbar (menuitem_close);
+		this.connect_menuitem_to_statusbar (menuitem_create_game_disk);
+		this.connect_menuitem_to_statusbar (menuitem_save);
+		this.connect_menuitem_to_statusbar (menuitem_revert);
+		this.connect_menuitem_to_statusbar (menuitem_lower_layer);
+		this.connect_menuitem_to_statusbar (menuitem_upper_layer);
+		this.connect_menuitem_to_statusbar (menuitem_event_layer);
+		this.connect_menuitem_to_statusbar (menuitem_11_scale);
+		this.connect_menuitem_to_statusbar (menuitem_12_scale);
+		this.connect_menuitem_to_statusbar (menuitem_14_scale);
+		this.connect_menuitem_to_statusbar (menuitem_18_scale);
+		this.connect_menuitem_to_statusbar (menuitem_database);
+		this.connect_menuitem_to_statusbar (menuitem_material);
+		this.connect_menuitem_to_statusbar (menuitem_music);
+		this.connect_menuitem_to_statusbar (menuitem_playtest);
+		this.connect_menuitem_to_statusbar (menuitem_content);
+		this.connect_menuitem_to_statusbar (menuitem_fullscreen);
+		this.connect_menuitem_to_statusbar (menuitem_show_title);
+		this.connect_menuitem_to_statusbar (menuitem_about);
+		this.connect_menuitem_to_statusbar (menuitem_quit);
+		this.connect_menuitem_to_statusbar (menuitem_eraser_normal);
+		this.connect_menuitem_to_statusbar (menuitem_eraser_rectangle);
+		this.connect_menuitem_to_statusbar (menuitem_eraser_circle);
+		this.connect_menuitem_to_statusbar (menuitem_eraser_fill);
 
 		// Close application
-		menuitem_quit.activate.connect (on_close);
+		action_quit.activate.connect (on_close);
 		this.destroy.connect (on_close);
 	}
 
@@ -713,19 +645,7 @@ public class MainWindow : Gtk.Window {
 	 * @return 0 for lower layer; 1 for upper layer; 2 for event layer.
 	 */
 	public int get_current_layer () {
-		/* This way is crashed */
-		//return this.radio_layer.get_current_value ();
-		int layer = -1;
-		if (this.menuitem_lower_layer.active){
-			layer = MainController.Layer.LOWER;
-		};
-		if (this.menuitem_upper_layer.active){
-			layer = MainController.Layer.UPPER;
-		};
-		if (this.menuitem_event_layer.active){
-			layer = MainController.Layer.EVENT;
-		};
-		return layer;
+		return this.radio_layer.get_current_value ();
 	}
 
 	/**
@@ -772,28 +692,28 @@ public class MainWindow : Gtk.Window {
 	public void set_current_drawing_tool (int value) {
 		Gtk.Image image;
 		switch (value){
-			case MainController.DrawingTool.ERASER_NORMAL:
+			case DrawingTool.ERASER_NORMAL:
 				Gtk.RadioAction action = actiongroup_project_open.get_action("ActionEraserNormal") as Gtk.RadioAction;
 				this.toolitem_eraser.set_related_action(action);
 				image = new Gtk.Image.from_file ("./share/easyrpg/toolbar/eraser.png");
 				this.toolitem_eraser.set_icon_widget (image);
 				image.show();
 				break;
-			case MainController.DrawingTool.ERASER_RECTANGLE:
+			case DrawingTool.ERASER_RECTANGLE:
 				Gtk.RadioAction action = actiongroup_project_open.get_action("ActionEraserRectangle") as Gtk.RadioAction;
 				this.toolitem_eraser.set_related_action(action);
 				image = new Gtk.Image.from_file ("./share/easyrpg/toolbar/eraser_rectangle.png");
 				this.toolitem_eraser.set_icon_widget (image);
 				image.show();
 				break;
-			case MainController.DrawingTool.ERASER_CIRCLE:
+			case DrawingTool.ERASER_CIRCLE:
 				Gtk.RadioAction action = actiongroup_project_open.get_action("ActionEraserCircle") as Gtk.RadioAction;
 				this.toolitem_eraser.set_related_action(action);
 				image = new Gtk.Image.from_file ("./share/easyrpg/toolbar/eraser_circle.png");
 				this.toolitem_eraser.set_icon_widget (image);
 				image.show();
 				break;
-			case MainController.DrawingTool.ERASER_FILL:
+			case DrawingTool.ERASER_FILL:
 				Gtk.RadioAction action = actiongroup_project_open.get_action("ActionEraserFill") as Gtk.RadioAction;
 				this.toolitem_eraser.set_related_action(action);
 				image = new Gtk.Image.from_file ("./share/easyrpg/toolbar/eraser_fill.png");
@@ -861,7 +781,6 @@ public class MainWindow : Gtk.Window {
 		Gtk.main_quit ();
 	}
 
-	
 	private void menu_item_select_cb (Gtk.Widget item){
 		string message;
 			Gtk.Action action;
@@ -880,40 +799,22 @@ public class MainWindow : Gtk.Window {
 		this.statusbar_tooltip.pop (0);
 	}
 	
-	private void connect_proxy_cb (Gtk.Widget proxy){
-		if (proxy is Gtk.MenuItem){
-			Gtk.MenuItem menu_item;
-			menu_item = proxy as Gtk.MenuItem;
-			menu_item.select.connect (this.menu_item_select_cb);
-			menu_item.deselect.connect (this.menu_item_deselect_cb);
-		}
-		//FIXME: search a way to dispay Gtk.ToolItem's tooltip
-		/*Gtk.ToolItem tool_item;
-		if (proxy is Gtk.ToolButton){
-			tool_item = proxy as Gtk.ToolButton;
-			tool_item.select.connect (this.menu_item_select_cb);
-			tool_item.deselect.connect (this.menu_item_deselect_cb);
-		}*/
+	private void connect_menuitem_to_statusbar (Gtk.MenuItem menu_item){
+		menu_item.select.connect (this.menu_item_select_cb);
+		menu_item.deselect.connect (this.menu_item_deselect_cb);
 	}
-
-	//FIXME: unused, should remove?
-	private void disconnect_proxy_cb (Gtk.Widget proxy){
-		Gtk.MenuItem item = proxy as Gtk.MenuItem;
-		item.select.disconnect (this.menu_item_select_cb);
-		item.deselect.disconnect (this.menu_item_deselect_cb);
-    }
 
 	public void update_statusbar_current_frame(){
 		this.statusbar_current_frame.remove_all(0);
 		if (actiongroup_project_open.sensitive){
 			switch (this.get_current_layer ()){
-				case MainController.Layer.LOWER:
+				case LayerType.LOWER:
 					this.statusbar_current_frame.push (0, "Lower Layer");
 					break;
-				case MainController.Layer.UPPER:
+				case LayerType.UPPER:
 					this.statusbar_current_frame.push (0, "Upper Layer");
 					break;
-				case MainController.Layer.EVENT:
+				case LayerType.EVENT:
 					this.statusbar_current_frame.push (0, "Events edition Mode");
 					break;
 				default:

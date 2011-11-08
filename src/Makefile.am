@@ -23,6 +23,7 @@ editor_SOURCES = \
 	controller.vala \
 	controller_main.vala \
 	editor.vala \
+	enum.vala \
 	model.vala \
 	model_layer.vala \
 	model_map.vala \
