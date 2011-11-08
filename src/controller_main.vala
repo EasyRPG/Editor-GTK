@@ -80,14 +80,13 @@ public class MainController : Controller {
 			string[] path_tokens = full_path.split ("/");
 			this.project_filename = path_tokens[path_tokens.length - 1];
 			this.base_path = full_path.replace (this.project_filename, "");
-
-			// Enable/disable some widgets
-			this.main_view.set_project_status ("open");
 			
 			// Manages all the XML read stuff
 			this.load_project_data ();
 			this.load_maps_data ();
 
+			// Enable/disable some widgets
+			this.main_view.set_project_status ("open");
 		}
 		open_project_dialog.destroy ();
 	}
