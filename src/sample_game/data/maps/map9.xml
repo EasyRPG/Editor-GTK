@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <map>
 	<name>Mapa9</name>
-	<parent_id>3</parent_id>
-	<order>0</order>
 	<width>20</width>
 	<height>15</height>
 	<tileset>basis.png</tileset>

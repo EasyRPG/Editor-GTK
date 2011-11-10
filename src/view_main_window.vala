@@ -36,7 +36,7 @@ public class MainWindow : Gtk.Window {
 	private Gtk.Statusbar statusbar_current_position;
 	private Gtk.Toolbar toolbar_main;
 	private Gtk.Toolbar toolbar_sidebar;
-	private Gtk.TreeView treeview_maptree;
+	public Gtk.TreeView treeview_maptree;
 
 	private Gtk.Menu menu_eraser;
 	private Gtk.ToolButton toolitem_eraser;
@@ -62,14 +62,14 @@ public class MainWindow : Gtk.Window {
 		 */
 		this.controller = controller;
 		this.set_title ("EasyRPG Editor");
-		
+
 		try {
 			this.set_icon (new Gdk.Pixbuf.from_file ("./share/easyrpg/icons/hicolor/48x48/apps/easyrpg.png"));
 		}
 		catch (Error e) {
 			stderr.printf ("Could not load about dialog logo: %s\n", e.message);
 		}
-		
+
 		this.set_default_size (500, 400);
 
 		/*
@@ -78,7 +78,7 @@ public class MainWindow : Gtk.Window {
 		var action_new = new Gtk.Action ("ActionNew", "_New", "Create a new project", null);
 		var action_open = new Gtk.Action ("ActionOpen", "_Open", "Open a saved project", null);
 		var action_close = new Gtk.Action ("ActionClose", "_Close", "Close current project", null);
-		var	action_create_game_disk = new Gtk.Action ("ActionCreateGameDisk", "_Create Game Disk", "", null);
+		var action_create_game_disk = new Gtk.Action ("ActionCreateGameDisk", "_Create Game Disk", "", null);
 		var action_quit = new Gtk.Action ("ActionQuit", "_Quit", "Quit EasyRPG Game Editor", Gtk.Stock.QUIT);
 		var action_save = new Gtk.Action ("ActionSave", "_Save", "Save all maps changes", null);
 		var action_revert = new Gtk.Action ("ActionRevert", "_Revert", "Revert maps to last saved state", null);
@@ -135,7 +135,7 @@ public class MainWindow : Gtk.Window {
 		action_rectangle.join_group (action_select);
 		action_circle.join_group (action_select);
 		action_fill.join_group (action_select);
-		
+
 		/*
 		 * Extra references to a Gtk.RadioAction for each group of RadioActions.
 		 * This allows to use group-range methods like get_current_value()
@@ -248,7 +248,7 @@ public class MainWindow : Gtk.Window {
 		menuitem_eraser_fill.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/eraser_fill.png"));
 		menuitem_eraser_fill.set_use_action_appearance (true);
 		menuitem_eraser_fill.set_always_show_image(true);
-		var toolitem_rectangle = action_rectangle.create_tool_item () as Gtk.ToolButton;		
+		var toolitem_rectangle = action_rectangle.create_tool_item () as Gtk.ToolButton;
 		toolitem_rectangle.set_icon_widget(new Gtk.Image.from_file ("./share/easyrpg/toolbar/rectangle.png"));
 		toolitem_rectangle.set_use_action_appearance (true);
 		var toolitem_circle = action_circle.create_tool_item () as Gtk.ToolButton;
@@ -476,6 +476,9 @@ public class MainWindow : Gtk.Window {
 		this.statusbar_current_position = new Gtk.Statusbar();
 		this.treeview_maptree = new Gtk.TreeView ();
 		this.treeview_maptree.set_size_request (-1, 60);
+		this.treeview_maptree.insert_column_with_attributes(-1, "ID", new Gtk.CellRendererText(), "text", 0);
+		this.treeview_maptree.insert_column_with_attributes(-1, "Map name", new Gtk.CellRendererText(), "text", 1);
+		this.treeview_maptree.set_headers_visible(false);
 
 		/*
 		 * Set properties
@@ -772,7 +775,7 @@ public class MainWindow : Gtk.Window {
 			default:
 				return;
 		}
-	}	
+	}
 
 	/**
 	 * Closes this view and quit the application.
@@ -789,7 +792,7 @@ public class MainWindow : Gtk.Window {
 			return_if_fail (action != null);
 
 			action.get ("tooltip", out message);
-		
+
 		if (message != null){
 			this.statusbar_tooltip.push (0, message);
 		}
@@ -833,8 +836,7 @@ public class MainWindow : Gtk.Window {
 		Gtk.Allocation menu_allocation;
 		Gdk.Screen screen = Gdk.Screen.get_default();
 		Gdk.Device cursor = Gdk.Display.get_default().get_device_manager().get_client_pointer();
-		
-		
+
 		int current_x, current_y, parent_x, parent_y;
 
 		parent.get_allocation(out parent_allocation);

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<maptree>
+	<map id="1" name="Map1" />
+	<map id="2" name="Map2" />
+	<map id="5" name="Map5" />
+	<map id="6" name="Map6">
+		<map id="7" name="Map7" />
+		<map id="3" name="Map3">
+			<map id="9" name="Map9" />
+		</map>
+	</map>
+	<map id="8" name="Map8" />
+	<map id="10" name="Map10" />
+	<map id="4" name="Map4" />
+</maptree>

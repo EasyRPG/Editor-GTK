@@ -73,9 +73,7 @@ public class XmlParser {
 			string file_content;
 
 			if (GLib.FileUtils.get_contents (path, out file_content)) {
-				// Delete blank spaces
-				file_content = file_content.replace ("\t", "");
-				file_content = file_content.replace ("\n", "");
+				file_content = Utils.clean_file_content(file_content);
 
 				this.context.parse (file_content, -1);
 			}
@@ -91,7 +89,7 @@ public class XmlParser {
 	 * The parser defines some parameters containing the information related to the tag.
 	 */
 	private void opening_tag_callback (GLib.MarkupParseContext ctx, string tag_name,
-	                                   string[] at_names, string[] at_values)
+	                                   string[] attr_names, string[] attr_values)
                                       throws GLib.MarkupError {
 		/*
 		 * Root Node
@@ -109,6 +107,8 @@ public class XmlParser {
 			this.root = new XmlNode ();
 			this.root.name = tag_name;
 			this.root.parent = null;
+			this.root.prev = null;
+			this.root.next = null;
 			this.current_ref = this.root;
 		}
 		/*
@@ -117,12 +117,11 @@ public class XmlParser {
 		else {
 			XmlNode node = new XmlNode ();
 			node.name = tag_name;
-			node.attr_names = at_names;
-			node.attr_values = at_values;
-
-			// Add the node as child and update current_ref
-			this.current_ref.add_child (node);
+			node.attr_names = attr_names;
+			node.attr_values = attr_values;
 			node.parent = this.current_ref;
+
+			this.current_ref.add_child (node);
 			this.current_ref = node;
 		}
 
@@ -164,52 +163,10 @@ public class XmlParser {
 		// Not used yet
 	}
 
+	/**
+	 * Returns the root of the tree generated from the XML data.
+	 */
 	public XmlNode get_root () {
 		return this.root;
-	}
-
-	/**
-	 * Searchs recursively for the wanted node and returns it if found or null if not.
-	 * 
-	 * @param name The name of the wanted XmlNode.
-	 * @param node_ref A reference used to track the nodes while searching.
-	 * @return The XmlNode with name "name" if found or null if not. 
-	 */
-	public XmlNode get_node (string name, XmlNode? node_ref = null) {
-		XmlNode? wanted_node = null;
-
-		/* 
-		 * The first time get_node is called, node_ref should be null. This
-		 * connects it to the root.
-		 */
-		if(node_ref == null) {
-			node_ref = root;
-		}
-
-		/*
-		 * If this node is the one we are looking for, return it
-		 */
-		if(node_ref.name == name) {
-			return node_ref;
-		}
-		/*
-		 * Else, check the children nodes
-		 */
-		else {
-			int i = 0;
-			while(i < node_ref.get_children_num ()) {
-				// Recursion!
-				wanted_node = this.get_node (name, node_ref.get_child(i));
-
-				// If the wanted node was found, stop the process
-				if(wanted_node != null) {
-					break;
-				}
-
-				i++;
-			}
-
-			return wanted_node;
-		}
 	}
 }

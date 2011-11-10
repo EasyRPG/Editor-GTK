@@ -27,24 +27,6 @@ public class Map : Model {
 	public string name {get; set; default = "";}
 
 	/**
-	 * Parent map id.
-	 * 
-	 * Id 0 means no parent map.
-	 */
-	public int parent_id {get; set; default = 0;}
-
-	/**
-	 * Map order regarding to the parent.
-	 * 
-	 * Default is 0.
-	 * 0 means first map.
-	 * 
-	 * When two or more maps have the same order number, the id is mandatory and
-	 * the map with the lowest id goes first. Then the order should be updated.
-	 */
-	public int order {get; set; default = 0;}
-
-	/**
 	 * Map width in tiles.
 	 * 
 	 * Default is 20.
@@ -245,8 +227,6 @@ public class Map : Model {
 	 */
 	public override void load_data (XmlNode data) {
 		string name = "";
-		int parent_id = 0;
-		int order = 0;
 		int width = 0;
 		int height = 0;
 		int scroll_type = 0;
@@ -271,177 +251,157 @@ public class Map : Model {
 		int enemy_encounter_steps = 0;
 		int save_time = 0;
 
-		int i = 0;
-		while(i < data.get_children_num ()) {
-			switch (data.get_child(i).name) {
+		XmlNode node = data.children;
+		while (node != null) {
+			switch (node.name) {
 				case "name":
-					name = data.get_child(i).content;
-					break;
-				case "parent_id":
-					parent_id = int.parse (data.get_child(i).content);
-					break;
-				case "order":
-					order = int.parse (data.get_child(i).content);
+					name = node.content;
 					break;
 				case "width":
-					width = int.parse (data.get_child(i).content);
+					width = int.parse (node.content);
 					break;
 				case "height":
-					height = int.parse (data.get_child(i).content);
+					height = int.parse (node.content);
 					break;
 				case "scroll_type":
-					scroll_type = int.parse (data.get_child(i).content);
+					scroll_type = int.parse (node.content);
 					break;
 				case "panorama":
-					XmlNode panorama = data.get_child(i);
-					
-					int j = 0;
-					while(j < panorama.get_children_num ()) {
-						switch (panorama.get_child(j).name) {
+					XmlNode panorama = node.children;
+					while (panorama != null) {
+						switch (panorama.name) {
 							case "filename":
-								panorama_filename = panorama.get_child(j).content;
+								panorama_filename = panorama.content;
 								break;
 							case "horizontal_loop":
-								panorama_horizontal_loop = bool.parse (panorama.get_child(j).content);
+								panorama_horizontal_loop = bool.parse (panorama.content);
 								break;
 							case "horizontal_autoscroll":
-								panorama_horizontal_autoscroll = bool.parse (panorama.get_child(j).content);
+								panorama_horizontal_autoscroll = bool.parse (panorama.content);
 								break;
 							case "horizontal_autoscroll_speed":
-								panorama_horizontal_autoscroll_speed = int.parse (panorama.get_child(j).content);
+								panorama_horizontal_autoscroll_speed = int.parse (panorama.content);
 								break;
 							case "vertical_loop":
-								panorama_vertical_loop = bool.parse (panorama.get_child(j).content);
+								panorama_vertical_loop = bool.parse (panorama.content);
 								break;
 							case "vertical_autoscroll":
-								panorama_vertical_autoscroll = bool.parse (panorama.get_child(j).content);
+								panorama_vertical_autoscroll = bool.parse (panorama.content);
 								break;
 							case "vertical_autoscroll_speed":
-								panorama_vertical_autoscroll_speed = int.parse (panorama.get_child(j).content);
+								panorama_vertical_autoscroll_speed = int.parse (panorama.content);
 								break;
 							default:
 								break;
 						}
-						j++;
+						panorama = panorama.next;
 					}
 					break;
 				case "bgm":
-					XmlNode bgm = data.get_child(i);
-					
-					int j = 0;
-					while(j < bgm.get_children_num ()) {
-						switch (bgm.get_child(j).name) {
+					XmlNode bgm = node.children;
+					while (bgm != null) {
+						switch (bgm.name) {
 							case "type":
-								bgm_type = int.parse (bgm.get_child(j).content);
+								bgm_type = int.parse (bgm.content);
 								break;
 							case "filename":
-								bgm_filename = bgm.get_child(j).content;
+								bgm_filename = bgm.content;
 								break;
 							default:
 								break;
 						}
-						j++;
+						bgm = bgm.next;
 					}
 					break;
 				case "backdrop":
-					XmlNode backdrop = data.get_child(i);
-					
-					int j = 0;
-					while(j < backdrop.get_children_num ()) {
-						switch (backdrop.get_child(j).name) {
+					XmlNode backdrop = node.children;
+					while (backdrop != null) {
+						switch (backdrop.name) {
 							case "type":
-								backdrop_type = int.parse (backdrop.get_child(j).content);
+								backdrop_type = int.parse (backdrop.content);
 								break;
 							case "filename":
-								backdrop_filename = backdrop.get_child(j).content;
+								backdrop_filename = backdrop.content;
 								break;
 							default:
 								break;
 						}
-						j++;
+						backdrop = backdrop.next;
 					}
 					break;
 				case "teleport":
-					XmlNode teleport = data.get_child(i);
-					
-					int j = 0;
-					while(j < teleport.get_children_num ()) {
-						switch (teleport.get_child(j).name) {
+					XmlNode teleport = node.children;
+					while (teleport != null) {
+						switch (teleport.name) {
 							case "type":
-								teleport_type = int.parse (teleport.get_child(j).content);
+								teleport_type = int.parse (teleport.content);
 								break;
 							case "allow":
-								teleport_allow = bool.parse (teleport.get_child(j).content);
+								teleport_allow = bool.parse (teleport.content);
 								break;
 							default:
 								break;
 						}
-						j++;
+						teleport = teleport.next;
 					}
 					break;
 				case "escape":
-					XmlNode escape = data.get_child(i);
-					
-					int j = 0;
-					while(j < escape.get_children_num ()) {
-						switch (escape.get_child(j).name) {
+					XmlNode escape = node.children;
+					while (escape != null) {
+						switch (escape.name) {
 							case "type":
-								escape_type = int.parse (escape.get_child(j).content);
+								escape_type = int.parse (escape.content);
 								break;
 							case "allow":
-								escape_allow = bool.parse (escape.get_child(j).content);
+								escape_allow = bool.parse (escape.content);
 								break;
 							default:
 								break;
 						}
-						j++;
+						escape = escape.next;
 					}
 					break;
 				case "save":
-					XmlNode save = data.get_child(i);
-					
-					int j = 0;
-					while(j < save.get_children_num ()) {
-						switch (save.get_child(j).name) {
+					XmlNode save = node.children;
+					while (save != null) {
+						switch (save.name) {
 							case "type":
-								save_type = int.parse (save.get_child(j).content);
+								save_type = int.parse (save.content);
 								break;
 							case "allow":
-								save_allow = bool.parse (save.get_child(j).content);
+								save_allow = bool.parse (save.content);
 								break;
 							default:
 								break;
 						}
-						j++;
+						save = save.next;
 					}
 					break;
 				case "layers":
-					XmlNode layers_data = data.get_child(i);
-					
-					int j = 0;
-					while(j < layers_data.get_children_num ()) {
-						switch (layers_data.get_child(j).name) {
+					XmlNode layers_data = node.children;
+					while (layers_data != null) {
+						switch (layers_data.name) {
 							case "layer":
 								Layer layer = new Layer();
-								layer.load_data (layers_data.get_child(j));
+								layer.load_data (layers_data);
 								layers += layer;
 								break;
 							default:
 								break;
 						}
-						j++;
+						layers_data = layers_data.next;
 					}
 					break;
 				case "enemy_encounter_steps":
-					enemy_encounter_steps = int.parse (data.get_child(i).content);
+					enemy_encounter_steps = int.parse (node.content);
 					break;
 				case "save_time":
-					save_time = int.parse (data.get_child(i).content);
+					save_time = int.parse (node.content);
 					break;
 				default:
 					break;
 			}
-			i++;
+			node = node.next;
 		}
 
 		/*
@@ -453,16 +413,6 @@ public class Map : Model {
 		 */
 		this.name = (name == "") ? "Untitled" : name;
 
-		// FIXME: check if the parent map xml file exists 
-		if (parent_id < 0) {
-			parent_id = 0;
-		}
-		else {
-			// Check parent
-		}
-
-		this.order = (order < 0) ? 0 : order;
-
 		// Set a non-default width only when the parsed value is valid
 		if (width > 20) {
 			this.width = width;
@@ -473,7 +423,7 @@ public class Map : Model {
 			this.height = height;
 		}
 
-		this.scroll_type = (scroll_type < 0) ? 0 : order;
+		this.scroll_type = (scroll_type < 0) ? 0 : scroll_type;
 
 		// If the map does not use a panorama ignore its related values
 		if (panorama_filename != "") {
@@ -550,8 +500,6 @@ public class Map : Model {
 		print ("MAP DATA\n");
 		print ("********************************\n");
 		print ("Name: %s\n", this.name);
-		print ("Parent id: %i\n", this.parent_id);
-		print ("Order: %i\n", this.order);
 		print ("Width: %i\n", this.width);
 		print ("Height: %i\n", this.height);
 		print ("Scroll type: %i\n", this.scroll_type);

@@ -37,12 +37,17 @@ public class MainController : Controller {
 	private string project_filename;
 	private XmlNode project_data;
 	private XmlNode game_data;
+	private GLib.HashTable<int, Map> maps;
+	private GLib.HashTable<int, Gtk.TreeRowReference> map_references;
+	private Gtk.TreeStore treestore_maptree;
 
 	/**
 	 * Instantiantes the MainWindow view.
 	 */
 	public MainController () {
 		this.main_view = new MainWindow (this);
+		this.maps = new GLib.HashTable<int, Map> (null, null);
+		this.map_references = new GLib.HashTable<int, Gtk.TreeRowReference> (null, null);
 	}
 
 	/**
@@ -73,17 +78,18 @@ public class MainController : Controller {
 		gtk_file_filter_set_name (file_filter, "EasyRPG Project (*.rproject)");
 		file_filter.add_pattern ("*.rproject"); // for case-insensitive patterns -> add_custom()
 		open_project_dialog.add_filter (file_filter);
-		
+
 		if (open_project_dialog.run () == Gtk.ResponseType.ACCEPT) {
 			// Get the base_path and project_filename from the selected file
 			string full_path = open_project_dialog.get_filename ();
 			string[] path_tokens = full_path.split ("/");
 			this.project_filename = path_tokens[path_tokens.length - 1];
 			this.base_path = full_path.replace (this.project_filename, "");
-			
+
 			// Manages all the XML read stuff
 			this.load_project_data ();
-			this.load_maps_data ();
+			this.load_maptree_data ();
+//			this.load_maps_data ();
 
 			// Enable/disable some widgets
 			this.main_view.set_project_status ("open");
@@ -97,18 +103,20 @@ public class MainController : Controller {
 	 */
 	private void load_project_data () {
 		XmlParser parser = new XmlParser ();
-		
+
 		// Load data from the .rproject file
 		parser.parse_file (this.base_path + this.project_filename);
 		this.project_data = parser.get_root ();
-		int current_map = int.parse (parser.get_node ("current_map").content);
+		int current_map = int.parse (this.project_data.get_node_by_name ("current_map").content);
 
-		int current_scale = int.parse (parser.get_node ("current_scale").content);
+		// If the scale value found in the .rproject file is valid, set it.
+		int current_scale = int.parse (this.project_data.get_node_by_name ("current_scale").content);
 		if (current_scale > 0 && current_scale < 4) {
 			this.main_view.set_current_scale (current_scale);
 		}
 
-		int current_layer = int.parse (parser.get_node ("current_layer").content);
+		// If the layer value found in the .rproject file is valid, set it.
+		int current_layer = int.parse (this.project_data.get_node_by_name ("current_layer").content);
 		if (current_layer > 0 && current_layer < 3) {
 			this.main_view.set_current_layer (current_layer);
 		}
@@ -117,24 +125,110 @@ public class MainController : Controller {
 		parser.parse_file (this.base_path + "data/game.xml");
 		this.game_data = parser.get_root ();
 
-		XmlNode title_node = parser.get_node ("title");
+		XmlNode title_node = this.game_data.get_node_by_name ("title");
 		this.game_title = title_node.content;
 
 		this.party = new Party ();
-		XmlNode party_node = parser.get_node ("party");
+		XmlNode party_node = this.game_data.get_node_by_name ("party");
 		this.party.load_data (party_node);
 
 		this.boat = new Vehicle ();
-		XmlNode boat_node = parser.get_node ("boat");
+		XmlNode boat_node = this.game_data.get_node_by_name ("boat");
 		this.boat.load_data (boat_node);
 
 		this.ship = new Vehicle ();
-		XmlNode ship_node = parser.get_node ("ship");
+		XmlNode ship_node = this.game_data.get_node_by_name ("ship");
 		this.ship.load_data (ship_node);
 
 		this.airship = new Vehicle ();
-		XmlNode airship_node = parser.get_node ("airship");
+		XmlNode airship_node = this.game_data.get_node_by_name ("airship");
 		this.airship.load_data (airship_node);
+	}
+
+	/**
+	 * Loads XML data from the maptree file.
+	 */
+	public void load_maptree_data () {
+		XmlParser parser = new XmlParser ();
+
+		// Load data from the .rproject file
+		parser.parse_file (this.base_path + "data/maps/maptree.xml");
+		XmlNode maptree = parser.get_root ();
+
+		var treestore_maptree = new Gtk.TreeStore (2, typeof(int), typeof(string));
+		this.main_view.treeview_maptree.set_model (treestore_maptree);
+
+		/*
+		 * The iter_table hashtable stores the last used TreeIters for each depth.
+		 * They are used to point the correct parent when adding childs.
+		 */
+		var iter_table = new GLib.HashTable<int, Gtk.TreeIter?> (null, null);
+		Gtk.TreeIter iter;
+
+		// Append and set the first row (game_title)
+		treestore_maptree.append (out iter, null);
+		treestore_maptree.set_value (iter, 0, 0);
+		treestore_maptree.set_value (iter, 1, this.game_title);
+		iter_table.set (0, iter);
+
+		// Append a new row, the next while block will set the data
+		treestore_maptree.append (out iter, iter);
+		iter_table.set (1, iter);
+
+		XmlNode current_ref = maptree.children;
+		int depth = 1;
+
+		while (current_ref != null && depth > 0) {
+
+			// attr_values[0] stores the map id
+			int map_id = int.parse (current_ref.attr_values[0]);
+
+			/*
+			 * If the map exists in the map_references table, let's check the next one
+			 * or go back to its parent.
+			 * 
+			 * This allows to return to the correct map after adding child maps.
+			 */
+			if (this.map_references.get (map_id) != null) {
+				if (current_ref.next != null) {
+					current_ref = current_ref.next;
+				}
+				else {
+					current_ref = current_ref.parent;
+					depth--;
+				}
+				continue;
+			}
+
+			// Add map data to the row
+			treestore_maptree.set_value (iter, 0, int.parse (current_ref.attr_values[0]));
+			treestore_maptree.set_value (iter, 1, current_ref.attr_values[1]);
+
+			// Mark the iter as the master iter for this depth
+			iter_table.set (depth, iter);
+
+			// A TreeRowReference is created and stored in map_references
+			var path = new Gtk.TreePath.from_string (treestore_maptree.get_string_from_iter (iter_table.get (depth)));
+			var row_reference = new Gtk.TreeRowReference (treestore_maptree, path);
+			this.map_references.set (int.parse (current_ref.attr_values[0]), row_reference);
+
+			// If this map has children, manage them
+			if (current_ref.children != null) {
+				treestore_maptree.append (out iter, iter_table.get (depth));
+				current_ref = current_ref.children;
+				depth++;
+			}
+			// No children? Next map
+			else if (current_ref.next != null) {
+				treestore_maptree.append (out iter, iter_table.get (depth - 1));
+				current_ref = current_ref.next;
+			}
+			// Neither of them? Return to the parent
+			else {
+				current_ref = current_ref.parent;
+				depth--;
+			}
+		}
 	}
 
 	/**
@@ -143,16 +237,50 @@ public class MainController : Controller {
 	public void load_maps_data () {
 		XmlParser parser = new XmlParser ();
 
-		/*
-		 * Load example
-		 * 
-		 * The next goal is to load all the maps
-		 */
-		parser.parse_file (this.base_path + "data/maps/map1.xml");
-		XmlNode map_node = parser.get_root ();
-		
-		Map test_map = new Map ();
-		test_map.load_data (map_node);
+		string maps_dir_name = this.base_path + "data/maps/";
+		var maps_dir = File.new_for_path (maps_dir_name);
+
+		try {
+			var enumerator = maps_dir.enumerate_children ("standard::name", FileQueryInfoFlags.NONE);
+			FileInfo file_info;
+			string filename;
+
+			while ((file_info = enumerator.next_file (null)) != null) {
+				filename = file_info.get_name ();
+
+				// Ignore files without ".xml" suffix
+				if (!filename.has_suffix (".xml")) {
+					continue;
+				}
+
+				string string_map_id = filename.replace ("map", "").replace (".xml", "");
+
+				/*
+				 * An non-int id will be parsed to 0:
+				 *  "map23.xml" -> "23" -> 23
+				 *  "mapzz.xml" -> "zz" -> 0
+				 */
+				int map_id = int.parse (string_map_id);
+
+				// Maps with invalid map_id are ignored
+				if (map_id < 1) {
+					continue;
+				}
+
+				// Parse the xml file and load map data
+				parser.parse_file (maps_dir_name + filename);
+				XmlNode map_node = parser.get_root ();
+
+				var map = new Map ();
+				map.load_data (map_node);
+
+				// Insert the map into the maps HashTable 
+				this.maps.set (map_id, map);
+			}
+		}
+		catch (Error e) {
+			stderr.printf ("Error: %s\n", e.message);
+		}
 	}
 
 	/**
@@ -165,11 +293,18 @@ public class MainController : Controller {
 		this.base_path = null;
 		this.project_data = null;
 		this.game_data = null;
-
 		this.party = null;
 		this.boat = null;
 		this.ship = null;
 		this.airship = null;
+
+		// Hashtables are cleared
+		this.maps.remove_all ();
+		this.map_references.remove_all ();
+
+		// TreeStore is cleared too
+		var treestore_maptree = this.main_view.treeview_maptree.get_model () as Gtk.TreeStore;
+		treestore_maptree.clear ();
 
 		// Enable/disable some widgets
 		this.main_view.set_project_status ("closed");
@@ -222,10 +357,10 @@ public class MainController : Controller {
 		about_dialog.run ();
 		about_dialog.destroy ();
 	}
-	
+
 	public void on_layer_change(){
 		this.main_view.update_statusbar_current_frame();
-	}	
+	}
 }
 
 // Workaround

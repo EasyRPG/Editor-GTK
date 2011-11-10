@@ -46,26 +46,26 @@ public class Party : Model {
 		int map_id = 0;
 		int x = 0;
 		int y = 0;
-		
-		int i = 0;
-		while(i < data.get_children_num ()) {
-			switch (data.get_child(i).name) {
+
+		XmlNode node = data.children;
+		while (node != null) {
+			switch (node.name) {
 				case "map":
-					map_id = int.parse (data.get_child(i).content);
+					map_id = int.parse (node.content);
 					break;
 				case "x_coordinate":
-					x = int.parse (data.get_child(i).content);
+					x = int.parse (node.content);
 					break;
 				case "y_coordinate":
-					y = int.parse (data.get_child(i).content);
+					y = int.parse (node.content);
 					break;
 				default:
 					break;
 			}
-			i++;
+			node = node.next;
 		}
 
-		// Before this, there would be some value/type checking
+		// Before this, there should be some value/type checking
 		this.map_id = map_id;
 		this.x = x;
 		this.y = y;

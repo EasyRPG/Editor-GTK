@@ -1,6 +1,6 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * enum.vala
+ * utils.vala
  * Copyright (C) EasyRPG Project 2011
  *
  * EasyRPG is free software: you can redistribute it and/or modify it
@@ -16,21 +16,12 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public enum LayerType {
-	LOWER = 0,
-	UPPER = 1,
-	EVENT = 2
-}
+namespace Utils {
+	public string clean_file_content (string content) {
+		string clean_content = content;
+		clean_content = content.replace ("\t", "");
+		clean_content = content.replace ("\n", "");
 
-public enum DrawingTool {
-	SELECT = 0,
-	ZOOM = 1,
-	PEN = 2,
-	ERASER_NORMAL = 3,
-	ERASER_RECTANGLE = 4,
-	ERASER_CIRCLE = 5,
-	ERASER_FILL = 6,
-	RECTANGLE = 7,
-	CIRCLE = 8,
-	FILL = 9
+		return clean_content;
+	}
 }

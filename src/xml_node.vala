@@ -42,20 +42,26 @@ public class XmlNode {
 	public string content;
 
 	/**
-	 * A reference to the parent XmlNode.
-	 * 
-	 * The "weak" keyword is used to avoid reference cycles.
-	 * More information can be found at [[https://live.gnome.org/Vala/ReferenceHandling]]
+	 * A reference to the parent node.
 	 */
 	public weak XmlNode parent;
 
-	/*
-	 * An array containing the children XmlNodes.
+	/**
+	 * A reference to the first child.
 	 * 
-	 * It is defined as private to workaround the problem when adding items dinamically
-	 * from outside the class. There are related get and set methods.
+	 * The rest of the children should be accessed using next ().
 	 */
-	private XmlNode[] children;
+	public XmlNode children;
+
+	/**
+	 * A reference to the next node.
+	 */
+	public XmlNode next;
+
+	/**
+	 * A reference to the previous node.
+	 */
+	public weak XmlNode prev;
 
 	/**
 	 * An array containing the attribute names of the element.
@@ -73,30 +79,114 @@ public class XmlNode {
 	public XmlNode () {
 		this.name = "";
 		this.content = "";
+		this.attr_names = {};
+		this.attr_values = {};
 	}
 
 	/**
-	 * Adds a child XmlNode to the children array.
-	 * 
-	 * This is a workaround to the problem when adding items dinamically from outside the class.
+	 * Returns true if this node is the root.
+	 */
+	public bool is_root () {
+		return this.parent == null ? true : false;
+	}
+
+	/**
+	 * Returns true if this node is a leaf.
+	 */
+	public bool is_leaf () {
+		return this.children == null ? true : false;
+	}
+
+	/**
+	 * Gets the root of the tree.
+	 */
+	public unowned XmlNode get_root () {
+		if (this.is_root ()) {
+			return this;
+		}
+		else {
+			return this.parent.get_root ();
+		}
+	}
+
+	/**
+	 * Looks for a node with the given name and gets it if found.
+	 */
+	public unowned XmlNode? get_node_by_name (string name, XmlNode? node_ref = null) {
+		unowned XmlNode? wanted_node = null;
+
+		/* 
+		 * The first time get_node_by_name is called, node_ref should be null. This
+		 * connects it to the root.
+		 */
+		if (node_ref == null) {
+			node_ref = this.get_root ();
+		}
+
+		/*
+		 * If this node is the one we are looking for, return it
+		 */
+		if (node_ref.name == name) {
+			return node_ref;
+		}
+
+		/*
+		 * Else, check the children nodes
+		 */
+		if (node_ref.children != null) {
+			node_ref = node_ref.children;
+
+			while (node_ref != null) {
+				// Recursion!
+				wanted_node = node_ref.get_node_by_name (name, node_ref);
+
+				// If the wanted node was found, stop the process
+				if(wanted_node != null) {
+					break;
+				}
+
+				node_ref = node_ref.next;
+			}
+
+			return wanted_node;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Gets the last child node
+	 */
+	public unowned XmlNode? get_last_child () {
+		if (this.children == null) {
+			return null;
+		}
+		
+		unowned XmlNode child = this.children;
+ 
+		while (child.next != null) {
+			child = child.next;
+		}
+
+		return child;
+	}
+
+	/**
+	 * Adds node as last child.
 	 */
 	public void add_child (XmlNode node) {
-		this.children += node;
-	}
+		// If this node has no children, change the children reference
+		if (this.children == null) {
+			this.children = node;
+		}
+		// Else, add it after the last one
+		else {
+			unowned XmlNode? last_child = this.get_last_child ();
 
-	/**
-	 * Gets the length of the children array.
-	 */
-	public int get_children_num () {
-		return this.children.length;
-	}
+			last_child.next = node;
+			node.prev = last_child;
+		}
 
-	/*
-	 * Gets an XmlNode from the children array.
-	 * 
-	 * @param i The position of the desired XmlNode. 
-	 */
-	public XmlNode get_child (int i) {
-		return this.children[i];
+		node.parent = this;
 	}
 }

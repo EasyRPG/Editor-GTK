@@ -37,16 +37,16 @@ public class Layer : Model {
 		string[] tiles_string = {};
 		int[] tiles = {};
 
-		int i = 0;
-		while(i < data.get_children_num ()) {
-			switch (data.get_child(i).name) {
+		XmlNode node = data.children;
+		while (node != null) {
+			switch (node.name) {
 				case "tiles":
-					tiles_string = data.get_child(i).content.split (" ");
+					tiles_string = node.content.split (" ");
 					break;
 				default:
 					break;
 			}
-			i++;
+			node = node.next;
 		}
 
 		/*
