@@ -39,7 +39,6 @@ public class MainController : Controller {
 	private XmlNode game_data;
 	private GLib.HashTable<int, Map> maps;
 	private GLib.HashTable<int, Gtk.TreeRowReference> map_references;
-	private Gtk.TreeStore treestore_maptree;
 
 	/**
 	 * Instantiantes the MainWindow view.
@@ -149,14 +148,12 @@ public class MainController : Controller {
 	 * Loads XML data from the maptree file.
 	 */
 	public void load_maptree_data () {
+		var maptree_model = this.main_view.treeview_maptree.get_model () as Gtk.TreeStore;
 		XmlParser parser = new XmlParser ();
 
 		// Load data from the .rproject file
 		parser.parse_file (this.base_path + "data/maps/maptree.xml");
 		XmlNode maptree = parser.get_root ();
-
-		var treestore_maptree = new Gtk.TreeStore (2, typeof(int), typeof(string));
-		this.main_view.treeview_maptree.set_model (treestore_maptree);
 
 		/*
 		 * The iter_table hashtable stores the last used TreeIters for each depth.
@@ -166,13 +163,13 @@ public class MainController : Controller {
 		Gtk.TreeIter iter;
 
 		// Append and set the first row (game_title)
-		treestore_maptree.append (out iter, null);
-		treestore_maptree.set_value (iter, 0, 0);
-		treestore_maptree.set_value (iter, 1, this.game_title);
+		maptree_model.append (out iter, null);
+		maptree_model.set_value (iter, 0, 0);
+		maptree_model.set_value (iter, 1, this.game_title);
 		iter_table.set (0, iter);
 
 		// Append a new row, the next while block will set the data
-		treestore_maptree.append (out iter, iter);
+		maptree_model.append (out iter, iter);
 		iter_table.set (1, iter);
 
 		XmlNode current_ref = maptree.children;
@@ -201,26 +198,26 @@ public class MainController : Controller {
 			}
 
 			// Add map data to the row
-			treestore_maptree.set_value (iter, 0, int.parse (current_ref.attr_values[0]));
-			treestore_maptree.set_value (iter, 1, current_ref.attr_values[1]);
+			maptree_model.set_value (iter, 0, int.parse (current_ref.attr_values[0]));
+			maptree_model.set_value (iter, 1, current_ref.attr_values[1]);
 
 			// Mark the iter as the master iter for this depth
 			iter_table.set (depth, iter);
 
 			// A TreeRowReference is created and stored in map_references
-			var path = new Gtk.TreePath.from_string (treestore_maptree.get_string_from_iter (iter_table.get (depth)));
-			var row_reference = new Gtk.TreeRowReference (treestore_maptree, path);
+			var path = new Gtk.TreePath.from_string (maptree_model.get_string_from_iter (iter_table.get (depth)));
+			var row_reference = new Gtk.TreeRowReference (maptree_model, path);
 			this.map_references.set (int.parse (current_ref.attr_values[0]), row_reference);
 
 			// If this map has children, manage them
 			if (current_ref.children != null) {
-				treestore_maptree.append (out iter, iter_table.get (depth));
+				maptree_model.append (out iter, iter_table.get (depth));
 				current_ref = current_ref.children;
 				depth++;
 			}
 			// No children? Next map
 			else if (current_ref.next != null) {
-				treestore_maptree.append (out iter, iter_table.get (depth - 1));
+				maptree_model.append (out iter, iter_table.get (depth - 1));
 				current_ref = current_ref.next;
 			}
 			// Neither of them? Return to the parent
@@ -302,9 +299,9 @@ public class MainController : Controller {
 		this.maps.remove_all ();
 		this.map_references.remove_all ();
 
-		// TreeStore is cleared too
-		var treestore_maptree = this.main_view.treeview_maptree.get_model () as Gtk.TreeStore;
-		treestore_maptree.clear ();
+		// Maptree model is cleared too
+		var maptree_model = this.main_view.treeview_maptree.get_model () as Gtk.TreeStore;
+		maptree_model.clear ();
 
 		// Enable/disable some widgets
 		this.main_view.set_project_status ("closed");

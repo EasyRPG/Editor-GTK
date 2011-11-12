@@ -34,6 +34,7 @@ editor_SOURCES = \
 	view_generic_widgets.vala \
 	view_database_dialog.vala \
 	view_main_window.vala \
+	widget_treeview_maptree.vala \
 	xml_node.vala \
 	xml_parser.vala
 

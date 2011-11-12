@@ -36,7 +36,7 @@ public class MainWindow : Gtk.Window {
 	private Gtk.Statusbar statusbar_current_position;
 	private Gtk.Toolbar toolbar_main;
 	private Gtk.Toolbar toolbar_sidebar;
-	public Gtk.TreeView treeview_maptree;
+	public Maptree treeview_maptree;
 
 	private Gtk.Menu menu_eraser;
 	private Gtk.ToolButton toolitem_eraser;
@@ -470,15 +470,12 @@ public class MainWindow : Gtk.Window {
 		this.drawingarea_palette = new Gtk.DrawingArea ();
 		this.paned_palette_maptree = new Gtk.Paned (Gtk.Orientation.VERTICAL);
 		this.scrolled_maprender = new Gtk.ScrolledWindow (null, null);
-		this.scrolled_palette = new Gtk.ScrolledWindow(null, null);
+		this.scrolled_palette = new Gtk.ScrolledWindow (null, null);
 		this.statusbar_tooltip = new Gtk.Statusbar ();
-		this.statusbar_current_frame = new Gtk.Statusbar();
-		this.statusbar_current_position = new Gtk.Statusbar();
-		this.treeview_maptree = new Gtk.TreeView ();
+		this.statusbar_current_frame = new Gtk.Statusbar ();
+		this.statusbar_current_position = new Gtk.Statusbar ();
+		this.treeview_maptree = new Maptree ();
 		this.treeview_maptree.set_size_request (-1, 60);
-		this.treeview_maptree.insert_column_with_attributes(-1, "ID", new Gtk.CellRendererText(), "text", 0);
-		this.treeview_maptree.insert_column_with_attributes(-1, "Map name", new Gtk.CellRendererText(), "text", 1);
-		this.treeview_maptree.set_headers_visible(false);
 
 		/*
 		 * Set properties
