@@ -36,7 +36,7 @@ public class MainWindow : Gtk.Window {
 	private Gtk.Statusbar statusbar_current_position;
 	private Gtk.Toolbar toolbar_main;
 	private Gtk.Toolbar toolbar_sidebar;
-	public Maptree treeview_maptree;
+	public MaptreeTreeView treeview_maptree;
 
 	private Gtk.Menu menu_eraser;
 	private Gtk.ToolButton toolitem_eraser;
@@ -474,7 +474,7 @@ public class MainWindow : Gtk.Window {
 		this.statusbar_tooltip = new Gtk.Statusbar ();
 		this.statusbar_current_frame = new Gtk.Statusbar ();
 		this.statusbar_current_position = new Gtk.Statusbar ();
-		this.treeview_maptree = new Maptree ();
+		this.treeview_maptree = new MaptreeTreeView ();
 		this.treeview_maptree.set_size_request (-1, 60);
 
 		/*

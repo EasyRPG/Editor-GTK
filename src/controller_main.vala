@@ -148,7 +148,7 @@ public class MainController : Controller {
 	 * Loads XML data from the maptree file.
 	 */
 	public void load_maptree_data () {
-		var maptree_model = this.main_view.treeview_maptree.get_model () as Gtk.TreeStore;
+		var maptree_model = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
 		XmlParser parser = new XmlParser ();
 
 		// Load data from the .rproject file
@@ -300,7 +300,7 @@ public class MainController : Controller {
 		this.map_references.remove_all ();
 
 		// Maptree model is cleared too
-		var maptree_model = this.main_view.treeview_maptree.get_model () as Gtk.TreeStore;
+		var maptree_model = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
 		maptree_model.clear ();
 
 		// Enable/disable some widgets

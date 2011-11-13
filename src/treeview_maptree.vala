@@ -1,6 +1,6 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * xml_node.vala
+ * treeview_maptree.vala
  * Copyright (C) EasyRPG Project 2011
  *
  * EasyRPG is free software: you can redistribute it and/or modify it
@@ -20,15 +20,13 @@
 /**
  * The maptree TreeView.
  */
-public class Maptree : Gtk.TreeView {
-	private Gtk.TreeStore maptree_model;
+public class MaptreeTreeView : Gtk.TreeView {
+	private MaptreeTreeStore maptree_model;
 
 	/**
 	 * Builds the maptree TreeView.
-	 * 
-	 * @param controller A reference to the controller that launched this view.
 	 */
-	public Maptree () {
+	public MaptreeTreeView () {
 		this.insert_column_with_attributes (-1, "Map ID", new Gtk.CellRendererText(), "text", 0);
 		this.insert_column_with_attributes (-1, "Map name", new Gtk.CellRendererText(), "text", 1);
 
@@ -40,7 +38,7 @@ public class Maptree : Gtk.TreeView {
 		this.set_reorderable (true);
 
 		// Get the TreeStore ready
-		this.maptree_model = new Gtk.TreeStore (2, typeof(int), typeof(string));
+		this.maptree_model = new MaptreeTreeStore ();
 		this.set_model (maptree_model);
 
 		/*
