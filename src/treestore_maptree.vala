@@ -21,13 +21,14 @@
  * The maptree TreeStore.
  */
 public class MaptreeTreeStore : Gtk.TreeStore, Gtk.TreeDragSource, Gtk.TreeDragDest {
-
+	
 	/**
 	 * Instantiates the Maptree TreeStore.
 	 */
 	public MaptreeTreeStore () {
-		set_column_types(new GLib.Type[2] {
+		set_column_types(new GLib.Type[3] {
 			typeof(int),
+			typeof(Gdk.Pixbuf),
 			typeof(string)
 		});
 	}

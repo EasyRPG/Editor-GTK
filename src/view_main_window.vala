@@ -157,7 +157,7 @@ public class MainWindow : Gtk.Window {
 		toolitem_open.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/open.png"));
 		toolitem_open.set_use_action_appearance (true);
 		var toolitem_close = action_close.create_tool_item () as Gtk.ToolButton;
-		toolitem_close.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/close.png"));
+		toolitem_close.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/folder.png"));
 		toolitem_close.set_use_action_appearance (true);
 		var toolitem_create_game_disk = action_create_game_disk.create_tool_item () as Gtk.ToolButton;
 		toolitem_create_game_disk.set_icon_widget (new Gtk.Image.from_file ("./share/easyrpg/toolbar/create_game_disk.png"));
@@ -301,7 +301,7 @@ public class MainWindow : Gtk.Window {
 		menuitem_open.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/open.png"));
 		menuitem_open.set_use_action_appearance (true);
 		var menuitem_close = action_close.create_menu_item () as Gtk.ImageMenuItem;
-		menuitem_close.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/close.png"));
+		menuitem_close.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/folder.png"));
 		menuitem_close.set_use_action_appearance (true);
 		var menuitem_create_game_disk = action_create_game_disk.create_menu_item () as Gtk.ImageMenuItem;
 		menuitem_create_game_disk.set_image (new Gtk.Image.from_file ("./share/easyrpg/toolbar/create_game_disk.png"));

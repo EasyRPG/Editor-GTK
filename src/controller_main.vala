@@ -165,7 +165,8 @@ public class MainController : Controller {
 		// Append and set the first row (game_title)
 		maptree_model.append (out iter, null);
 		maptree_model.set_value (iter, 0, 0);
-		maptree_model.set_value (iter, 1, this.game_title);
+		maptree_model.set_value (iter, 1, this.main_view.treeview_maptree.pix_folder);
+		maptree_model.set_value (iter, 2, this.game_title);
 		iter_table.set (0, iter);
 
 		// Append a new row, the next while block will set the data
@@ -199,7 +200,8 @@ public class MainController : Controller {
 
 			// Add map data to the row
 			maptree_model.set_value (iter, 0, int.parse (current_ref.attr_values[0]));
-			maptree_model.set_value (iter, 1, current_ref.attr_values[1]);
+			maptree_model.set_value (iter, 1, this.main_view.treeview_maptree.pix_map);
+			maptree_model.set_value (iter, 2, current_ref.attr_values[1]);
 
 			// Mark the iter as the master iter for this depth
 			iter_table.set (depth, iter);

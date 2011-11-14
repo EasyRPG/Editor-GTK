@@ -23,12 +23,35 @@
 public class MaptreeTreeView : Gtk.TreeView {
 	private MaptreeTreeStore maptree_model;
 
+	// TODO: The pixbufs instances could be placed in some other place in the future
+	public Gdk.Pixbuf pix_folder;
+	public Gdk.Pixbuf pix_map;
+
 	/**
 	 * Builds the maptree TreeView.
 	 */
 	public MaptreeTreeView () {
-		this.insert_column_with_attributes (-1, "Map ID", new Gtk.CellRendererText(), "text", 0);
-		this.insert_column_with_attributes (-1, "Map name", new Gtk.CellRendererText(), "text", 1);
+		// TODO: The pixbufs instances could be placed in some other place in the future 
+		this.pix_folder = new Gdk.Pixbuf.from_file("./share/easyrpg/toolbar/folder.png");
+		this.pix_map = new Gdk.Pixbuf.from_file("./share/easyrpg/toolbar/map.png");
+
+		// The ID column can be added with the shorthand insert_column_with_attributes
+		this.insert_column_with_attributes (-1, "ID", new Gtk.CellRendererText (), "text", 0);
+
+		// The Map column contain two CellRenderers, so it must be built first
+		var col_map = new Gtk.TreeViewColumn ();
+		col_map.set_title ("Map");
+
+		var cell_icon = new Gtk.CellRendererPixbuf ();
+		var cell_name = new Gtk.CellRendererText ();
+		
+		col_map.pack_start (cell_icon, false);
+		col_map.pack_start (cell_name, true);
+
+		col_map.add_attribute (cell_icon, "pixbuf", 1);
+		col_map.add_attribute (cell_name, "text", 2);
+
+		this.append_column (col_map);
 
 		// The map_id column should not be visible
 		var col_map_id = this.get_column (0);
