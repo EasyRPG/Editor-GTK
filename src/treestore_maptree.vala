@@ -22,6 +22,8 @@
  */
 public class MaptreeTreeStore : Gtk.TreeStore, Gtk.TreeDragSource, Gtk.TreeDragDest {
 	
+	private string dragged_row_path;
+	
 	/**
 	 * Instantiates the Maptree TreeStore.
 	 */
@@ -42,6 +44,7 @@ public class MaptreeTreeStore : Gtk.TreeStore, Gtk.TreeDragSource, Gtk.TreeDragD
 			return false;
 		}
 
+		this.dragged_row_path = path.to_string ();
 		return true;
 	}
 
@@ -53,8 +56,27 @@ public class MaptreeTreeStore : Gtk.TreeStore, Gtk.TreeDragSource, Gtk.TreeDragD
 		if (dest_path.get_depth () == 1) {
 			return false;
 		}
+
 		// The game_title row itself is not a possible place
-		else if (dest_path.to_string () == "0:0") {
+		if (dest_path.to_string () == "0") {
+			return false;
+		}
+		
+		var source_path = new Gtk.TreePath.from_string (this.dragged_row_path);
+
+		// A descendant of the dragged row is not a possible place
+		if (dest_path.is_descendant (source_path)) {
+			return false;
+		}
+
+		// The current place (after the previous row) should not appear as a possible place
+		if (dest_path.compare (source_path) == 0) {
+			return false;
+		}
+
+		// The current place (before the next row) should not appear as a possible place
+		source_path.next ();
+		if (dest_path.compare (source_path) == 0) {
 			return false;
 		}
 

@@ -100,7 +100,7 @@ public class XmlNode {
 	/**
 	 * Gets the root of the tree.
 	 */
-	public unowned XmlNode get_root () {
+	public XmlNode get_root () {
 		if (this.is_root ()) {
 			return this;
 		}
@@ -112,40 +112,41 @@ public class XmlNode {
 	/**
 	 * Looks for a node with the given name and gets it if found.
 	 */
-	public unowned XmlNode? get_node_by_name (string name, XmlNode? node_ref = null) {
-		unowned XmlNode? wanted_node = null;
+	public XmlNode? get_node_by_name (string name, XmlNode? node_ref = null) {
+		XmlNode? wanted_node = null;
+		XmlNode? current_node = node_ref;
 
 		/* 
 		 * The first time get_node_by_name is called, node_ref should be null. This
 		 * connects it to the root.
 		 */
-		if (node_ref == null) {
-			node_ref = this.get_root ();
+		if (current_node == null) {
+			current_node = this.get_root ();
 		}
 
 		/*
 		 * If this node is the one we are looking for, return it
 		 */
-		if (node_ref.name == name) {
-			return node_ref;
+		if (current_node.name == name) {
+			return current_node;
 		}
 
 		/*
 		 * Else, check the children nodes
 		 */
-		if (node_ref.children != null) {
-			node_ref = node_ref.children;
+		if (current_node.children != null) {
+			current_node = current_node.children;
 
-			while (node_ref != null) {
+			while (current_node != null) {
 				// Recursion!
-				wanted_node = node_ref.get_node_by_name (name, node_ref);
+				wanted_node = current_node.get_node_by_name (name, current_node);
 
 				// If the wanted node was found, stop the process
 				if(wanted_node != null) {
 					break;
 				}
 
-				node_ref = node_ref.next;
+				current_node = current_node.next;
 			}
 
 			return wanted_node;
@@ -157,12 +158,12 @@ public class XmlNode {
 	/**
 	 * Gets the last child node
 	 */
-	public unowned XmlNode? get_last_child () {
+	public XmlNode? get_last_child () {
 		if (this.children == null) {
 			return null;
 		}
 		
-		unowned XmlNode child = this.children;
+		XmlNode child = this.children;
  
 		while (child.next != null) {
 			child = child.next;
@@ -181,7 +182,7 @@ public class XmlNode {
 		}
 		// Else, add it after the last one
 		else {
-			unowned XmlNode? last_child = this.get_last_child ();
+			XmlNode? last_child = this.get_last_child ();
 
 			last_child.next = node;
 			node.prev = last_child;

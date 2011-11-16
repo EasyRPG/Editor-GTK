@@ -70,6 +70,10 @@ public class MaptreeTreeView : Gtk.TreeView {
 		this.cursor_changed.connect(on_change);
 	}
 
+	public void clear () {
+		this.maptree_model.clear ();
+	}
+
 	/**
 	 * This method is triggered everytime a row (map) is selected.
 	 */
@@ -84,7 +88,7 @@ public class MaptreeTreeView : Gtk.TreeView {
 			maptree_model.get_value (selected, 0, out value);
 
 			int map_id = value.get_int ();
-			print ("Map %i activated!\n", map_id);
+			//print ("Map %i activated!\n", map_id);
 		}
 	}
 }

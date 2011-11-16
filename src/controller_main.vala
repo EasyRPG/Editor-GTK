@@ -301,9 +301,8 @@ public class MainController : Controller {
 		this.maps.remove_all ();
 		this.map_references.remove_all ();
 
-		// Maptree model is cleared too
-		var maptree_model = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
-		maptree_model.clear ();
+		// The Maptree is cleared too
+		this.main_view.treeview_maptree.clear ();
 
 		// Enable/disable some widgets
 		this.main_view.set_project_status ("closed");
