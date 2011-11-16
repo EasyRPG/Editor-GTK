@@ -61,7 +61,7 @@ public class MaptreeTreeView : Gtk.TreeView {
 		this.set_reorderable (true);
 
 		// Get the TreeStore ready
-		this.maptree_model = new MaptreeTreeStore ();
+		this.maptree_model = new MaptreeTreeStore (this);
 		this.set_model (maptree_model);
 
 		/*
@@ -70,6 +70,9 @@ public class MaptreeTreeView : Gtk.TreeView {
 		this.cursor_changed.connect(on_change);
 	}
 
+	/**
+	 * Clears the model.
+	 */
 	public void clear () {
 		this.maptree_model.clear ();
 	}

@@ -21,18 +21,28 @@
  * The maptree TreeStore.
  */
 public class MaptreeTreeStore : Gtk.TreeStore, Gtk.TreeDragSource, Gtk.TreeDragDest {
-	
+
+	/**
+	 * A weak reference to the related MaptreeTreeView.
+	 */
+	private weak MaptreeTreeView maptree_treeview;
+
+	/**
+	 * The path of the last dragged row.
+	 */
 	private string dragged_row_path;
 	
 	/**
 	 * Instantiates the Maptree TreeStore.
 	 */
-	public MaptreeTreeStore () {
+	public MaptreeTreeStore (MaptreeTreeView treeview) {
 		set_column_types(new GLib.Type[3] {
 			typeof(int),
 			typeof(Gdk.Pixbuf),
 			typeof(string)
 		});
+
+		this.maptree_treeview = treeview;
 	}
 
 	/**
@@ -81,5 +91,23 @@ public class MaptreeTreeStore : Gtk.TreeStore, Gtk.TreeDragSource, Gtk.TreeDragD
 		}
 
 		return true;
-	} 
+	}
+
+	/**
+	 * Manages the received data.
+	 */
+	public bool drag_data_received (Gtk.TreePath dest, Gtk.SelectionData selection_data) {
+		// Chain with the parent drag_data_received
+		if (base.drag_data_received (dest, selection_data)) {
+			// The dragged map should be visible, so the parent must be expanded
+			this.maptree_treeview.expand_to_path (dest);
+
+			// Reselect the dragged map
+			this.maptree_treeview.set_cursor (dest, this.maptree_treeview.get_column (1), false); 
+
+			return true;
+		}
+
+		return false;
+	}
 }
