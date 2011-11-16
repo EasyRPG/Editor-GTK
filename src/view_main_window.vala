@@ -29,8 +29,6 @@ public class MainWindow : Gtk.Window {
 	private Gtk.DrawingArea drawingarea_palette;
 	private Gtk.MenuBar menubar_main;
 	private Gtk.Paned paned_palette_maptree;
-	private Gtk.ScrolledWindow scrolled_maprender;
-	private Gtk.ScrolledWindow scrolled_palette;
 	private Gtk.Statusbar statusbar_tooltip;
 	private Gtk.Statusbar statusbar_current_frame;
 	private Gtk.Statusbar statusbar_current_position;
@@ -469,13 +467,15 @@ public class MainWindow : Gtk.Window {
 		this.drawingarea_maprender = new Gtk.DrawingArea ();
 		this.drawingarea_palette = new Gtk.DrawingArea ();
 		this.paned_palette_maptree = new Gtk.Paned (Gtk.Orientation.VERTICAL);
-		this.scrolled_maprender = new Gtk.ScrolledWindow (null, null);
-		this.scrolled_palette = new Gtk.ScrolledWindow (null, null);
 		this.statusbar_tooltip = new Gtk.Statusbar ();
 		this.statusbar_current_frame = new Gtk.Statusbar ();
 		this.statusbar_current_position = new Gtk.Statusbar ();
 		this.treeview_maptree = new MaptreeTreeView ();
 		this.treeview_maptree.set_size_request (-1, 60);
+
+		var scrolled_maprender = new Gtk.ScrolledWindow (null, null);
+		var scrolled_palette = new Gtk.ScrolledWindow (null, null);
+		var scrolled_maptree = new Gtk.ScrolledWindow (null, null);
 
 		/*
 		 * Set properties
@@ -494,17 +494,19 @@ public class MainWindow : Gtk.Window {
 		/*
 		 * Window layout
 		 */
-		this.paned_palette_maptree.pack1 (this.scrolled_palette, true, false);
-		this.paned_palette_maptree.pack2 (this.treeview_maptree, true, false);
+		scrolled_maptree.add (treeview_maptree);
+
+		this.paned_palette_maptree.pack1 (scrolled_palette, true, false);
+		this.paned_palette_maptree.pack2 (scrolled_maptree, true, false);
 
 		box_sidebar.pack_start (this.toolbar_sidebar, false, true, 0);
 		box_sidebar.pack_start (this.paned_palette_maptree, true, true, 0);
 
-		this.scrolled_palette.add_with_viewport (this.drawingarea_palette);
-		this.scrolled_maprender.add_with_viewport (this.drawingarea_maprender);
+		scrolled_palette.add_with_viewport (this.drawingarea_palette);
+		scrolled_maprender.add_with_viewport (this.drawingarea_maprender);
 
 		box_central.pack_start (box_sidebar, false, false);
-		box_central.pack_start (this.scrolled_maprender, true, true);
+		box_central.pack_start (scrolled_maprender, true, true);
 
 		box_statusbar.pack_start(statusbar_tooltip, true, true, 0);
 		box_statusbar.pack_start(statusbar_current_frame, false, true, 0);
