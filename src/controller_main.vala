@@ -168,6 +168,10 @@ public class MainController : Controller {
 		maptree_model.set_value (iter, 1, this.main_view.treeview_maptree.pix_folder);
 		maptree_model.set_value (iter, 2, this.game_title);
 		iter_table.set (0, iter);
+		// A TreeRowReference is created and stored in map_references
+		var path = new Gtk.TreePath.from_string (maptree_model.get_string_from_iter (iter));
+		var row_reference = new Gtk.TreeRowReference (maptree_model, path);
+		this.map_references.set (0, row_reference);
 
 		// Append a new row, the next while block will set the data
 		maptree_model.append (out iter, iter);
@@ -194,9 +198,13 @@ public class MainController : Controller {
 				else {
 					current_ref = current_ref.parent;
 					depth--;
-				}
+					if (depth == 1 && current_ref.next != null && map_references.get (int.parse(current_ref.next.attr_values[0])) == null ){
+						maptree_model.append(out iter, iter_table.get(0));
+					}
 				continue;
+				}
 			}
+
 
 			// Add map data to the row
 			maptree_model.set_value (iter, 0, int.parse (current_ref.attr_values[0]));
@@ -207,8 +215,8 @@ public class MainController : Controller {
 			iter_table.set (depth, iter);
 
 			// A TreeRowReference is created and stored in map_references
-			var path = new Gtk.TreePath.from_string (maptree_model.get_string_from_iter (iter_table.get (depth)));
-			var row_reference = new Gtk.TreeRowReference (maptree_model, path);
+			path = new Gtk.TreePath.from_string (maptree_model.get_string_from_iter (iter_table.get (depth)));
+			row_reference = new Gtk.TreeRowReference (maptree_model, path);
 			this.map_references.set (int.parse (current_ref.attr_values[0]), row_reference);
 
 			// If this map has children, manage them
@@ -224,9 +232,13 @@ public class MainController : Controller {
 			}
 			// Neither of them? Return to the parent
 			else {
-				current_ref = current_ref.parent;
-				depth--;
+					current_ref = current_ref.parent;
+					depth--;
+					if (depth == 1 && current_ref.next != null && map_references.get (int.parse(current_ref.next.attr_values[0])) == null ){
+						maptree_model.append(out iter, iter_table.get(0));
+					}
 			}
+
 		}
 	}
 
