@@ -33,8 +33,8 @@ editor_SOURCES = \
 	treeview_maptree.vala \
 	utils.vala \
 	view_actor.vala \
-	view_generic_widgets.vala \
 	view_database_dialog.vala \
+	view_generic_widgets.vala \
 	view_main_window.vala \
 	xml_node.vala \
 	xml_parser.vala
