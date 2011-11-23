@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <map>
-	<name>Mapa4</name>
+	<name>Map4</name>
 	<width>20</width>
 	<height>15</height>
 	<tileset>basis.png</tileset>

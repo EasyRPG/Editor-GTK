@@ -88,7 +88,6 @@ public class MainController : Controller {
 			// Manages all the XML read stuff
 			this.load_project_data ();
 			this.load_maptree_data ();
-//			this.load_maps_data ();
 
 			// Enable/disable some widgets
 			this.main_view.set_project_status ("open");
@@ -173,13 +172,20 @@ public class MainController : Controller {
 		// Append a new row, the next while block will set the data
 		maptree_model.append (out iter, iter);
 
+		// Get ready for the first map row
 		XmlNode current_ref = maptree.children;
 		depth++;
 
+		// Every maptree row has a map_id, map_icon and map_name
+		int map_id;
+		Gdk.Pixbuf map_icon;
+		string map_name;
+
+		// This while block sets the map data and appends new rows to the maptree
 		while (current_ref != null && depth > 0) {
 
 			// attr_values[0] stores the map id
-			int map_id = int.parse (current_ref.attr_values[0]);
+			map_id = int.parse (current_ref.attr_values[0]);
 
 			/*
 			 * If the map exists in the map_references table, let's check the next one
@@ -199,10 +205,22 @@ public class MainController : Controller {
 				continue;
 			}
 
+			// If the map file can be loaded, use its map_name instead of the maptree file one
+			if (this.load_map_data (map_id) == true) {
+				map_name = this.maps.get (map_id).name;
+			}
+			else {
+				// TODO: create&load a blank map in order to ensure tree integrity
+				map_name = current_ref.attr_values[1];
+			}
+
+			// treeview_maptree.pix_map contains the "map" icon
+			map_icon = this.main_view.treeview_maptree.pix_map;
+
 			// Add map data to the row
-			maptree_model.set_value (iter, 0, int.parse (current_ref.attr_values[0]));
-			maptree_model.set_value (iter, 1, this.main_view.treeview_maptree.pix_map);
-			maptree_model.set_value (iter, 2, current_ref.attr_values[1]);
+			maptree_model.set_value (iter, 0, map_id);
+			maptree_model.set_value (iter, 1, map_icon);
+			maptree_model.set_value (iter, 2, map_name);
 
 			// Mark the iter as the master iter for this depth
 			iter_table.set (depth, iter);
@@ -230,57 +248,32 @@ public class MainController : Controller {
 			}
 		}
 	}
-
 	/**
-	 * Loads XML data from the map files.
+	 * Loads XML data from a map file.
+	 *  
+	 * @param The id of the map to load.
 	 */
-	public void load_maps_data () {
-		XmlParser parser = new XmlParser ();
+	public bool load_map_data (int map_id) {
+		var parser = new XmlParser ();
 
-		string maps_dir_name = this.base_path + "data/maps/";
-		var maps_dir = File.new_for_path (maps_dir_name);
+		string map_filename = this.base_path + "data/maps/map" + map_id.to_string () + ".xml";
 
-		try {
-			var enumerator = maps_dir.enumerate_children ("standard::name", FileQueryInfoFlags.NONE);
-			FileInfo file_info;
-			string filename;
-
-			while ((file_info = enumerator.next_file (null)) != null) {
-				filename = file_info.get_name ();
-
-				// Ignore files without ".xml" suffix
-				if (!filename.has_suffix (".xml")) {
-					continue;
-				}
-
-				string string_map_id = filename.replace ("map", "").replace (".xml", "");
-
-				/*
-				 * An non-int id will be parsed to 0:
-				 *  "map23.xml" -> "23" -> 23
-				 *  "mapzz.xml" -> "zz" -> 0
-				 */
-				int map_id = int.parse (string_map_id);
-
-				// Maps with invalid map_id are ignored
-				if (map_id < 1) {
-					continue;
-				}
-
-				// Parse the xml file and load map data
-				parser.parse_file (maps_dir_name + filename);
-				XmlNode map_node = parser.get_root ();
-
-				var map = new Map ();
-				map.load_data (map_node);
-
-				// Insert the map into the maps HashTable 
-				this.maps.set (map_id, map);
-			}
+		// If the map file does not exists, there is nothing to do
+		if (GLib.FileUtils.test (map_filename, GLib.FileTest.EXISTS) == false) {
+			return false;
 		}
-		catch (Error e) {
-			stderr.printf ("Error: %s\n", e.message);
-		}
+
+		// Parse the xml file and load map data
+		parser.parse_file (map_filename);
+		XmlNode map_node = parser.get_root ();
+
+		var map = new Map ();
+		map.load_data (map_node);
+
+		// Insert the map into the maps HashTable 
+		this.maps.set (map_id, map);
+
+		return true;
 	}
 
 	/**

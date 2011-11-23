@@ -442,7 +442,7 @@ public class MainWindow : Gtk.Window {
 		 * Drawing toolbar layout
 		 */
 		this.toolbar_sidebar = new Gtk.Toolbar ();
-		this.toolbar_sidebar.set_show_arrow (false);
+		this.toolbar_sidebar.set_show_arrow (true);
 		this.toolbar_sidebar.get_style_context ().add_class (Gtk.STYLE_CLASS_PRIMARY_TOOLBAR);
 
 		// Add buttons
@@ -471,7 +471,6 @@ public class MainWindow : Gtk.Window {
 		this.statusbar_current_frame = new Gtk.Statusbar ();
 		this.statusbar_current_position = new Gtk.Statusbar ();
 		this.treeview_maptree = new MaptreeTreeView ();
-		this.treeview_maptree.set_size_request (-1, 60);
 
 		var scrolled_maprender = new Gtk.ScrolledWindow (null, null);
 		var scrolled_palette = new Gtk.ScrolledWindow (null, null);
@@ -495,15 +494,17 @@ public class MainWindow : Gtk.Window {
 		 * Window layout
 		 */
 		scrolled_maptree.add (treeview_maptree);
-
-		this.paned_palette_maptree.pack1 (scrolled_palette, true, false);
-		this.paned_palette_maptree.pack2 (scrolled_maptree, true, false);
+		scrolled_palette.add_with_viewport (this.drawingarea_palette);
+		scrolled_palette.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.ALWAYS);
+		scrolled_palette.set_min_content_width (192);
+		scrolled_palette.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
+		scrolled_maprender.add_with_viewport (this.drawingarea_maprender);
+		
+		this.paned_palette_maptree.pack1 (scrolled_palette, true, true);
+		this.paned_palette_maptree.pack2 (scrolled_maptree, true, true);
 
 		box_sidebar.pack_start (this.toolbar_sidebar, false, true, 0);
 		box_sidebar.pack_start (this.paned_palette_maptree, true, true, 0);
-
-		scrolled_palette.add_with_viewport (this.drawingarea_palette);
-		scrolled_maprender.add_with_viewport (this.drawingarea_maprender);
 
 		box_central.pack_start (box_sidebar, false, false);
 		box_central.pack_start (scrolled_maprender, true, true);
@@ -774,6 +775,17 @@ public class MainWindow : Gtk.Window {
 			default:
 				return;
 		}
+	}
+
+	/**
+	 * Shows the view and makes small fixes to the layout.
+	 */
+	public void show_all () {
+		base.show_all ();
+
+		// Sets the paned_palette_maptree handle position to middle
+		int height = this.paned_palette_maptree.get_allocated_height ();
+		this.paned_palette_maptree.set_position (height / 2);
 	}
 
 	/**
