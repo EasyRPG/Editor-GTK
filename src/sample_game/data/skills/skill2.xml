@@ -3,7 +3,7 @@
 	<absorb_damage>false</absorb_damage>
 	<affect_agility>false</affect_agility>
 	<affect_agility>false</affect_agility>
-	<affect_attr_defence>false</affect_attr_defence>
+	<affect_attr_defense>false</affect_attr_defense>
 	<affect_defense>false</affect_defense>
 	<affect_hp>true</affect_hp>
 	<affect_sp>false</affect_sp>

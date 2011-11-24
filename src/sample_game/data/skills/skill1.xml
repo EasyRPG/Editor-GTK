@@ -3,13 +3,15 @@
 	<absorb_damage>false</absorb_damage>
 	<affect_agility>false</affect_agility>
 	<affect_agility>false</affect_agility>
-	<affect_attr_defence>false</affect_attr_defence>
+	<affect_attr_defense>false</affect_attr_defense>
 	<affect_defense>false</affect_defense>
 	<affect_hp>true</affect_hp>
 	<affect_sp>false</affect_sp>
 	<affect_sp>false</affect_sp>
 	<animation_id>1</animation_id>
-	<attribute_effects>false false false false false false false false false false false false false false false false false</attribute_effects>
+	<attribute_effects>
+		false false false false false false false false false false false false false false false false false
+	</attribute_effects>
 	<battler_animation>3</battler_animation>
 	<battler_animation_data>
 		<after_image>1</after_image>
@@ -38,7 +40,9 @@
 	<sp_percent>1</sp_percent>
 	<sp_type>0</sp_type>
 	<state_effect>0</state_effect>
-	<state_effects>false false false false false false false false false false</state_effects>
+	<state_effects>
+		false false false false false false false false false false
+	</state_effects>
 	<switch_id>0</switch_id>
 	<type>0</type>
 	<using_message1> casts Cure</using_message1>
