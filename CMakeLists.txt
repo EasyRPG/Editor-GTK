@@ -19,8 +19,14 @@ endif()
 file(GLOB VALA_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.vala)
 file(GLOB VALA_APIS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.vapi)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+foreach(i ${VALA_SRCS})
+  get_filename_component(out ${i} NAME)
+  list(APPEND VALA_SRCS_AUX src/${out})
+endforeach()
+
 vala_precompile(VALA_C
-  SOURCES ${VALA_SRCS}
+  SOURCES ${VALA_SRCS_AUX}
   PACKAGES gtk+-3.0 gio-2.0 posix libxml-2.0 gdk-3.0
   OPTIONS --thread
   CUSTOM_VAPIS ${VALA_APIS}
