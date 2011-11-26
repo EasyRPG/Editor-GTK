@@ -154,6 +154,21 @@ public class MainController : Controller {
 		parser.parse_file (this.base_path + "data/maps/maptree.xml");
 		XmlNode maptree = parser.get_root ();
 
+		/* FIXME: this lines are for resting XmlWriter, remove after
+		 * the writer is complete
+		 */
+		var writer = new XmlWriter();
+		print("Test XmlWriter:\n");
+		print("--------Full Tree writing-------\n");
+		writer.set_root(maptree);
+		writer.write_file();
+		writer.save_to_file(this.base_path + "data/maps/maptree2.xml");
+		print("-----Use a subnode as root------\n");
+		writer.set_root((((maptree.children).next).next).next);
+		writer.write_file();
+		writer.save_to_file(this.base_path + "data/maps/maptree3.xml");
+		
+
 		/*
 		 * The iter_table hashtable stores the last used TreeIters for each depth.
 		 * They are used to point the correct parent when adding childs.

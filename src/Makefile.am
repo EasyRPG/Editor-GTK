@@ -37,7 +37,8 @@ editor_SOURCES = \
 	view_generic_widgets.vala \
 	view_main_window.vala \
 	xml_node.vala \
-	xml_parser.vala
+	xml_parser.vala \
+	xml_writer.vala
 
 editor_LDFLAGS = \
 	-Wl,--export-dynamic

@@ -488,6 +488,7 @@ public class MainWindow : Gtk.Window {
 		var box_main = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 		var box_central = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
 		var box_sidebar = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+		box_sidebar.set_size_request(160, -1);
 		var box_statusbar = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 5);
 
 		/*
