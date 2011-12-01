@@ -342,7 +342,7 @@ public class MainController : Controller {
 		about_dialog.set_transient_for (this.main_view);
 		about_dialog.set_modal (true);
 		about_dialog.set_version ("0.1.0");
-		about_dialog.set_license ("The GNU General Public License, version 3.0"); // Gtk.License.GPL_3_0);
+		about_dialog.set_license_type (Gtk.License.GPL_3_0);
 		about_dialog.set_program_name ("EasyRPG Editor");
 		about_dialog.set_comments ("A role playing game editor");
 		about_dialog.set_website ("http://easy-rpg.org/");

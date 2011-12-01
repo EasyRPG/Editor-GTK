@@ -113,26 +113,26 @@ public class MainWindow : Gtk.Window {
 		 */
 		var group_action_layer = new GLib.SList<Gtk.RadioAction> ();
 		action_lower_layer.set_group (group_action_layer);
-		action_upper_layer.set_group (action_lower_layer.get_group());
-		action_event_layer.set_group (action_lower_layer.get_group());
+		action_upper_layer.join_group (action_lower_layer);
+		action_event_layer.join_group (action_lower_layer);
 
 		var group_action_scale = new GLib.SList<Gtk.RadioAction> ();
 		action_11_scale.set_group (group_action_scale);
-		action_12_scale.set_group (action_11_scale.get_group());
-		action_14_scale.set_group (action_11_scale.get_group());
-		action_18_scale.set_group (action_11_scale.get_group());
+		action_12_scale.join_group (action_11_scale);
+		action_14_scale.join_group (action_11_scale);
+		action_18_scale.join_group (action_11_scale);
 
 		var group_action_drawing_tools = new GLib.SList<Gtk.RadioAction> ();
 		action_select.set_group (group_action_drawing_tools);
-		action_zoom.set_group (action_select.get_group());
-		action_pen.set_group (action_select.get_group());
-		action_eraser.set_group (action_select.get_group());
-		action_eraser_rectangle.set_group (action_select.get_group());
-		action_eraser_circle.set_group (action_select.get_group());
-		action_eraser_fill.set_group (action_select.get_group());
-		action_rectangle.set_group (action_select.get_group());
-		action_circle.set_group (action_select.get_group());
-		action_fill.set_group (action_select.get_group());
+		action_zoom.join_group (action_select);
+		action_pen.join_group (action_select);
+		action_eraser.join_group (action_select);
+		action_eraser_rectangle.join_group (action_select);
+		action_eraser_circle.join_group (action_select);
+		action_eraser_fill.join_group (action_select);
+		action_rectangle.join_group (action_select);
+		action_circle.join_group (action_select);
+		action_fill.join_group (action_select);
 
 		/*
 		 * Extra references to a Gtk.RadioAction for each group of RadioActions.
@@ -406,9 +406,7 @@ public class MainWindow : Gtk.Window {
 		 * Main toolbar layout
 		 */
 		this.toolbar_main = new Gtk.Toolbar ();
-#if GTK_MAJOR_VERSION_3
 		this.toolbar_main.get_style_context ().add_class (Gtk.STYLE_CLASS_PRIMARY_TOOLBAR);
-#endif
 
 		// Add buttons
 		this.toolbar_main.add (toolitem_new);
@@ -445,9 +443,7 @@ public class MainWindow : Gtk.Window {
 		 */
 		this.toolbar_sidebar = new Gtk.Toolbar ();
 		this.toolbar_sidebar.set_show_arrow (true);
-#if GTK_MAJOR_VERSION_3
 		this.toolbar_sidebar.get_style_context ().add_class (Gtk.STYLE_CLASS_PRIMARY_TOOLBAR);
-#endif
 
 		// Add buttons
 		this.toolbar_sidebar.add (toolitem_undo);
@@ -470,7 +466,7 @@ public class MainWindow : Gtk.Window {
 		 */
 		this.drawingarea_maprender = new Gtk.DrawingArea ();
 		this.drawingarea_palette = new Gtk.DrawingArea ();
-		this.paned_palette_maptree = new Gtk.VPaned ();
+		this.paned_palette_maptree = new Gtk.Paned (Gtk.Orientation.VERTICAL);
 		this.statusbar_tooltip = new Gtk.Statusbar ();
 		this.statusbar_current_frame = new Gtk.Statusbar ();
 		this.statusbar_current_position = new Gtk.Statusbar ();
@@ -489,11 +485,11 @@ public class MainWindow : Gtk.Window {
 		/*
 		 * Initialize boxes
 		 */
-		var box_main = new Gtk.VBox (false, 0);
-		var box_central = new Gtk.HBox (false, 0);
-		var box_sidebar = new Gtk.VBox (false, 0);
+		var box_main = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+		var box_central = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+		var box_sidebar = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 		box_sidebar.set_size_request(160, -1);
-		var box_statusbar = new Gtk.HBox (false, 5);
+		var box_statusbar = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 5);
 
 		/*
 		 * Window layout
@@ -501,9 +497,7 @@ public class MainWindow : Gtk.Window {
 		scrolled_maptree.add (treeview_maptree);
 		scrolled_palette.add_with_viewport (this.drawingarea_palette);
 		scrolled_palette.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.ALWAYS);
-#if GTK_MAJOR_VERSION_3
 		scrolled_palette.set_min_content_width (192);
-#endif
 		scrolled_palette.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
 		scrolled_maprender.add_with_viewport (this.drawingarea_maprender);
 		
@@ -787,13 +781,11 @@ public class MainWindow : Gtk.Window {
 	/**
 	 * Shows the view and makes small fixes to the layout.
 	 */
-	public new void show_all () {
+	public void show_all () {
 		base.show_all ();
 
 		// Sets the paned_palette_maptree handle position to middle
-		Gtk.Allocation alloc;
-		this.paned_palette_maptree.get_allocation(out alloc);
-		int height = alloc.height;
+		int height = this.paned_palette_maptree.get_allocated_height ();
 		this.paned_palette_maptree.set_position (height / 2);
 	}
 
@@ -828,13 +820,7 @@ public class MainWindow : Gtk.Window {
 	}
 
 	public void update_statusbar_current_frame(){
-#if GTK_MAJOR_VERSION_2
-		while(this.statusbar_current_frame.messages.length() > 0) {
-			this.statusbar_current_frame.pop (0);
-		}
-#elif GTK_MAJOR_VERSION_3
 		this.statusbar_current_frame.remove_all(0);
-#endif
 		if (actiongroup_project_open.sensitive){
 			switch (this.get_current_layer ()){
 				case LayerType.LOWER:
@@ -860,22 +846,15 @@ public class MainWindow : Gtk.Window {
 		var parent = menu.get_attach_widget() as Gtk.ToggleToolButton;
 		Gtk.Allocation parent_allocation;
 		Gtk.Allocation menu_allocation;
-#if GTK_MAJOR_VERSION_3
 		Gdk.Screen screen = Gdk.Screen.get_default();
 		Gdk.Device cursor = Gdk.Display.get_default().get_device_manager().get_client_pointer();
-#endif
-		
+
 		int current_x, current_y, parent_x, parent_y;
 
 		parent.get_allocation(out parent_allocation);
 		menu.get_allocation(out menu_allocation);
 		parent.get_pointer(out parent_x, out parent_y);
-#if GTK_MAJOR_VERSION_2
-		Gdk.Screen screen; Gdk.ModifierType mask;
-		Gdk.Display.get_default().get_pointer(out screen, out current_x, out current_y, out mask);
-#elif GTK_MAJOR_VERSION_3
 		cursor.get_position(out screen, out current_x, out current_y);
-#endif
 
 		x = current_x - parent_x;
 		y = current_y - parent_y;

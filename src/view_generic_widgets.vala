@@ -42,9 +42,9 @@ public class IndexSelector : Gtk.Frame {
 		this.model = new Gtk.ListStore (1, typeof (string));
 		this.view = new Gtk.TreeView ();
 		this.button_set_size = new Gtk.Button.with_label ("Max Number ...");
-		this.main_box = new Gtk.HBox (false, 0);
+		this.main_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
 		this.scrolled_view = new Gtk.ScrolledWindow(null, null);
-		var list_box = new Gtk.VBox (false, 0);
+		var list_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 		
 		//Set properties
 		this.view.set_model(model);
@@ -94,8 +94,7 @@ public class GroupFrame : Gtk.Frame {
 		//Create widgets
 		this.set_label (title);
 		var label = this.label_widget as Gtk.Label;
-		this.main_box = new Gtk.VBox (false, 0);
-		this.main_box.set_orientation(orientation);
+		this.main_box = new Gtk.Box (orientation, 0);
 		Pango.AttrList attr_list;
 		attr_list = new Pango.AttrList ();
 
@@ -119,9 +118,9 @@ public class GroupFrame : Gtk.Frame {
 	 */
 	public void add_entries(string[] labels, Gtk.Entry[] entries){
 		//Create containers
-		var group_box = new Gtk.HBox (false, 0);
-		var labels_box = new Gtk.VBox (false, 0);
-		var entries_box = new Gtk.VBox (false, 0);
+		var group_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+		var labels_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+		var entries_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
 		//Set widgets properties
 		labels_box.set_homogeneous (true);
@@ -154,9 +153,9 @@ public class GroupFrame : Gtk.Frame {
 	 */
 	public void add_spin_buttons(string[] labels, Gtk.SpinButton[] buttons){
 		//Create containers
-		var group_box = new Gtk.HBox (false, 20);
-		var labels_box = new Gtk.VBox (false, 0);
-		var buttons_box = new Gtk.VBox (false, 0);
+		var group_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 20);
+		var labels_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+		var buttons_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
 		//Set widgets properties
 		labels_box.set_homogeneous (true);
