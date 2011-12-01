@@ -128,20 +128,20 @@ public class ActorGeneralSettings : Gtk.Frame {
 		check_buttons += this.check_fixed_equipment;
 		check_buttons += this.check_ai_control;
 		check_buttons += this.check_strong_deffense;
-		var box_critical = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+		var box_critical = new Gtk.HBox (false, 0);
 		box_critical.pack_start(this.check_critical_chance, false, true, 0);
 		box_critical.pack_start(this.spin_critical_rate, false, true, 13);
 		this.frame_miscellaneous.add_check_buttons(check_buttons);
 		this.frame_miscellaneous.add_widget(box_critical, false, true, 2);
 
 		//Layout frame_profession
-		var box_profession = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 10);
+		var box_profession = new Gtk.VBox (false, 10);
 		box_profession.pack_start(this.combo_profession, true, true, 0);
 		box_profession.pack_start(this.button_apply_profession, false, true, 0);
 		this.frame_profession.add_widget(box_profession, true, false, 0);
 
 		//Do main layout
-		var box_main = new Gtk.Box (Gtk.Orientation.VERTICAL, 3);
+		var box_main = new Gtk.VBox (false, 3);
 		box_main.pack_start(this.frame_identify, false, true, 0);
 		box_main.pack_start(this.frame_leveling, false, true, 0);
 		box_main.pack_start(this.frame_miscellaneous, false, true, 0);
@@ -186,9 +186,9 @@ public class ActorGeneralSettings : Gtk.Frame {
 			this.button_chose_chara = new Gtk.Button.with_label("Chose ...");
 			this.combo_battler = new Gtk.ComboBox();
 			this.combo_weaponless_animation = new Gtk.ComboBox();
-			var box_main = new Gtk.Box (Gtk.Orientation.VERTICAL, 2);
-			var box_battler = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-			var box_weaponless_animation = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+			var box_main = new Gtk.VBox (false, 2);
+			var box_battler = new Gtk.VBox (false, 0);
+			var box_weaponless_animation = new Gtk.VBox (false, 0);
 
 			//Layout frame_face
 			this.frame_face.add_widget (view_face, true, true, 0);
@@ -233,12 +233,12 @@ public class ActorCurve : Gtk.Frame{
 	public ActorCurve (){
 		//Initialize widgets
 		this.notebook = new Gtk.Notebook();
-		this.view_hp = new CurveFrame(new Gdk.Color());
-		this.view_mp = new CurveFrame(new Gdk.Color());
-		this.view_att = new CurveFrame(new Gdk.Color());
-		this.view_def = new CurveFrame(new Gdk.Color());
-		this.view_int = new CurveFrame(new Gdk.Color());
-		this.view_dex = new CurveFrame(new Gdk.Color());
+		this.view_hp = new CurveFrame(Gdk.Color());
+		this.view_mp = new CurveFrame(Gdk.Color());
+		this.view_att = new CurveFrame(Gdk.Color());
+		this.view_def = new CurveFrame(Gdk.Color());
+		this.view_int = new CurveFrame(Gdk.Color());
+		this.view_dex = new CurveFrame(Gdk.Color());
 
 		//Set properties
 		this.notebook.set_tab_pos(Gtk.PositionType.BOTTOM);

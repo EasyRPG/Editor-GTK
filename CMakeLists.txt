@@ -6,16 +6,6 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake_module)
 find_package(Vala REQUIRED)
 include(${VALA_USE_FILE})
 
-find_package(GTK3 REQUIRED)
-include_directories(${GTK3_INCLUDE_DIRS})
-
-find_library(GDK3_LIBRARY gdk-3)
-if(GDK3_LIBRARY)
-  message(STATUS "gdk-3.0 found")
-else()
-  message(FATAL_ERROR "gdk-3.0 not found")
-endif()
-
 file(GLOB VALA_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.vala)
 file(GLOB VALA_APIS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.vapi)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -25,13 +15,46 @@ foreach(i ${VALA_SRCS})
   list(APPEND VALA_SRCS_AUX src/${out})
 endforeach()
 
-vala_precompile(VALA_C
-  SOURCES ${VALA_SRCS_AUX}
-  PACKAGES gtk+-3.0 gio-2.0 posix libxml-2.0 gdk-3.0
-  OPTIONS --thread
-  CUSTOM_VAPIS ${VALA_APIS}
-  GENERATE_VAPI editor_vala
-  GENERATE_HEADER editor_vala)
+if(NOT DEFINED GTK_VERSION)
+  set(GTK_VERSION 2)
+endif()
 
-add_executable(${PROJECT_NAME} ${VALA_C})
-target_link_libraries(${PROJECT_NAME} ${GTK3_LIBRARIES} ${GDK3_LIBRARY})
+if(${GTK_VERSION} EQUAL 2)
+  find_package(GTK2 REQUIRED)
+  include_directories(${GTK2_INCLUDE_DIRS})
+
+
+  vala_precompile(VALA_C
+    SOURCES ${VALA_SRCS_AUX}
+    PACKAGES gtk+-2.0 gio-2.0 posix libxml-2.0 gdk-2.0
+    OPTIONS --define=GTK_MAJOR_VERSION_${GTK_VERSION} --thread
+    CUSTOM_VAPIS ${VALA_APIS}
+    GENERATE_VAPI editor_vala
+    GENERATE_HEADER editor_vala)
+
+  add_executable(${PROJECT_NAME} ${VALA_C})
+  target_link_libraries(${PROJECT_NAME} ${GTK2_LIBRARIES})
+elseif(${GTK_VERSION} EQUAL 3)
+  find_package(GTK3 REQUIRED)
+  include_directories(${GTK3_INCLUDE_DIRS})
+
+  find_library(GDK3_LIBRARY gdk-3)
+  if(GDK3_LIBRARY)
+    message(STATUS "gdk3 found")
+  else()
+    message(FATAL_ERROR "gdk3 not found")
+  endif()
+
+  vala_precompile(VALA_C
+    SOURCES ${VALA_SRCS_AUX}
+    PACKAGES gtk+-3.0 gio-2.0 posix libxml-2.0 gdk-3.0
+    OPTIONS --define=GTK_MAJOR_VERSION_${GTK_VERSION} --thread
+    CUSTOM_VAPIS ${VALA_APIS}
+    GENERATE_VAPI editor_vala
+    GENERATE_HEADER editor_vala)
+
+  add_executable(${PROJECT_NAME} ${VALA_C})
+  target_link_libraries(${PROJECT_NAME} ${GTK3_LIBRARIES} ${GDK3_LIBRARY})
+else()
+  message(FATAL_ERROR "unknown gtk version")
+endif()
