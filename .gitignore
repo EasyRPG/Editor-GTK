@@ -1,5 +1,6 @@
 /src/*.c
 /editor_vala
+/editor_vala.app
 /editor_vala.h
 /editor_vala.vapi
 /editor_vala_internal.h
