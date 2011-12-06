@@ -648,8 +648,8 @@ public class MainWindow : Gtk.Window {
 	 * 
 	 * @return 0 for lower layer; 1 for upper layer; 2 for event layer.
 	 */
-	public int get_current_layer () {
-		return this.radio_layer.get_current_value ();
+	public LayerType get_current_layer () {
+		return (LayerType) this.radio_layer.get_current_value ();
 	}
 
 	/**
@@ -657,8 +657,8 @@ public class MainWindow : Gtk.Window {
 	 * 
 	 * @param value 0 for lower layer; 1 for upper layer; 2 for event layer.
 	 */
-	public void set_current_layer (int value) {
-		this.radio_layer.set_current_value (value);
+	public void set_current_layer (LayerType layer) {
+		this.radio_layer.set_current_value (layer.to_int ());
 	}
 
 	/**

@@ -17,20 +17,60 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 public enum LayerType {
-	LOWER = 0,
-	UPPER = 1,
-	EVENT = 2
+	LOWER,
+	UPPER,
+	EVENT;
+
+	public int to_int () {
+		switch (this) {
+			case LOWER:
+				return 0;
+			case UPPER:
+				return 1;
+			case EVENT:
+				return 2;
+			default:
+				error("Unknown layer: %d", this);
+		}
+	}
 }
 
 public enum DrawingTool {
-	SELECT = 0,
-	ZOOM = 1,
-	PEN = 2,
-	ERASER_NORMAL = 3,
-	ERASER_RECTANGLE = 4,
-	ERASER_CIRCLE = 5,
-	ERASER_FILL = 6,
-	RECTANGLE = 7,
-	CIRCLE = 8,
-	FILL = 9
+	SELECT,
+	ZOOM,
+	PEN,
+	ERASER_NORMAL,
+	ERASER_RECTANGLE,
+	ERASER_CIRCLE,
+	ERASER_FILL,
+	RECTANGLE,
+	CIRCLE,
+	FILL;
+
+	public int to_int () {
+		switch (this) {
+			case SELECT:
+				return 0;
+			case ZOOM:
+				return 1;
+			case PEN:
+				return 2;
+			case ERASER_NORMAL:
+				return 3;
+			case ERASER_RECTANGLE:
+				return 4;
+			case ERASER_CIRCLE:
+				return 5;
+			case ERASER_FILL:
+				return 6;
+			case RECTANGLE:
+				return 7;
+			case CIRCLE:
+				return 8;
+			case FILL:
+				return 9;
+			default:
+				error("Unknown drawing tool: %d", this);
+		}
+	}
 }

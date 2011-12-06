@@ -116,7 +116,7 @@ public class MainController : Controller {
 		// If the layer value found in the .rproject file is valid, set it.
 		int current_layer = int.parse (this.project_data.get_node_by_name ("current_layer").content);
 		if (current_layer > 0 && current_layer < 3) {
-			this.main_view.set_current_layer (current_layer);
+			this.main_view.set_current_layer ((LayerType) current_layer);
 		}
 
 		// Load data from game.xml and instantiate the party and vehicles
@@ -154,9 +154,10 @@ public class MainController : Controller {
 		parser.parse_file (this.base_path + "data/maps/maptree.xml");
 		XmlNode maptree = parser.get_root ();
 
-		/* FIXME: this lines are for resting XmlWriter, remove after
+		/* FIXME: this lines are for testing XmlWriter, remove after
 		 * the writer is complete
 		 */
+/*
 		var writer = new XmlWriter();
 		print("Test XmlWriter:\n");
 		print("--------Full Tree writing-------\n");
@@ -167,7 +168,7 @@ public class MainController : Controller {
 		writer.set_root((((maptree.children).next).next).next);
 		writer.write_file();
 		writer.save_to_file(this.base_path + "data/maps/maptree3.xml");
-		
+*/	
 
 		/*
 		 * The iter_table hashtable stores the last used TreeIters for each depth.
