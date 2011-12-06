@@ -23,6 +23,8 @@
 public class MaptreeTreeView : Gtk.TreeView {
 	private MaptreeTreeStore maptree_model;
 
+	public signal void map_selected (int map_id);
+
 	// TODO: The pixbufs instances could be placed in some other place in the future
 	public Gdk.Pixbuf pix_folder;
 	public Gdk.Pixbuf pix_map;
@@ -83,7 +85,7 @@ public class MaptreeTreeView : Gtk.TreeView {
 	public void on_change () {
 		Gtk.TreeIter selected;
 
-		// Don't try to load a map_id if there isn't any row selected (not probably but just in case)
+		// Don't try to load a map_id if there isn't any row selected (not probable but just in case)
 		if (this.get_selection ().get_selected (null, out selected)) {
 			var maptree_model = this.get_model ();
 
@@ -91,7 +93,8 @@ public class MaptreeTreeView : Gtk.TreeView {
 			maptree_model.get_value (selected, 0, out value);
 
 			int map_id = value.get_int ();
-			//print ("Map %i activated!\n", map_id);
+
+			map_selected (map_id);
 		}
 	}
 }

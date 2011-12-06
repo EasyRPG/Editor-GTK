@@ -488,7 +488,7 @@ public class MainWindow : Gtk.Window {
 		var box_main = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 		var box_central = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
 		var box_sidebar = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-		box_sidebar.set_size_request(160, -1);
+		box_sidebar.set_size_request(192, -1);
 		var box_statusbar = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 5);
 
 		/*
@@ -596,6 +596,9 @@ public class MainWindow : Gtk.Window {
 		// Change edition mode
 		this.radio_layer.changed.connect (this.controller.on_layer_change);
 
+		// Map selected
+		this.treeview_maptree.map_selected.connect (this.controller.on_map_selected);
+
 		// Eraser menu callbacks
 		toolitem_menu_eraser.clicked.connect (menu_eraser_popup);
 		menuitem_eraser_normal.activate.connect		(() => {set_current_drawing_tool(DrawingTool.ERASER_NORMAL);});
@@ -645,8 +648,6 @@ public class MainWindow : Gtk.Window {
 
 	/**
 	 * Returns an int that represents the active layer.
-	 * 
-	 * @return 0 for lower layer; 1 for upper layer; 2 for event layer.
 	 */
 	public LayerType get_current_layer () {
 		return (LayerType) this.radio_layer.get_current_value ();
@@ -654,17 +655,13 @@ public class MainWindow : Gtk.Window {
 
 	/**
 	 * Sets the active layer.
-	 * 
-	 * @param value 0 for lower layer; 1 for upper layer; 2 for event layer.
 	 */
 	public void set_current_layer (LayerType layer) {
 		this.radio_layer.set_current_value (layer.to_int ());
 	}
 
 	/**
-	 * Returns an int that represents the active layer.
-	 * 
-	 * @return 0 for 1/1; 1 for 1/2; 2 for 1/4; 3 for 1/8.
+	 * Returns an int that represents the active scale.
 	 */
 	public int get_current_scale () {
 		return this.radio_scale.get_current_value ();
@@ -672,8 +669,6 @@ public class MainWindow : Gtk.Window {
 
 	/**
 	 * Sets the active scale.
-	 * 
-	 * @param 0 for 1/1; 1 for 1/2; 2 for 1/4; 3 for 1/8.
 	 */
 	public void set_current_scale (int value) {
 		this.radio_scale.set_current_value (value);
@@ -681,8 +676,6 @@ public class MainWindow : Gtk.Window {
 
 	/**
 	 * Returns an int that represents the active drawing tool.
-	 * 
-	 * @return 0 for select; 1 for zoom; 2 for pen; 3 for rectangle; 4 for circle; 5 for fill.
 	 */
 	public int get_current_drawing_tool () {
 		return this.radio_drawing_tool.get_current_value ();
@@ -690,8 +683,6 @@ public class MainWindow : Gtk.Window {
 
 	/**
 	 * Sets the active drawing tool
-	 * 
-	 * @param 0 for select; 1 for zoom; 2 for pen; 3 for rectangle; 4 for circle; 5 for fill.
 	 */
 	public void set_current_drawing_tool (int value) {
 		Gtk.Image image;

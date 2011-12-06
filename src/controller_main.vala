@@ -39,6 +39,7 @@ public class MainController : Controller {
 	private XmlNode game_data;
 	private GLib.HashTable<int, Map> maps;
 	private GLib.HashTable<int, Gtk.TreeRowReference> map_references;
+	private int current_map;
 
 	/**
 	 * Instantiantes the MainWindow view.
@@ -141,6 +142,8 @@ public class MainController : Controller {
 		this.airship = new Vehicle ();
 		XmlNode airship_node = this.game_data.get_node_by_name ("airship");
 		this.airship.load_data (airship_node);
+
+		this.current_map = 0;
 	}
 
 	/**
@@ -285,8 +288,6 @@ public class MainController : Controller {
 
 		var map = new Map ();
 		map.load_data (map_node);
-
-		// Insert the map into the maps HashTable 
 		this.maps.set (map_id, map);
 
 		return true;
@@ -313,6 +314,7 @@ public class MainController : Controller {
 
 		// The Maptree is cleared too
 		this.main_view.treeview_maptree.clear ();
+		this.current_map = 0;
 
 		// Enable/disable some widgets
 		this.main_view.set_project_status ("closed");
@@ -324,6 +326,19 @@ public class MainController : Controller {
 		this.main_view.set_fullscreen_status (false);
 		this.main_view.set_show_title_status (false);
 		this.main_view.update_statusbar_current_frame();
+	}
+
+	/**
+	 * Manages the reactions to the map selection.
+	 */
+	public void on_map_selected (int map_id) {
+		// Don't react if the selected map is map 0 (game_title) or the current map
+		if (map_id == 0 || map_id == this.current_map) {
+			return;
+		}
+
+		this.current_map = map_id;
+		print ("Load map %i\n", this.current_map);
 	}
 
 	/**
