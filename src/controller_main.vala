@@ -316,6 +316,9 @@ public class MainController : Controller {
 		this.main_view.treeview_maptree.clear ();
 		this.current_map = 0;
 
+		// The Tileset is cleared too
+		this.main_view.drawingarea_palette.clear ();
+
 		// Enable/disable some widgets
 		this.main_view.set_project_status ("closed");
 
@@ -329,6 +332,22 @@ public class MainController : Controller {
 	}
 
 	/**
+	 * Manages the reactions to the layer change.
+	 */
+	public void on_layer_change () {
+		this.main_view.update_statusbar_current_frame();
+
+		// Don't react if the current map is map 0 (game_title)
+		if (this.current_map == 0) {
+			return;
+		}
+
+		// Update the palette
+		var palette = this.main_view.drawingarea_palette;
+		palette.set_layer (this.main_view.get_current_layer ());
+	}
+
+	/**
 	 * Manages the reactions to the map selection.
 	 */
 	public void on_map_selected (int map_id) {
@@ -337,8 +356,16 @@ public class MainController : Controller {
 			return;
 		}
 
+		Map map = this.maps.get (map_id);
+		int width = map.width * 16;
+		int height = map.height * 16;
+
 		this.current_map = map_id;
-		print ("Load map %i\n", this.current_map);
+
+		var palette = this.main_view.drawingarea_palette;
+		palette.clear ();
+		palette.load_tileset (this.base_path + "graphics/tilesets/" + map.tileset);
+		palette.set_layer (this.main_view.get_current_layer ());
 	}
 
 	/**
@@ -379,10 +406,6 @@ public class MainController : Controller {
 
 		about_dialog.run ();
 		about_dialog.destroy ();
-	}
-
-	public void on_layer_change(){
-		this.main_view.update_statusbar_current_frame();
 	}
 }
 

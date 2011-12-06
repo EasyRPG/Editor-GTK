@@ -41,6 +41,13 @@ public class Map : Model {
 	public int height {get; set; default = 15;}
 
 	/**
+	 * Tileset used to design the map.
+	 * 
+	 * TODO: This should be replaced by an int id in the future 
+	 */
+	public string tileset {get; set; default = "";}
+
+	/**
 	 * Scroll type of the map.
 	 * 
 	 * 0: No scroll. (Default)
@@ -205,7 +212,8 @@ public class Map : Model {
 	/**
 	 * Model containing layer data.
 	 */
-	public Layer[] layers {get; set;}
+	public int[,] lower_layer {get; set;}
+	public int[,] upper_layer {get; set;}
 
 	/**
 	 * Determines how often a battle will happen.
@@ -229,6 +237,7 @@ public class Map : Model {
 		string name = "";
 		int width = 0;
 		int height = 0;
+		string tileset = "";
 		int scroll_type = 0;
 		string panorama_filename = "";
 		bool panorama_horizontal_loop = false;
@@ -247,7 +256,8 @@ public class Map : Model {
 		bool escape_allow = false;
 		int save_type = 0;
 		bool save_allow = false;
-		Layer[] layers = {};
+		string[] lower_layer_string = {};
+		string[] upper_layer_string = {};
 		int enemy_encounter_steps = 0;
 		int save_time = 0;
 
@@ -262,6 +272,9 @@ public class Map : Model {
 					break;
 				case "height":
 					height = int.parse (node.content);
+					break;
+				case "tileset":
+					tileset = node.content;
 					break;
 				case "scroll_type":
 					scroll_type = int.parse (node.content);
@@ -381,10 +394,11 @@ public class Map : Model {
 					XmlNode layers_data = node.children;
 					while (layers_data != null) {
 						switch (layers_data.name) {
-							case "layer":
-								Layer layer = new Layer();
-								layer.load_data (layers_data);
-								layers += layer;
+							case "lower":
+								lower_layer_string = layers_data.content.split (" ");
+								break;
+							case "upper":
+								upper_layer_string = layers_data.content.split (" ");
 								break;
 							default:
 								break;
@@ -421,6 +435,10 @@ public class Map : Model {
 		// Set a non-default height only when the parsed value is valid
 		if (height > 15) {
 			this.height = height;
+		}
+
+		if (tileset != "") {
+			this.tileset = tileset;
 		}
 
 		this.scroll_type = (scroll_type < 0) ? 0 : scroll_type;
@@ -485,7 +503,69 @@ public class Map : Model {
 		 * This is the place where the layer tile_id checks should be made, but
 		 * it could be interesting to make them at map rendering time.
 		 */
-		this.layers = layers;
+		var lower_layer = new int[height, width];
+		var upper_layer = new int[height, width];
+
+		/*
+		 * Adjusts the length of the array to the size of the map.
+		 * 
+		 * This will discard any extra tile or create undefined tiles.
+		 */
+		if (lower_layer_string.length != (width * height)) {
+			lower_layer_string.resize (width * height);
+		}
+
+		if (upper_layer_string.length != width * height) {
+			upper_layer_string.resize (width * height);
+		}
+
+		int i = 0;
+		int col = 0;
+		int row = 0;
+		int tile_id = 0;
+
+		/*
+		 * Layers are converted from an unidimensional array to a bidimensional one
+		 */
+		while (i < width * height) {
+			col = i % width;
+			row = i / width;
+
+			// Lower layer		
+			if (lower_layer_string[i] == null) {
+				tile_id = 0;
+			}
+			else {
+				tile_id = int.parse (lower_layer_string[i]);
+				
+				// Tile ids cannot be negative
+				if (tile_id < 0) {
+					tile_id = 0;
+				}
+			}
+
+			lower_layer[row, col] = tile_id;
+
+			// Upper layer	
+			if (upper_layer_string[i] == null) {
+				tile_id = 0;
+			}
+			else {
+				tile_id = int.parse (upper_layer_string[i]);
+				
+				// Tile ids cannot be negative
+				if (tile_id < 0) {
+					tile_id = 0;
+				}
+			}
+
+			upper_layer[row, col] = tile_id;
+
+			i++;
+		}
+
+		this.lower_layer = lower_layer;
+		this.upper_layer = lower_layer;
 
 		this.enemy_encounter_steps = (enemy_encounter_steps < 0) ? 0 : enemy_encounter_steps;
 
@@ -502,6 +582,7 @@ public class Map : Model {
 		print ("Name: %s\n", this.name);
 		print ("Width: %i\n", this.width);
 		print ("Height: %i\n", this.height);
+		print ("Tileset: %s\n", this.tileset);
 		print ("Scroll type: %i\n", this.scroll_type);
 		print ("Panorama:\n");
 		print ("  Filename: %s\n", this.panorama_filename);
@@ -521,10 +602,16 @@ public class Map : Model {
 		print ("Escape allowed: %s\n", (this.escape_allow == true) ? "TRUE" : "FALSE");
 		print ("Save type: %i\n", this.save_type);
 		print ("Save allowed: %s\n", (this.save_allow == true) ? "TRUE" : "FALSE");
-		foreach (Layer layer in this.layers) {
-			layer.print_data ();
+		print ("Lower layer:");
+		int i = 0;
+		while (i < lower_layer.length[0] * lower_layer.length[1]) {
+			if (i % lower_layer.length[1] == 0) {
+				print ("\n");
+			}
+			print ("%i ", lower_layer[i / lower_layer.length[1], i % lower_layer.length[1]]);
+			i++;
 		}
-		print ("Enemy encounter steps: %i\n", this.enemy_encounter_steps);
+		print ("\nEnemy encounter steps: %i\n", this.enemy_encounter_steps);
 		print ("Save time: %i\n\n", this.save_time);
 	}
 }

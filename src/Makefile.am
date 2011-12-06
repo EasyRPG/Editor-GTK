@@ -22,10 +22,11 @@ bin_PROGRAMS = editor
 editor_SOURCES = \
 	controller.vala \
 	controller_main.vala \
+	drawingarea_map.vala \
+	drawingarea_tileset.vala \
 	editor.vala \
 	enum.vala \
 	model.vala \
-	model_layer.vala \
 	model_map.vala \
 	model_party.vala \
 	model_vehicle.vala \

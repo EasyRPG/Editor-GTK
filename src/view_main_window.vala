@@ -25,8 +25,8 @@ public class MainWindow : Gtk.Window {
 	 * Properties
 	 */
 	private weak MainController controller;
-	private Gtk.DrawingArea drawingarea_maprender;
-	private Gtk.DrawingArea drawingarea_palette;
+	public MapDrawingArea drawingarea_maprender;
+	public TilesetDrawingArea drawingarea_palette;
 	private Gtk.MenuBar menubar_main;
 	private Gtk.Paned paned_palette_maptree;
 	private Gtk.Statusbar statusbar_tooltip;
@@ -464,8 +464,8 @@ public class MainWindow : Gtk.Window {
 		/*
 		 * Initialize widgets
 		 */
-		this.drawingarea_maprender = new Gtk.DrawingArea ();
-		this.drawingarea_palette = new Gtk.DrawingArea ();
+		this.drawingarea_maprender = new MapDrawingArea ();
+		this.drawingarea_palette = new TilesetDrawingArea ();
 		this.paned_palette_maptree = new Gtk.Paned (Gtk.Orientation.VERTICAL);
 		this.statusbar_tooltip = new Gtk.Statusbar ();
 		this.statusbar_current_frame = new Gtk.Statusbar ();
@@ -488,7 +488,6 @@ public class MainWindow : Gtk.Window {
 		var box_main = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 		var box_central = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
 		var box_sidebar = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-		box_sidebar.set_size_request(192, -1);
 		var box_statusbar = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 5);
 
 		/*
