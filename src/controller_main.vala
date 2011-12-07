@@ -111,7 +111,7 @@ public class MainController : Controller {
 		// If the scale value found in the .rproject file is valid, set it.
 		int current_scale = int.parse (this.project_data.get_node_by_name ("current_scale").content);
 		if (current_scale > 0 && current_scale < 4) {
-			this.main_view.set_current_scale (current_scale);
+			this.main_view.set_current_scale ((Scale) current_scale);
 		}
 
 		// If the layer value found in the .rproject file is valid, set it.
@@ -297,27 +297,30 @@ public class MainController : Controller {
 	 * Closes the current project and restores the default status of some widgets.
 	 */
 	public void close_project () {
-		// Properties are set to null
+		// Clear the main data
 		this.game_title = null;
 		this.project_filename = null;
 		this.base_path = null;
 		this.project_data = null;
 		this.game_data = null;
+
+		// Clear the vehicles data
 		this.party = null;
 		this.boat = null;
 		this.ship = null;
 		this.airship = null;
 
-		// Hashtables are cleared
+		// Empty the hashtables
 		this.maps.remove_all ();
 		this.map_references.remove_all ();
 
-		// The Maptree is cleared too
+		// Empty the maptree TreeView
 		this.main_view.treeview_maptree.clear ();
 		this.current_map = 0;
 
-		// The Tileset is cleared too
+		// Clear the tile palette and map DrawingAreas
 		this.main_view.drawingarea_palette.clear ();
+		this.main_view.drawingarea_maprender.clear ();
 
 		// Enable/disable some widgets
 		this.main_view.set_project_status ("closed");
@@ -342,9 +345,33 @@ public class MainController : Controller {
 			return;
 		}
 
+		// Get the current layer
+		var layer = (LayerType) this.main_view.get_current_layer ();
+
 		// Update the palette
 		var palette = this.main_view.drawingarea_palette;
-		palette.set_layer (this.main_view.get_current_layer ());
+		palette.set_layer (layer);
+
+		// Update the maprender
+		var maprender = this.main_view.drawingarea_maprender;
+		maprender.set_layer (layer);
+	}
+
+	/**
+	 * Manages the reactions to the scale change.
+	 */
+	public void on_scale_change () {
+		// Don't react if the current map is map 0 (game_title)
+		if (this.current_map == 0) {
+			return;
+		}
+
+		// Get the current scale
+		var scale = (Scale) this.main_view.get_current_scale ();
+
+		// Update the maprender
+		var maprender = this.main_view.drawingarea_maprender;
+		maprender.set_scale (scale);
 	}
 
 	/**
@@ -366,6 +393,13 @@ public class MainController : Controller {
 		palette.clear ();
 		palette.load_tileset (this.base_path + "graphics/tilesets/" + map.tileset);
 		palette.set_layer (this.main_view.get_current_layer ());
+
+		var maprender = this.main_view.drawingarea_maprender;
+		maprender.clear ();
+		maprender.load_map (map.lower_layer, map.upper_layer);
+		maprender.set_layer (this.main_view.get_current_layer ());
+		maprender.set_scale (this.main_view.get_current_scale ());
+		//maprender.load_events ();
 	}
 
 	/**

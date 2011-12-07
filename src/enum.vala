@@ -35,6 +35,28 @@ public enum LayerType {
 	}
 }
 
+public enum Scale {
+	1_1,
+	1_2,
+	1_4,
+	1_8;
+
+	public int to_int () {
+		switch (this) {
+			case 1_1:
+				return 0;
+			case 1_2:
+				return 1;
+			case 1_4:
+				return 2;
+			case 1_8:
+				return 3;
+			default:
+				error("Unknown scale: %d", this);
+		}
+	}
+}
+
 public enum DrawingTool {
 	SELECT,
 	ZOOM,

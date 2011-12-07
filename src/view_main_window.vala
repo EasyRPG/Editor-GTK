@@ -25,8 +25,8 @@ public class MainWindow : Gtk.Window {
 	 * Properties
 	 */
 	private weak MainController controller;
+	public TilePaletteDrawingArea drawingarea_palette;
 	public MapDrawingArea drawingarea_maprender;
-	public TilesetDrawingArea drawingarea_palette;
 	private Gtk.MenuBar menubar_main;
 	private Gtk.Paned paned_palette_maptree;
 	private Gtk.Statusbar statusbar_tooltip;
@@ -464,16 +464,16 @@ public class MainWindow : Gtk.Window {
 		/*
 		 * Initialize widgets
 		 */
-		this.drawingarea_maprender = new MapDrawingArea ();
-		this.drawingarea_palette = new TilesetDrawingArea ();
+		this.drawingarea_palette = new TilePaletteDrawingArea ();
+		this.drawingarea_maprender = new MapDrawingArea (this.drawingarea_palette);
 		this.paned_palette_maptree = new Gtk.Paned (Gtk.Orientation.VERTICAL);
 		this.statusbar_tooltip = new Gtk.Statusbar ();
 		this.statusbar_current_frame = new Gtk.Statusbar ();
 		this.statusbar_current_position = new Gtk.Statusbar ();
 		this.treeview_maptree = new MaptreeTreeView ();
 
-		var scrolled_maprender = new Gtk.ScrolledWindow (null, null);
 		var scrolled_palette = new Gtk.ScrolledWindow (null, null);
+		var scrolled_maprender = new Gtk.ScrolledWindow (null, null);
 		var scrolled_maptree = new Gtk.ScrolledWindow (null, null);
 
 		/*
@@ -499,6 +499,7 @@ public class MainWindow : Gtk.Window {
 		scrolled_palette.set_min_content_width (192);
 		scrolled_palette.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
 		scrolled_maprender.add_with_viewport (this.drawingarea_maprender);
+		scrolled_maprender.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
 		
 		this.paned_palette_maptree.pack1 (scrolled_palette, true, true);
 		this.paned_palette_maptree.pack2 (scrolled_maptree, true, true);
@@ -594,6 +595,7 @@ public class MainWindow : Gtk.Window {
 
 		// Change edition mode
 		this.radio_layer.changed.connect (this.controller.on_layer_change);
+		this.radio_scale.changed.connect (this.controller.on_scale_change);
 
 		// Map selected
 		this.treeview_maptree.map_selected.connect (this.controller.on_map_selected);
@@ -662,15 +664,15 @@ public class MainWindow : Gtk.Window {
 	/**
 	 * Returns an int that represents the active scale.
 	 */
-	public int get_current_scale () {
-		return this.radio_scale.get_current_value ();
+	public Scale get_current_scale () {
+		return (Scale) this.radio_scale.get_current_value ();
 	}
 
 	/**
 	 * Sets the active scale.
 	 */
-	public void set_current_scale (int value) {
-		this.radio_scale.set_current_value (value);
+	public void set_current_scale (Scale scale) {
+		this.radio_scale.set_current_value (scale.to_int ());
 	}
 
 	/**

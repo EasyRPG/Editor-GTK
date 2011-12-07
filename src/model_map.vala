@@ -565,7 +565,7 @@ public class Map : Model {
 		}
 
 		this.lower_layer = lower_layer;
-		this.upper_layer = lower_layer;
+		this.upper_layer = upper_layer;
 
 		this.enemy_encounter_steps = (enemy_encounter_steps < 0) ? 0 : enemy_encounter_steps;
 
