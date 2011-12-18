@@ -201,7 +201,7 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 	/**
 	 * Manages the reactions to the layer change.
 	 * 
-	 * Display the correct palette for the selected layer.
+	 * Displays the correct palette for the selected layer.
 	 */
 	public void set_layer (LayerType layer) {
 		this.current_layer = layer;
@@ -233,14 +233,14 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 	 */
 	public Cairo.ImageSurface get_tile (int tile_id, LayerType layer) {
 		var surface_tile = new Cairo.ImageSurface (Cairo.Format.ARGB32, 16, 16);
-		var ctx = new Cairo.Context (surface_tile);
-		ctx.rectangle (0, 0, 16, 16);
 
 		// Find the tile coordinates
 		int orig_x = ((tile_id - 1) % 6) * 16;
 		int orig_y = ((tile_id - 1) / 6) * 16;
 
-		// Set the correct source
+		var ctx = new Cairo.Context (surface_tile);
+		ctx.rectangle (0, 0, 16, 16);
+
 		if (layer == LayerType.LOWER) {
 			ctx.set_source_surface (this.surface_lower_tiles, -orig_x, -orig_y);
 		}
@@ -249,6 +249,7 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 		}
 
 		// Paint the tile in the 16x16 surface
+		ctx.set_operator (Cairo.Operator.SOURCE);
 		ctx.fill ();
 
 		return surface_tile;
@@ -276,7 +277,7 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 	/**
 	 * Manages the reactions to the draw signal.
 	 * 
-	 * Draw the palette according to the active layer.
+	 * Draws the palette according to the active layer.
 	 */
 	public bool on_draw (Cairo.Context ctx) {
 		// The palette must be scaled to 2x (32x32 tile size) 

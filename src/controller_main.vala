@@ -396,10 +396,9 @@ public class MainController : Controller {
 
 		var maprender = this.main_view.drawingarea_maprender;
 		maprender.clear ();
-		maprender.load_map (map.lower_layer, map.upper_layer);
+		maprender.load_map_scheme (map.lower_layer, map.upper_layer);
 		maprender.set_layer (this.main_view.get_current_layer ());
 		maprender.set_scale (this.main_view.get_current_scale ());
-		//maprender.load_events ();
 	}
 
 	/**

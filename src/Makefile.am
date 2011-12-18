@@ -30,6 +30,7 @@ editor_SOURCES = \
 	model_map.vala \
 	model_party.vala \
 	model_vehicle.vala \
+	structs.vala \
 	treestore_maptree.vala \
 	treeview_maptree.vala \
 	utils.vala \
