@@ -59,7 +59,7 @@ public class MainWindow : Gtk.Window {
 		 * Initialize properties
 		 */
 		this.controller = controller;
-		var app_icon = Resources.load_icon_as_pixbuf ("cacota", 48);
+		var app_icon = Resources.load_icon_as_pixbuf ("easyrpg", 48);
 		this.set_icon (app_icon);
 		this.set_default_size (500, 400);
 
@@ -175,80 +175,50 @@ public class MainWindow : Gtk.Window {
 		 * Initialize main toolbar
 		 */
 		var toolitem_new = action_new.create_tool_item () as Gtk.ToolButton;
-		toolitem_new.set_use_action_appearance (true);
 		var toolitem_open = action_open.create_tool_item () as Gtk.ToolButton;
-		toolitem_open.set_use_action_appearance (true);
 		var toolitem_close = action_close.create_tool_item () as Gtk.ToolButton;
-		toolitem_close.set_use_action_appearance (true);
 		var toolitem_create_game_disk = action_create_game_disk.create_tool_item () as Gtk.ToolButton;
-		toolitem_create_game_disk.set_use_action_appearance (true);
 		var toolitem_save = action_save.create_tool_item () as Gtk.ToolButton;
-		toolitem_save.set_use_action_appearance (true);
 		var toolitem_revert = action_revert.create_tool_item () as Gtk.ToolButton;
-		toolitem_revert.set_use_action_appearance (true);
 		var toolitem_lower_layer = action_lower_layer.create_tool_item () as Gtk.ToggleToolButton;
-		toolitem_lower_layer.set_use_action_appearance (true);
 		var toolitem_upper_layer = action_upper_layer.create_tool_item () as Gtk.ToggleToolButton;
-		toolitem_upper_layer.set_use_action_appearance (true);
 		var toolitem_event_layer = action_event_layer.create_tool_item () as Gtk.ToggleToolButton;
-		toolitem_event_layer.set_use_action_appearance (true);
 		var toolitem_11_scale = action_11_scale.create_tool_item () as Gtk.ToggleToolButton;
-		toolitem_11_scale.set_use_action_appearance (true);
 		var toolitem_12_scale = action_12_scale.create_tool_item () as Gtk.ToggleToolButton;
 		var toolitem_14_scale = action_14_scale.create_tool_item () as Gtk.ToggleToolButton;
 		var toolitem_18_scale = action_18_scale.create_tool_item () as Gtk.ToggleToolButton;
 		var toolitem_database = action_database.create_tool_item () as Gtk.ToolButton;
-		toolitem_database.set_use_action_appearance (true);
 		var toolitem_material = action_material.create_tool_item () as Gtk.ToolButton;
-		toolitem_material.set_use_action_appearance (true);
 		var toolitem_music = action_music.create_tool_item () as Gtk.ToolButton;
-		toolitem_music.set_use_action_appearance (true);
 		var toolitem_playtest = action_playtest.create_tool_item () as Gtk.ToolButton;
-		toolitem_playtest.set_use_action_appearance (true);
 		var toolitem_fullscreen = action_fullscreen.create_tool_item () as Gtk.ToolButton;
-		toolitem_fullscreen.set_use_action_appearance (true);
 		var toolitem_show_title = action_show_title.create_tool_item () as Gtk.ToolButton;
-		toolitem_show_title.set_use_action_appearance (true);
 		var toolitem_content = action_content.create_tool_item () as Gtk.ToolButton;
-		toolitem_content.set_use_action_appearance (true);
 
 		/*
 		 * Initialize drawing toolbar
 		 */
 		var toolitem_undo = action_undo.create_tool_item () as Gtk.ToolButton;
-		toolitem_undo.set_use_action_appearance (true);
 		var toolitem_select = action_select.create_tool_item () as Gtk.ToolButton;
-		toolitem_select.set_use_action_appearance (true);
 		var toolitem_zoom = action_zoom.create_tool_item () as Gtk.ToolButton;
-		toolitem_zoom.set_use_action_appearance (true);
 		var toolitem_pen = action_pen.create_tool_item () as Gtk.ToolButton;
-		toolitem_pen.set_use_action_appearance (true);
 		this.toolitem_eraser = action_eraser.create_tool_item () as Gtk.ToolButton;
-		this.toolitem_eraser.set_use_action_appearance (true);
 		var toolitem_menu_eraser = action_menu_eraser.create_tool_item () as Gtk.ToggleToolButton;
 		toolitem_menu_eraser.set_icon_widget(new Gtk.Arrow(Gtk.ArrowType.DOWN, Gtk.ShadowType.IN));
 		toolitem_menu_eraser.set_label ("Eraser");
 		toolitem_menu_eraser.set_size_request(15, -1);
-		toolitem_menu_eraser.set_use_action_appearance (true);
 		this.menu_eraser = new Gtk.Menu ();
 		var menuitem_eraser_normal = new Gtk.ImageMenuItem ();
-		menuitem_eraser_normal.set_use_action_appearance (true);
 		menuitem_eraser_normal.set_always_show_image(true);
 		var menuitem_eraser_rectangle = new Gtk.ImageMenuItem();
-		menuitem_eraser_rectangle.set_use_action_appearance (true);
 		menuitem_eraser_rectangle.set_always_show_image(true);
 		var menuitem_eraser_circle = new Gtk.ImageMenuItem();
-		menuitem_eraser_circle.set_use_action_appearance (true);
 		menuitem_eraser_circle.set_always_show_image(true);
 		var menuitem_eraser_fill = new Gtk.ImageMenuItem();
-		menuitem_eraser_fill.set_use_action_appearance (true);
 		menuitem_eraser_fill.set_always_show_image(true);
 		var toolitem_rectangle = action_rectangle.create_tool_item () as Gtk.ToolButton;
-		toolitem_rectangle.set_use_action_appearance (true);
 		var toolitem_circle = action_circle.create_tool_item () as Gtk.ToolButton;
-		toolitem_circle.set_use_action_appearance (true);
 		var toolitem_fill = action_fill.create_tool_item () as Gtk.ToolButton;
-		toolitem_fill.set_use_action_appearance (true);
 
 		/*
 		 * Initialize menu
@@ -287,53 +257,31 @@ public class MainWindow : Gtk.Window {
 
 		// Submenu items
 		var menuitem_new = action_new.create_menu_item () as Gtk.ImageMenuItem;
-		menuitem_new.set_use_action_appearance (true);
 		var menuitem_open = action_open.create_menu_item () as Gtk.ImageMenuItem;
-		menuitem_open.set_use_action_appearance (true);
 		var menuitem_close = action_close.create_menu_item () as Gtk.ImageMenuItem;
-		menuitem_close.set_use_action_appearance (true);
 		var menuitem_create_game_disk = action_create_game_disk.create_menu_item () as Gtk.ImageMenuItem;
-		menuitem_create_game_disk.set_use_action_appearance (true);
 		var menuitem_quit = action_quit.create_menu_item () as Gtk.ImageMenuItem;
-		menuitem_quit.set_use_action_appearance(true);
 		var menuitem_save = action_save.create_menu_item () as Gtk.ImageMenuItem;
-		menuitem_save.set_use_action_appearance (true);
 		var menuitem_revert = action_revert.create_menu_item () as Gtk.ImageMenuItem;
-		menuitem_revert.set_use_action_appearance (true);
 		var menuitem_database = action_database.create_menu_item () as Gtk.ImageMenuItem;
-		menuitem_database.set_use_action_appearance (true);
 		var menuitem_material = action_material.create_menu_item () as Gtk.ImageMenuItem;
-		menuitem_material.set_use_action_appearance (true);
 		var menuitem_music = action_music.create_menu_item () as Gtk.ImageMenuItem;
-		menuitem_music.set_use_action_appearance (true);
 		var menuitem_playtest = action_playtest.create_menu_item () as Gtk.ImageMenuItem;
-		menuitem_playtest.set_use_action_appearance (true);
 		var menuitem_content = action_content.create_menu_item () as Gtk.ImageMenuItem;
-		menuitem_content.set_use_action_appearance (true);
 		var menuitem_about = action_about.create_menu_item () as Gtk.ImageMenuItem;
-		menuitem_about.set_use_action_appearance (true);
 
 		// Radio items
 		var menuitem_lower_layer = action_lower_layer.create_menu_item () as Gtk.CheckMenuItem;
-		menuitem_lower_layer.set_use_action_appearance (true);
 		var menuitem_upper_layer = action_upper_layer.create_menu_item () as Gtk.CheckMenuItem;
-		menuitem_upper_layer.set_use_action_appearance (true);
 		var menuitem_event_layer = action_event_layer.create_menu_item () as Gtk.CheckMenuItem;
-		menuitem_event_layer.set_use_action_appearance (true);
 		var menuitem_11_scale = action_11_scale.create_menu_item () as Gtk.CheckMenuItem;
-		menuitem_11_scale.set_use_action_appearance (true);
 		var menuitem_12_scale = action_12_scale.create_menu_item () as Gtk.CheckMenuItem;
-		menuitem_12_scale.set_use_action_appearance (true);
 		var menuitem_14_scale = action_14_scale.create_menu_item () as Gtk.CheckMenuItem;
-		menuitem_14_scale.set_use_action_appearance (true);
 		var menuitem_18_scale = action_18_scale.create_menu_item () as Gtk.CheckMenuItem;
-		menuitem_18_scale.set_use_action_appearance (true);
 
 		// Toggle items
 		var menuitem_fullscreen = action_fullscreen.create_menu_item () as Gtk.CheckMenuItem;
-		menuitem_fullscreen.set_use_action_appearance (true);
 		var menuitem_show_title = action_show_title.create_menu_item () as Gtk.CheckMenuItem;
-		menuitem_show_title.set_use_action_appearance (true);
 
 		/*
 		 * Menu layout
