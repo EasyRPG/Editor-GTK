@@ -25,18 +25,10 @@ public class MaptreeTreeView : Gtk.TreeView {
 
 	public signal void map_selected (int map_id);
 
-	// TODO: The pixbufs instances could be placed in some other place in the future
-	public Gdk.Pixbuf pix_folder;
-	public Gdk.Pixbuf pix_map;
-
 	/**
 	 * Builds the maptree TreeView.
 	 */
 	public MaptreeTreeView () {
-		// TODO: The pixbufs instances could be placed in some other place in the future 
-		this.pix_folder = new Gdk.Pixbuf.from_file("./share/easyrpg/toolbar/folder.png");
-		this.pix_map = new Gdk.Pixbuf.from_file("./share/easyrpg/toolbar/map.png");
-
 		// The ID column can be added with the shorthand insert_column_with_attributes
 		this.insert_column_with_attributes (-1, "ID", new Gtk.CellRendererText (), "text", 0);
 

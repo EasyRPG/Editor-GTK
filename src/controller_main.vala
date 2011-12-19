@@ -45,6 +45,7 @@ public class MainController : Controller {
 	 * Instantiantes the MainWindow view.
 	 */
 	public MainController () {
+		Gtk.IconTheme.get_default().append_search_path ("../data/icons");
 		this.main_view = new MainWindow (this);
 		this.maps = new GLib.HashTable<int, Map> (null, null);
 		this.map_references = new GLib.HashTable<int, Gtk.TreeRowReference> (null, null);
@@ -173,6 +174,10 @@ public class MainController : Controller {
 		writer.save_to_file(this.base_path + "data/maps/maptree3.xml");
 */	
 
+		// Load "folder" and "map" icons before using them in the maptree treestore
+		var folder_icon = Resources.load_icon_as_pixbuf (Resources.ICON_FOLDER, 16);
+		var map_icon = Resources.load_icon_as_pixbuf (Resources.ICON_MAP, 16);
+
 		/*
 		 * The iter_table hashtable stores the last used TreeIters for each depth.
 		 * They are used to point the correct parent when adding childs.
@@ -184,7 +189,7 @@ public class MainController : Controller {
 		// Append and set the first row (game_title)
 		maptree_model.append (out iter, null);
 		maptree_model.set_value (iter, 0, 0);
-		maptree_model.set_value (iter, 1, this.main_view.treeview_maptree.pix_folder);
+		maptree_model.set_value (iter, 1, folder_icon);
 		maptree_model.set_value (iter, 2, this.game_title);
 		iter_table.set (depth, iter);
 
@@ -197,7 +202,6 @@ public class MainController : Controller {
 
 		// Every maptree row has a map_id, map_icon and map_name
 		int map_id;
-		Gdk.Pixbuf map_icon;
 		string map_name;
 
 		// This while block sets the map data and appends new rows to the maptree
@@ -232,9 +236,6 @@ public class MainController : Controller {
 				// TODO: create&load a blank map in order to ensure tree integrity
 				map_name = current_ref.attr_values[1];
 			}
-
-			// treeview_maptree.pix_map contains the "map" icon
-			map_icon = this.main_view.treeview_maptree.pix_map;
 
 			// Add map data to the row
 			maptree_model.set_value (iter, 0, map_id);
