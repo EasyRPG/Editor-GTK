@@ -59,8 +59,7 @@ public class MainWindow : Gtk.Window {
 		 * Initialize properties
 		 */
 		this.controller = controller;
-		var app_icon = Resources.load_icon_as_pixbuf ("easyrpg", 48);
-		this.set_icon (app_icon);
+		this.set_icon (Resources.load_icon_as_pixbuf ("easyrpg", 48));
 		this.set_default_size (500, 400);
 
 		/*

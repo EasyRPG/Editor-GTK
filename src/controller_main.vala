@@ -418,25 +418,15 @@ public class MainController : Controller {
 		var about_dialog = new Gtk.AboutDialog ();
 		about_dialog.set_transient_for (this.main_view);
 		about_dialog.set_modal (true);
-		about_dialog.set_version ("0.1.0");
+		about_dialog.set_version (Resources.APP_VERSION);
 		about_dialog.set_license_type (Gtk.License.GPL_3_0);
-		about_dialog.set_program_name ("EasyRPG Editor");
+		about_dialog.set_program_name (Resources.APP_NAME);
 		about_dialog.set_comments ("A role playing game editor");
-		about_dialog.set_website ("http://easy-rpg.org/");
+		about_dialog.set_website (Resources.APP_WEBSITE);
 		about_dialog.set_copyright ("© EasyRPG Project 2011");
-
-		const string authors[] = {"Héctor Barreiro", "Glynn Clements", "Francisco de la Peña", "Aitor García", "Gabriel Kind", "Alejandro Marzini http://vgvgf.com.ar/", "Shin-NiL", "Rikku2000 http://u-ac.net/rikku2000/gamedev/", "Mariano Suligoy", "Paulo Vizcaíno", "Takeshi Watanabe http://takecheeze.blog47.fc2.com/", null};
-		const string artists[] = {"Ben Beltran http://nsovocal.com/", "Juan «Magnífico»", "Marina Navarro http://muerteatartajo.blogspot.com/", null};
-		about_dialog.set_authors (authors);
-		about_dialog.set_artists (artists);
-
-		try {
-			var logo = new Gdk.Pixbuf.from_file ("./share/easyrpg/icons/hicolor/48x48/apps/easyrpg.png");
-			about_dialog.set_logo (logo);
-		}
-		catch (Error e) {
-			stderr.printf ("Could not load about dialog logo: %s\n", e.message);
-		}
+		about_dialog.set_authors (Resources.APP_AUTHORS);
+		about_dialog.set_artists (Resources.APP_ARTISTS);
+		about_dialog.set_logo (Resources.load_icon_as_pixbuf ("easyrpg", 48));
 
 		about_dialog.run ();
 		about_dialog.destroy ();

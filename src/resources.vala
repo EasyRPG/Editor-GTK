@@ -19,6 +19,10 @@
 namespace Resources {
 	public const string APP_NAME = "EasyRPG Editor";
 	public const string APP_ICON = "easyrpg";
+	public const string APP_VERSION = "0.1.0";
+	public const string APP_WEBSITE = "http://easy-rpg.org/";
+	public const string APP_AUTHORS[] = {"Héctor Barreiro", "Glynn Clements", "Francisco de la Peña", "Aitor García", "Gabriel Kind", "Alejandro Marzini http://vgvgf.com.ar/", "Shin-NiL", "Rikku2000 http://u-ac.net/rikku2000/gamedev/", "Mariano Suligoy", "Paulo Vizcaíno", "Takeshi Watanabe http://takecheeze.blog47.fc2.com/", null};
+	public const string APP_ARTISTS[] = {"Ben Beltran http://nsovocal.com/", "Juan «Magnífico»", "Marina Navarro http://muerteatartajo.blogspot.com/", null};
 
 	public const string ICON_NEW = "old_new";
 	public const string ICON_OPEN = "old_open";
