@@ -10,7 +10,7 @@ AM_MAINTAINER_MODE
 
 AC_PROG_CC
 
-
+CFLAGS="$CFLAGS -Wno-unused-but-set-variable"
 
 dnl Check for vala
 AM_PROG_VALAC([0.14.0])
