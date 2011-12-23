@@ -107,7 +107,7 @@ public class MainController : Controller {
 		// Load data from the .rproject file
 		parser.parse_file (this.base_path + this.project_filename);
 		this.project_data = parser.get_root ();
-		int current_map = int.parse (this.project_data.get_node_by_name ("current_map").content);
+//		int current_map = int.parse (this.project_data.get_node_by_name ("current_map").content);
 
 		// If the scale value found in the .rproject file is valid, set it.
 		int current_scale = int.parse (this.project_data.get_node_by_name ("current_scale").content);
@@ -385,8 +385,6 @@ public class MainController : Controller {
 		}
 
 		Map map = this.maps.get (map_id);
-		int width = map.width * 16;
-		int height = map.height * 16;
 
 		this.current_map = map_id;
 

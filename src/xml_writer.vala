@@ -102,7 +102,7 @@ public class XmlWriter {
 			write_node (node.next);
 	}
 
-	public bool save_to_file(string path){
+/*	public bool save_to_file(string path){
 		try {
 			GLib.File file = GLib.File.new_for_path (path);
 
@@ -115,5 +115,5 @@ public class XmlWriter {
 			stderr.printf ("Coudn't save file: %s", path);
 			return false;
 		}
-	}
+	}*/
 }

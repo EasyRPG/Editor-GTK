@@ -1,6 +1,6 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * controller_main.vala
+ * view_generic_widgets.vala
  * Copyright (C) EasyRPG Project 2011
  *
  * EasyRPG is free software: you can redistribute it and/or modify it
@@ -37,26 +37,26 @@ public class IndexSelector : Gtk.Frame {
 	 * 
 	 * @param title an string with the text displayed on the column header.
 	 */
-	public IndexSelector (string title){
+	public IndexSelector (string title) {
 		//Create widgets
 		this.model = new Gtk.ListStore (1, typeof (string));
 		this.view = new Gtk.TreeView ();
 		this.button_set_size = new Gtk.Button.with_label ("Max Number ...");
 		this.main_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
-		this.scrolled_view = new Gtk.ScrolledWindow(null, null);
+		this.scrolled_view = new Gtk.ScrolledWindow (null, null);
 		var list_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 		
 		//Set properties
-		this.view.set_model(model);
-		this.view.set_size_request(200, -1);
+		this.view.set_model (model);
+		this.view.set_size_request (200, -1);
 		this.view.insert_column_with_attributes (-1, title, new Gtk.CellRendererText ());
-		this.scrolled_view.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
+		this.scrolled_view.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
 
 		//Do layout
-		scrolled_view.add(view);
-		list_box.pack_start(scrolled_view, true, true, 0);
-		list_box.pack_start(button_set_size, false, true, 0);
-		this.main_box.pack_start(list_box, false, true, 10);
+		scrolled_view.add (view);
+		list_box.pack_start (scrolled_view, true, true, 0);
+		list_box.pack_start (button_set_size, false, true, 0);
+		this.main_box.pack_start (list_box, false, true, 10);
 		this.add (main_box);
 
 		//TODO: Connect Signals
@@ -68,8 +68,8 @@ public class IndexSelector : Gtk.Frame {
 	 * 
 	 * @param child is the widget to render in the right side of the screen.
 	 */
-	public void set_child (Gtk.Widget child){
-		main_box.pack_start(child, false, true, 0);
+	public void set_child (Gtk.Widget child) {
+		main_box.pack_start (child, false, true, 0);
 	}
 }
 
@@ -106,7 +106,7 @@ public class GroupFrame : Gtk.Frame {
 		this.alignment.left_padding = 12;
 		this.alignment.bottom_padding = 15;
 		this.add (this.alignment);
-		this.alignment.add(main_box);
+		this.alignment.add (main_box);
 	}
 
 
@@ -116,7 +116,7 @@ public class GroupFrame : Gtk.Frame {
 	 * @param labels an array of strings with the labes for the entries
 	 * @param entries an array with the widgets to put with the labels
 	 */
-	public void add_entries(string[] labels, Gtk.Entry[] entries){
+	public void add_entries (string[] labels, Gtk.Entry[] entries) {
 		//Create containers
 		var group_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
 		var labels_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
@@ -124,8 +124,8 @@ public class GroupFrame : Gtk.Frame {
 
 		//Set widgets properties
 		labels_box.set_homogeneous (true);
-		labels_box.set_size_request(140, -1);
-		entries_box.set_size_request(300, -1);
+		labels_box.set_size_request (140, -1);
+		entries_box.set_size_request (300, -1);
 
 		//Layout labels
 		foreach (string title in labels){
@@ -151,7 +151,7 @@ public class GroupFrame : Gtk.Frame {
 	 * @param labels an array of strings with the labes for the entries
 	 * @param buttons an array with the widgets to put with the labels
 	 */
-	public void add_spin_buttons(string[] labels, Gtk.SpinButton[] buttons){
+	public void add_spin_buttons (string[] labels, Gtk.SpinButton[] buttons) {
 		//Create containers
 		var group_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 20);
 		var labels_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
@@ -159,19 +159,19 @@ public class GroupFrame : Gtk.Frame {
 
 		//Set widgets properties
 		labels_box.set_homogeneous (true);
-		labels_box.set_size_request(120, -1);
-		buttons_box.set_size_request(50, -1);
+		labels_box.set_size_request (120, -1);
+		buttons_box.set_size_request (50, -1);
 
 		//Layout labels
-		foreach (string title in labels){
+		foreach (string title in labels) {
 			var label = new Gtk.Label (title);
 			label.xalign = 0.0f;
 			labels_box.pack_start (label, false, true, 0);
 		}
 
 		//Layout widgets
-		foreach (Gtk.SpinButton button in buttons){
-			buttons_box.pack_start(button, false, true, 2);
+		foreach (Gtk.SpinButton button in buttons) {
+			buttons_box.pack_start (button, false, true, 2);
 		}
 
 		//Do main layout
@@ -185,12 +185,12 @@ public class GroupFrame : Gtk.Frame {
 	 * 
 	 * @param checks an array with the chech buttons you want to add
 	 */
-	public void add_check_buttons (Gtk.CheckButton[] checks){
+	public void add_check_buttons (Gtk.CheckButton[] checks) {
 		//Set Properties
 		this.main_box.set_homogeneous (true);
 
 		//Layout widgets
-		foreach (Gtk.CheckButton button in checks){
+		foreach (Gtk.CheckButton button in checks) {
 			button.xalign = 0.0f;
 			this.main_box.pack_start (button, false, true, 2);
 		}
@@ -204,7 +204,7 @@ public class GroupFrame : Gtk.Frame {
 	 * @param fill bool indicating if the box should fill the space
 	 * @param paddling the paddling
 	 */
-	public void add_widget (Gtk.Widget widget, bool expand, bool fill, int paddling){
+	public void add_widget (Gtk.Widget widget, bool expand, bool fill, int paddling) {
 		main_box.pack_start (widget, expand, fill, paddling);
 	}
 }
@@ -212,7 +212,7 @@ public class GroupFrame : Gtk.Frame {
 /**
  * This widget displays an static image with a fixed size
  */
-public class ImageFrame : Gtk.AspectFrame{
+public class ImageFrame : Gtk.AspectFrame {
 	/*
 	 * Properties
 	 */
@@ -226,17 +226,17 @@ public class ImageFrame : Gtk.AspectFrame{
 	 * @param w the width of the display
 	 * @param h the heigth of the display
 	 */
-	public ImageFrame (int w, int h){
+	public ImageFrame (int w, int h) {
 		//Create widgets
-		this.view = new Gtk.DrawingArea();
+		this.view = new Gtk.DrawingArea ();
 		this.width = w;
 		this.height = h;
 		
 		//Set properties
-		this.view.set_size_request(this.width, this.height);
+		this.view.set_size_request (this.width, this.height);
 
 		//Do layout
-		this.add(view);
+		this.add (view);
 	}
 
 	/**
@@ -247,7 +247,7 @@ public class ImageFrame : Gtk.AspectFrame{
 	 * @param x an int indicating witch column should blitting start from
 	 * @param y an int indicating witch row should blitting start from
 	 */
-	public void render(string image_path, int x, int y){
+	public void render(string image_path, int x, int y) {
 		//TODO: use cairo to blit the file content.
 	}
 }
@@ -255,14 +255,14 @@ public class ImageFrame : Gtk.AspectFrame{
 /**
  * This widget displays an animated image with a fixed size
  */
-public class AnimatedFrame : Gtk.AspectFrame{
+public class AnimatedFrame : Gtk.AspectFrame {
 	/*
 	 * Properties
 	 */
 	private Gtk.DrawingArea view;
 	private int width;
 	private int height;
-	private int[] frames; //FIXME: not actually int, but an array with the images to be displayed sequencelly
+//	private int[] frames; //FIXME: not actually int, but an array with the images to be displayed sequencelly
 
 	/*
 	 * Constructor
@@ -291,9 +291,9 @@ public class AnimatedFrame : Gtk.AspectFrame{
 	 * @param x an int indicating witch column should blitting start from
 	 * @param y an int indicating witch row should blitting start from
 	 */
-	private int render_frame(string source, int x, int y){
+/*	private int render_frame (string source, int x, int y) {
 		//TODO: use cairo to blit the file content.
 		//FIXME: change string for a reference to the base image to get the frames from.
 		return 0;
-	}
+	}*/
 }

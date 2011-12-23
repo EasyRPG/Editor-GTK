@@ -165,7 +165,7 @@ public class ActorGeneralSettings : Gtk.Frame {
 		//FIXME: not actually Animated_Frame, but a class to render battle animations
 		private Gtk.Button button_chose_face;
 		private Gtk.Button button_chose_chara;
-		private Gtk.CheckButton check_use_transparency;
+//		private Gtk.CheckButton check_use_transparency;
 		private Gtk.ComboBox combo_battler;
 		private Gtk.ComboBox combo_weaponless_animation;
 		
@@ -233,12 +233,12 @@ public class ActorCurve : Gtk.Frame{
 	public ActorCurve (){
 		//Initialize widgets
 		this.notebook = new Gtk.Notebook();
-		this.view_hp = new CurveFrame(new Gdk.Color());
-		this.view_mp = new CurveFrame(new Gdk.Color());
-		this.view_att = new CurveFrame(new Gdk.Color());
-		this.view_def = new CurveFrame(new Gdk.Color());
-		this.view_int = new CurveFrame(new Gdk.Color());
-		this.view_dex = new CurveFrame(new Gdk.Color());
+		this.view_hp = new CurveFrame(Gdk.RGBA());
+		this.view_mp = new CurveFrame(Gdk.RGBA());
+		this.view_att = new CurveFrame(Gdk.RGBA());
+		this.view_def = new CurveFrame(Gdk.RGBA());
+		this.view_int = new CurveFrame(Gdk.RGBA());
+		this.view_dex = new CurveFrame(Gdk.RGBA());
 
 		//Set properties
 		this.notebook.set_tab_pos(Gtk.PositionType.BOTTOM);
@@ -261,7 +261,7 @@ public class CurveFrame : Gtk.Frame{
 	/*
 	 * Properties
 	 */
-	private Gdk.Color color;
+	private Gdk.RGBA color;
 	private GroupFrame frame_curve;
 	private GroupFrame frame_level;
 	private GroupFrame frame_value;
@@ -278,9 +278,9 @@ public class CurveFrame : Gtk.Frame{
 	/*
 	 * Constructor
 	 * 
-	 * @param color a Gdk.color indicating what color should the curve be drawn.
+	 * @param color a Gdk.RGBA indicating what color should the curve be drawn.
 	 */
-	public CurveFrame (Gdk.Color color) {
+	public CurveFrame (Gdk.RGBA color) {
 		this.color = color;
 		this.frame_curve = new GroupFrame ("Curve");
 		this.frame_level = new GroupFrame ("Level");

@@ -68,7 +68,7 @@ public class XmlParser {
 		this.root = null;
 
 		try {
-			GLib.File file = GLib.File.new_for_path (path);
+//			GLib.File file = GLib.File.new_for_path (path);
 
 			string file_content;
 

@@ -13,7 +13,7 @@ AC_PROG_CC
 
 
 dnl Check for vala
-AM_PROG_VALAC([0.14.1])
+AM_PROG_VALAC([0.14.0])
 
 
 PKG_CHECK_MODULES(EDITOR,

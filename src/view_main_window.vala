@@ -746,10 +746,10 @@ public class MainWindow : Gtk.Window {
 	}
 
 	private void menu_eraser_popup(){
-		this.menu_eraser.popup (null, null, position_func, 0, 0);
+//		this.menu_eraser.popup (null, null, position_func, 0, 0);
 	}
 
-	private void position_func (Gtk.Menu menu, out int x, out int y, out bool push_in){
+/*	private void position_func (Gtk.Menu menu, out int x, out int y, out bool push_in){
 		var parent = menu.get_attach_widget() as Gtk.ToggleToolButton;
 		Gtk.Allocation parent_allocation;
 		Gtk.Allocation menu_allocation;
@@ -777,5 +777,5 @@ public class MainWindow : Gtk.Window {
 			x -= menu_allocation.width;
 			x += parent_allocation.width;
 		}
-	}
+	}*/
 }
