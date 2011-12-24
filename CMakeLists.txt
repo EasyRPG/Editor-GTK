@@ -16,7 +16,7 @@ foreach(i ${VALA_SRCS})
 endforeach()
 
 if(NOT DEFINED GTK_VERSION)
-  set(GTK_VERSION 2)
+  set(GTK_VERSION 3)
 endif()
 
 if(${GTK_VERSION} EQUAL 2)
