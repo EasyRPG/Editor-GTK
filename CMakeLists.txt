@@ -36,13 +36,6 @@ elseif(${GTK_VERSION} EQUAL 3)
   find_package(GTK3 REQUIRED)
   include_directories(${GTK3_INCLUDE_DIRS})
 
-  find_library(GDK3_LIBRARY gdk-3)
-  if(GDK3_LIBRARY)
-    message(STATUS "gdk3 found")
-  else()
-    message(FATAL_ERROR "gdk3 not found")
-  endif()
-
   vala_precompile(VALA_C
     SOURCES ${VALA_SRCS_AUX}
     PACKAGES gtk+-3.0 gio-2.0 posix libxml-2.0 gdk-3.0
@@ -51,26 +44,20 @@ elseif(${GTK_VERSION} EQUAL 3)
     GENERATE_VAPI editor_vala
     GENERATE_HEADER editor_vala)
 
-  set(GTK_LIBRARIES ${GTK3_LIBRARIES} ${GDK3_LIBRARY})
+  set(GTK_LIBRARIES ${GTK3_LIBRARIES})
+  foreach(i "pango-1.0" "cairo" "cairo-gobject" "gobject-2.0" "gdk-3" "gdk_pixbuf-2.0" "gio-2.0" "gthread-2.0" "glib-2.0")
+    find_library(lib_${i} ${i})
+    if(EXISTS ${lib_${i}})
+      message(STATUS "${i} found: ${lib_${i}}")
+      list(APPEND GTK_LIBRARIES ${lib_${i}})
+    else()
+      message(SEND_ERROR "${i} not found")
+    endif()
+  endforeach()
 else()
   message(FATAL_ERROR "unknown gtk version")
 endif()
 
-# gio-2.0
-find_library(GIO2_LIBRARY gio-2.0)
-if(EXISTS ${GIO2_LIBRARY})
-  message(STATUS "gio-2.0 found")
-else()
-  message(SEND_ERROR "gio-2.0 not found")
-endif()
-
-# gthread-2.0
-find_library(GTHREAD2_LIBRARY gthread-2.0)
-if(EXISTS ${GTHREAD2_LIBRARY})
-  message(STATUS "gthread-2.0 found")
-else()
-  message(STATUS "gthread-2.0 found")
-endif()
 
 add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${VALA_C})
-target_link_libraries(${PROJECT_NAME} ${GTK_LIBRARIES} ${GIO2_LIBRARY} ${GTHREAD2_LIBRARY})
+target_link_libraries(${PROJECT_NAME} ${GTK_LIBRARIES})
