@@ -17,6 +17,13 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+const OptionEntry[] option_entries = {
+	{ "", 0, 0, OptionArg.FILENAME_ARRAY, ref files, "input project file", "FILE" },
+	{null}
+};
+
+static string[] files;
+
 /**
  * Editor is the application class, the starting point for the app.
  */
@@ -42,6 +49,19 @@ public class Editor {
 	 */
 	static int main (string[] args) {
 		Gtk.init (ref args);
+
+		/* parse parameters from shell */
+		var context = new OptionContext("- EasyRPG Editor");
+		context.set_help_enabled(true);
+		context.add_main_entries(option_entries, "editor_vala");
+		context.add_group(Gtk.get_option_group(true));
+
+		try {
+			context.parse(ref args);
+		} catch(OptionError e) {
+			stderr.puts(e.message + "\n");
+			return 1;
+		}
 
 		var app = new Editor ();
 		app.run ();
