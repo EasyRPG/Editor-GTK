@@ -34,6 +34,8 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	private LayerType current_layer;
 	private Scale current_scale;
 	private Rect drawn_rect;
+	private int cursor_x;
+	private int cursor_y;
 
 	/**
 	 * Builds the map DrawingArea.
@@ -44,6 +46,7 @@ public class MapDrawingArea : Gtk.DrawingArea {
 		this.set_size_request (-1, -1);
 		this.set_halign (Gtk.Align.CENTER);
 		this.set_valign (Gtk.Align.CENTER);
+		this.add_events(Gdk.EventMask.POINTER_MOTION_MASK);
 	}
 
 	/**
@@ -60,6 +63,7 @@ public class MapDrawingArea : Gtk.DrawingArea {
 		this.tile_height = this.lower_layer.length[0];
 
 		this.draw.connect (on_draw);
+		this.motion_notify_event.connect (on_motion);
 	}
 
 	/**
@@ -144,6 +148,7 @@ public class MapDrawingArea : Gtk.DrawingArea {
 		// Redraw the DrawingArea and don't react anymore to the draw signal
 		this.queue_draw ();
 		this.draw.disconnect (on_draw);
+		this.motion_notify_event.connect (on_motion);
 	}
 
 	/**
@@ -496,6 +501,7 @@ public class MapDrawingArea : Gtk.DrawingArea {
 		ctx.set_source_surface (tile, x, y);
 		ctx.get_source ().set_filter (Cairo.Filter.FAST);
 		ctx.set_operator (Cairo.Operator.SOURCE);
+
 		ctx.fill ();
 	}
 
@@ -623,6 +629,49 @@ public class MapDrawingArea : Gtk.DrawingArea {
 				break;
 			default:
 				return false;
+		}
+
+		draw_preview(ctx);
+
+		return true;
+	}
+
+	/**
+	 * Renders a preview of map changes based on the selected action and tiles
+	 * in the tile palette.
+	 */
+	public bool draw_preview (Cairo.Context ctx) {
+		MainWindow window = (MainWindow) this.get_toplevel ();
+		DrawingTool action = (DrawingTool) window.get_current_drawing_tool ();
+		Rect selected = this.palette.getSelectedArea (tile_size);
+
+		switch (action) {
+			case DrawingTool.PEN:
+			case DrawingTool.RECTANGLE:
+			case DrawingTool.CIRCLE:
+			case DrawingTool.FILL:
+				ctx.set_source_rgb (1.0,1.0,1.0);
+				ctx.set_line_width (2.0);
+				ctx.rectangle (cursor_x * tile_size, cursor_y * tile_size, selected.width, selected.height);
+				ctx.stroke ();
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	/**
+	 * Manages the reactions to the pointer motion signal.
+	 */
+	public bool on_motion (Gdk.EventMotion event) {
+		int x = ((int) event.x) / this.tile_size;
+		int y = ((int) event.y) / this.tile_size;
+
+		if(x != cursor_x || y != cursor_y) {
+			cursor_x = x;
+			cursor_y = y;
+
+			this.queue_draw ();
 		}
 
 		return true;
