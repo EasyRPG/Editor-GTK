@@ -26,10 +26,16 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 	private GLib.HashTable<int, Cairo.ImageSurface> autotiles;
 	private LayerType current_layer;
 
+	private Rect selected = Rect(0,0,0,0);
+
 	/**
 	 * Builds the tile palette DrawingArea.
 	 */
 	public TilePaletteDrawingArea () {
+		this.add_events(
+			Gdk.EventMask.BUTTON_PRESS_MASK |
+			Gdk.EventMask.BUTTON1_MOTION_MASK
+		);
 		this.set_size_request (192, -1);
 		this.autotiles = new GLib.HashTable<int, Cairo.ImageSurface> (null, null);
 	}
@@ -56,6 +62,9 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 		this.load_upper_tiles (surface_tileset);
 
 		this.draw.connect (on_draw);
+
+		this.button_press_event.connect (on_button_press);
+		this.motion_notify_event.connect (on_button_motion);
 	}
 
 	/**
@@ -272,6 +281,29 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 		// Redraw the DrawingArea and don't react anymore to the draw signal	
 		this.queue_draw ();
 		this.draw.disconnect (on_draw);
+
+		// do not react anymore to the mouse signals
+		this.button_press_event.disconnect (on_button_press);
+		this.motion_notify_event.disconnect (on_button_motion);
+	}
+
+	public bool on_button_press (Gdk.EventButton event) {
+		selected.set_values(((int) event.x)/32, ((int) event.y)/32, 0, 0);
+		this.queue_draw();
+		return true;
+	}
+
+	public bool on_button_motion (Gdk.EventMotion event) {
+		int width  = ((int) event.x)/32 - selected.x;
+		int height = ((int) event.y)/32 - selected.y;
+
+		if(selected.width != width || selected.height != height) {
+			selected.width = width;
+			selected.height = height;
+			this.queue_draw();
+		}
+
+		return true;
 	}
 
 	/**
@@ -298,6 +330,29 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 		// Fast interpolation, similar to nearest-neighbor
 		ctx.get_source ().set_filter (Cairo.Filter.FAST);
 		ctx.paint ();
+
+		// mark selected tiles with a blue half transparent rectangle
+		ctx.set_source_rgba(0.0,0.0,1.0,0.5);
+		double width = (double) selected.width;
+		double height = (double) selected.height;
+		double x = (double) selected.x;
+		double y = (double) selected.y;
+
+		if(width >= 0.0) {
+			width += 1.0;
+		} else {
+			width -= 1.0;
+			x += 1.0;
+		}
+		if(height >= 0.0) {
+			height += 1.0;
+		} else {
+			height -= 1.0;
+			y += 1.0;
+		}
+
+		ctx.rectangle(x * 16.0, y * 16.0, width * 16.0, height * 16.0);
+		ctx.fill();
 
 		return true;
 	}
