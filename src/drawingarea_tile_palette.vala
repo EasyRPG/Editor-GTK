@@ -29,6 +29,39 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 	private Rect selected = Rect(0,0,0,0);
 
 	/**
+	 * Returns the rectangle of selected tiles
+	 */
+	public Rect getSelected() {
+		return selected;
+	}
+
+	/**
+	 * Returns the rectangle of selected tiles prepared
+	 * for Drawing to Surfaces.
+	 */
+	public Rect getSelectedArea (int tile_size) {
+		int x = selected.x * tile_size;
+		int y = selected.y * tile_size;
+		int w = selected.width * tile_size;
+		int h = selected.height * tile_size;
+
+		if(w < 0) {
+			w = -w;
+			x -= w;
+		}
+
+		if(h < 0) {
+			h *= -1;
+			y -= h;
+		}
+
+		w+=tile_size;
+		h+=tile_size;
+
+		return Rect(x, y, w, h);
+	}
+
+	/**
 	 * Builds the tile palette DrawingArea.
 	 */
 	public TilePaletteDrawingArea () {
@@ -331,28 +364,12 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 		ctx.get_source ().set_filter (Cairo.Filter.FAST);
 		ctx.paint ();
 
-		// mark selected tiles with a blue half transparent rectangle
-		ctx.set_source_rgba(0.0,0.0,1.0,0.5);
-		double width = (double) selected.width;
-		double height = (double) selected.height;
-		double x = (double) selected.x;
-		double y = (double) selected.y;
-
-		if(width >= 0.0) {
-			width += 1.0;
-		} else {
-			width -= 1.0;
-			x += 1.0;
-		}
-		if(height >= 0.0) {
-			height += 1.0;
-		} else {
-			height -= 1.0;
-			y += 1.0;
-		}
-
-		ctx.rectangle(x * 16.0, y * 16.0, width * 16.0, height * 16.0);
-		ctx.fill();
+		// Mark selected tiles
+		ctx.set_source_rgb (1.0,1.0,1.0);
+		ctx.set_line_width (1.0);
+		Rect s = getSelectedArea (16);
+		ctx.rectangle ((double) s.x, (double) s.y, (double) s.width, (double) s.height);
+		ctx.stroke ();
 
 		return true;
 	}
