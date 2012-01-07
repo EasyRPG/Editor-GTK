@@ -371,7 +371,8 @@ public class MainWindow : Gtk.Window {
 		 */
 		this.toolbar_sidebar = new Gtk.Toolbar ();
 		this.toolbar_sidebar.set_show_arrow (true);
-		this.toolbar_sidebar.get_style_context ().add_class (Gtk.STYLE_CLASS_PRIMARY_TOOLBAR);
+		this.toolbar_sidebar.set_style (Gtk.ToolbarStyle.ICONS);
+		this.toolbar_sidebar.set_icon_size (Gtk.IconSize.SMALL_TOOLBAR);
 
 		// Add buttons
 		this.toolbar_sidebar.add (toolitem_undo);
