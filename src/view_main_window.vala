@@ -689,7 +689,7 @@ public class MainWindow : Gtk.Window {
 	/**
 	 * Shows the view and makes small fixes to the layout.
 	 */
-	public void show_all () {
+	public new void show_all () {
 		base.show_all ();
 
 		// Sets the paned_palette_maptree handle position to middle
