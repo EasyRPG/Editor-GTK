@@ -44,11 +44,16 @@ public class MainController : Controller {
 	/**
 	 * Instantiantes the MainWindow view.
 	 */
-	public MainController () {
+	public MainController (string? project_file = null) {
 		Gtk.IconTheme.get_default().append_search_path ("../data/icons");
+		Gtk.IconTheme.get_default().append_search_path ("data/icons");
+
 		this.main_view = new MainWindow (this);
 		this.maps = new GLib.HashTable<int, Map> (null, null);
 		this.map_references = new GLib.HashTable<int, Gtk.TreeRowReference> (null, null);
+
+		if(project_file != null)
+			open_project_from_file (project_file);
 	}
 
 	/**
@@ -59,7 +64,29 @@ public class MainController : Controller {
 	}
 
 	/**
-	 * Opens a project, loads its data and change the status of some widgets. 
+	 * Opens a project from file, loads its data and change the status of some widgets.
+	 */
+	public void open_project_from_file (string project_file) {
+		File file = File.new_for_path (project_file);
+
+		if(file.query_exists()) {
+			this.project_filename = file.get_basename ();
+			this.base_path = file.get_parent ().get_path () + "/";
+
+			// Manages all the XML read stuff
+			this.load_project_data ();
+			this.load_maptree_data ();
+
+			// Enable/disable some widgets
+			this.main_view.set_project_status ("open");
+			this.main_view.update_statusbar_current_frame();
+		} else {
+			warning("project file does not exist!");
+		}
+	}
+
+	/**
+	 * Opens a project from dialog, loads its data and change the status of some widgets.
 	 */
 	public void open_project () {
 		var open_project_dialog = new Gtk.FileChooserDialog ("Open Project", this.main_view,
@@ -80,21 +107,9 @@ public class MainController : Controller {
 		file_filter.add_pattern ("*.rproject"); // for case-insensitive patterns -> add_custom()
 		open_project_dialog.add_filter (file_filter);
 
-		if (open_project_dialog.run () == Gtk.ResponseType.ACCEPT) {
-			// Get the base_path and project_filename from the selected file
-			string full_path = open_project_dialog.get_filename ();
-			string[] path_tokens = full_path.split ("/");
-			this.project_filename = path_tokens[path_tokens.length - 1];
-			this.base_path = full_path.replace (this.project_filename, "");
+		if (open_project_dialog.run () == Gtk.ResponseType.ACCEPT)
+			open_project_from_file (open_project_dialog.get_filename ());
 
-			// Manages all the XML read stuff
-			this.load_project_data ();
-			this.load_maptree_data ();
-
-			// Enable/disable some widgets
-			this.main_view.set_project_status ("open");
-			this.main_view.update_statusbar_current_frame();
-		}
 		open_project_dialog.destroy ();
 	}
 

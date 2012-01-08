@@ -34,7 +34,7 @@ public class Editor {
 	 * Instantiates the main controller.
 	 */
 	public Editor () {
-		this.main_controller = new MainController ();
+		this.main_controller = new MainController (files != null ? files[0] : null);
 	}
 
 	/**
