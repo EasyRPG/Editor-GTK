@@ -109,13 +109,8 @@ public class MaptreeTreeView : Gtk.TreeView {
 			GLib.Value value;
 			maptree_model.get_value (selected, 0, out value);
 
-			int map_id = value.get_int ();
-
-			/* verify the map changed */
-			if(this.map_id != map_id) {
-				this.map_id = map_id;
-				map_selected (map_id);
-			}
+			this.map_id = value.get_int ();
+			map_selected (map_id);
 		} else {
 			this.map_id = -1;
 		}
