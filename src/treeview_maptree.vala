@@ -22,8 +22,19 @@
  */
 public class MaptreeTreeView : Gtk.TreeView {
 	private MaptreeTreeStore maptree_model;
+	private MapTreeMenu menu_root;
+	private MapTreeMenu menu_map;
+	private int map_id;
 
 	public signal void map_selected (int map_id);
+
+	public signal void map_new (int parent_id);
+	public signal void map_delete (int map_id);
+	public signal void map_properties (int map_id);
+	public signal void map_dungeon (int map_id);
+	public signal void map_copy (int map_id);
+	public signal void map_paste (int map_id);
+	public signal void map_shift (int map_id);
 
 	/**
 	 * Builds the maptree TreeView.
@@ -58,10 +69,24 @@ public class MaptreeTreeView : Gtk.TreeView {
 		this.maptree_model = new MaptreeTreeStore (this);
 		this.set_model (maptree_model);
 
-		/*
-		 * Connect signals
-		 */
-		this.cursor_changed.connect(on_change);
+		menu_root = new MapTreeMenu.root();
+		menu_map = new MapTreeMenu();
+
+		// Connect signals
+		this.cursor_changed.connect (on_change);
+		this.button_press_event.connect (on_button_press);
+		this.popup_menu.connect (on_popup_menu);
+
+		// Forward context menu signals together with selected map id
+		menu_root.map_new.connect (() => { map_new (0); });
+		menu_root.map_paste.connect (() => { map_paste (0); });
+		menu_map.map_new.connect (() => { map_new(this.map_id); });
+		menu_map.map_delete.connect (() => { map_delete(this.map_id); });
+		menu_map.map_properties.connect (() => { map_properties(this.map_id); });
+		menu_map.map_dungeon.connect (() => { map_dungeon(this.map_id); });
+		menu_map.map_copy.connect (() => { map_copy(this.map_id); });
+		menu_map.map_paste.connect (() => { map_paste(this.map_id); });
+		menu_map.map_shift.connect (() => { map_shift(this.map_id); });
 	}
 
 	/**
@@ -86,7 +111,51 @@ public class MaptreeTreeView : Gtk.TreeView {
 
 			int map_id = value.get_int ();
 
-			map_selected (map_id);
+			/* verify the map changed */
+			if(this.map_id != map_id) {
+				this.map_id = map_id;
+				map_selected (map_id);
+			}
+		} else {
+			this.map_id = -1;
 		}
+	}
+
+	/**
+	 * This method is triggered by clicking somewhere in the TreeView
+	 */
+	public bool on_button_press (Gdk.EventButton event) {
+		if(event.type == Gdk.EventType.BUTTON_PRESS && event.button == 3) {
+			/* update selection */
+			var selection = this.get_selection ();
+			Gtk.TreePath path;
+			if(this.get_path_at_pos ((int) event.x, (int) event.y, out path, null, null, null)) {
+				selection.unselect_all ();
+				selection.select_path (path);
+
+				/* call change method */
+				this.on_change ();
+
+				/* open context menu */
+				this.on_popup_menu ();
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * This method is triggered, when a popup menu should be shown
+	 */
+	public bool on_popup_menu () {
+		if(this.map_id == 0) {
+			menu_root.popup(null, null, null, 3, Gtk.get_current_event_time ());
+		} else {
+			menu_map.popup(null, null, null, 3, Gtk.get_current_event_time ());
+		}
+		
+		return true;
 	}
 }
