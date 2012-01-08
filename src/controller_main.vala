@@ -1,7 +1,7 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
  * controller_main.vala
- * Copyright (C) EasyRPG Project 2011
+ * Copyright (C) EasyRPG Project 2011-2012
  *
  * EasyRPG is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -457,7 +457,7 @@ public class MainController : Controller {
 		about_dialog.set_program_name (Resources.APP_NAME);
 		about_dialog.set_comments ("A role playing game editor");
 		about_dialog.set_website (Resources.APP_WEBSITE);
-		about_dialog.set_copyright ("© EasyRPG Project 2011");
+		about_dialog.set_copyright ("© EasyRPG Project 2011-2012");
 		about_dialog.set_authors (Resources.APP_AUTHORS);
 		about_dialog.set_artists (Resources.APP_ARTISTS);
 		about_dialog.set_logo (Resources.load_icon_as_pixbuf ("easyrpg", 48));
