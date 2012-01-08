@@ -416,6 +416,27 @@ public class MainController : Controller {
 	}
 
 	/**
+	 * Manages the reactions to the map creation.
+	 */
+	public void on_map_properties (int map_id) {
+		Map map = this.maps.get (map_id);
+
+		var dialog = new MapPropertiesDialog (map);
+		int result = dialog.run ();
+
+		switch(result) {
+			case Gtk.ResponseType.OK:
+				/* TODO */
+				warning ("TODO: update map properties of map %d", map_id);
+				break;
+			default:
+				break;
+		}
+
+		dialog.destroy ();
+	}
+
+	/**
 	 * Instantiates and shows the database dialog.
 	 */
 	public void show_database () {
