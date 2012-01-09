@@ -37,6 +37,7 @@ public class MainController : Controller {
 	private string project_filename;
 	private XmlNode project_data;
 	private XmlNode game_data;
+	private string[] tilesets;
 	private GLib.HashTable<int, Map> maps;
 	private GLib.HashTable<int, Gtk.TreeRowReference> map_references;
 	private int current_map;
@@ -158,6 +159,18 @@ public class MainController : Controller {
 		this.airship = new Vehicle ();
 		XmlNode airship_node = this.game_data.get_node_by_name ("airship");
 		this.airship.load_data (airship_node);
+
+		try {
+			var dir = Dir.open(this.base_path + "graphics/tilesets", 0);
+			string entry;
+			while((entry = dir.read_name ()) != null) {
+				this.tilesets += entry;
+			}
+		} catch (GLib.FileError e) {
+			error ("Could not open tileset directory: %s", e.message);
+		}
+
+		/* TODO: sort tilesets alphabetically */
 
 		this.current_map = 0;
 	}
@@ -421,13 +434,12 @@ public class MainController : Controller {
 	public void on_map_properties (int map_id) {
 		Map map = this.maps.get (map_id);
 
-		var dialog = new MapPropertiesDialog (map);
+		var dialog = new MapPropertiesDialog (this, map);
 		int result = dialog.run ();
 
 		switch(result) {
 			case Gtk.ResponseType.OK:
-				/* TODO */
-				warning ("TODO: update map properties of map %d", map_id);
+				dialog.updateModel ();
 				break;
 			default:
 				break;
@@ -464,6 +476,10 @@ public class MainController : Controller {
 
 		about_dialog.run ();
 		about_dialog.destroy ();
+	}
+
+	public string[] getTilesets () {
+		return this.tilesets;
 	}
 }
 

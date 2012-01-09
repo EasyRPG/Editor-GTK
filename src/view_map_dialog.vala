@@ -18,11 +18,18 @@
  */
 
 /**
+ * TODO:
+ *  - FileChooserButton should probably show only Project Ressources
+ *  - FileChooserButton result is currently neither loaded nor saved
+ */
+
+/**
  * The map properties window view.
  */
 public class MapPropertiesDialog : Gtk.Dialog {
 	private Gtk.Notebook notebook;
 	private BasicPage page1;
+	private Map model;
 
 	private class BasicPage : Gtk.Box {
 		private Gtk.Entry input_name;
@@ -32,25 +39,29 @@ public class MapPropertiesDialog : Gtk.Dialog {
 		private OptionTable options;
 		private PanoramaTable panorama;
 
-		public BasicPage () {
+		public BasicPage (MainController controller, Map map) {
 			Object(orientation: Gtk.Orientation.HORIZONTAL, spacing:5, halign:Gtk.Align.START, valign:Gtk.Align.START);
 
 			var left_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 5);
 
 			var frame_name = new Gtk.Frame ("Name");
 			input_name = new Gtk.Entry ();
+			input_name.set_text (map.name);
 			frame_name.add (input_name);
 			left_box.pack_start (frame_name, true, false);
 
 			var frame_tileset = new Gtk.Frame ("Tileset");
 			input_tileset = new Gtk.ComboBoxText ();
+			foreach (var tileset in controller.getTilesets ())
+				input_tileset.append (tileset, tileset);
+			input_tileset.set_active_id (map.tileset);
 			frame_tileset.add (input_tileset);
 			left_box.pack_start (frame_tileset, true, false);
 
 			var frame_dimensions = new Gtk.Frame ("Dimensions");
 			var table_dimensions = new Gtk.Table (2, 2, false);
-			input_width = new Gtk.SpinButton (new Gtk.Adjustment (20.0, 1.0, 500.0, 1.0, 5.0, 0.0), 1.0, 0);
-			input_height = new Gtk.SpinButton (new Gtk.Adjustment (15.0, 1.0, 500.0, 1.0, 5.0, 0.0), 1.0, 0);
+			input_width = new Gtk.SpinButton (new Gtk.Adjustment ((double) map.width, 1.0, 500.0, 1.0, 5.0, 0.0), 1.0, 0);
+			input_height = new Gtk.SpinButton (new Gtk.Adjustment ((double) map.height, 1.0, 500.0, 1.0, 5.0, 0.0), 1.0, 0);
 			table_dimensions.attach_defaults (new Gtk.Label ("Width:"), 0, 1, 0, 1);
 			table_dimensions.attach_defaults (input_width, 1, 2, 0, 1);
 			table_dimensions.attach_defaults (new Gtk.Label ("Height:"), 0, 1, 1, 2);
@@ -59,16 +70,26 @@ public class MapPropertiesDialog : Gtk.Dialog {
 			left_box.pack_start (frame_dimensions, true, false);
 
 			var frame_options = new Gtk.Frame ("Options");
-			options = new OptionTable ();
+			options = new OptionTable (map);
 			frame_options.add (options);
 			left_box.pack_start (frame_options, true, false);
 
 			this.pack_start (left_box, true, false);
 
 			var frame_panorama = new Gtk.Frame ("Background");
-			panorama = new PanoramaTable ();
+			panorama = new PanoramaTable (map);
 			frame_panorama.add (panorama);
 			this.pack_start (frame_panorama, true, false);
+		}
+
+		public void updateModel (Map map) {
+			map.name = input_name.get_text ().dup ();
+			map.tileset = input_tileset.get_active_id ();
+			map.width = input_width.get_value_as_int ();
+			map.height = input_height.get_value_as_int ();
+
+			options.updateModel (map);
+			panorama.updateModel (map);
 		}
 	}
 
@@ -81,18 +102,19 @@ public class MapPropertiesDialog : Gtk.Dialog {
 		private Gtk.CheckButton        input_v_auto;
 		private Gtk.SpinButton         input_v_speed;
 		private Gtk.Image              output_image;
-		private Gtk.FileChooserButton  input_image; /* TODO: use our own filer chooser button, which uses files from game database */
+		private Gtk.FileChooserButton  input_image;
 
-		public PanoramaTable () {
+		public PanoramaTable (Map map) {
 			Object(n_rows: 2, n_columns:2, homogeneous:false);
 
 			input_enabled = new Gtk.CheckButton.with_label ("Use Panorama Background");
+			input_enabled.set_active (map.panorama_use);
 			this.attach_defaults (input_enabled, 0, 2, 0, 1);
 
 			var frame_image = new Gtk.Frame ("Image");
 			var box_image = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
-			output_image = new Gtk.Image.from_stock ("gtk-missing-image", Gtk.IconSize.LARGE_TOOLBAR);
+			output_image = new Gtk.Image.from_file (map.panorama_filename);
 			output_image.set_size_request (320, 240);
 			box_image.pack_start (output_image, true, false);
 
@@ -107,20 +129,24 @@ public class MapPropertiesDialog : Gtk.Dialog {
 			var frame_h_scrolling = new Gtk.Frame ("Horizontal Scrolling");
 			var box_h_scrolling = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 			input_h_scroll = new Gtk.CheckButton.with_label ("Use Horizontal Scroll");
+			input_h_scroll.set_active (map.panorama_horizontal_loop);
 			box_h_scrolling.pack_start (input_h_scroll, true, false);
 			input_h_auto = new Gtk.CheckButton.with_label ("Autoscroll");
+			input_h_auto.set_active (map.panorama_horizontal_autoscroll);
 			box_h_scrolling.pack_start (input_h_auto, true, false);
-			input_h_speed = new Gtk.SpinButton (new Gtk.Adjustment (0.0, -8.0, 8.0, 1.0, 1.0, 0.0), 1.0, 0);
+			input_h_speed = new Gtk.SpinButton (new Gtk.Adjustment (map.panorama_horizontal_autoscroll_speed, -8.0, 8.0, 1.0, 1.0, 0.0), 1.0, 0);
 			box_h_scrolling.pack_start (input_h_speed, true, false);
 			frame_h_scrolling.add (box_h_scrolling);
 
 			var frame_v_scrolling = new Gtk.Frame ("Vertical Scrolling");
 			var box_v_scrolling = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 			input_v_scroll = new Gtk.CheckButton.with_label ("Use Vertical Scroll");
+			input_v_scroll.set_active (map.panorama_vertical_loop);
 			box_v_scrolling.pack_start (input_v_scroll, true, false);
 			input_v_auto = new Gtk.CheckButton.with_label ("Autoscroll");
+			input_v_auto.set_active (map.panorama_vertical_autoscroll);
 			box_v_scrolling.pack_start (input_v_auto, true, false);
-			input_v_speed = new Gtk.SpinButton (new Gtk.Adjustment (0.0, -8.0, 8.0, 1.0, 1.0, 0.0), 1.0, 0);
+			input_v_speed = new Gtk.SpinButton (new Gtk.Adjustment (map.panorama_vertical_autoscroll_speed, -8.0, 8.0, 1.0, 1.0, 0.0), 1.0, 0);
 			box_v_scrolling.pack_start (input_v_speed, true, false);
 			frame_v_scrolling.add (box_v_scrolling);
 
@@ -153,6 +179,17 @@ public class MapPropertiesDialog : Gtk.Dialog {
 			input_h_speed.set_sensitive (bg_enabled && h_scroll && h_auto);
 			input_v_speed.set_sensitive (bg_enabled && v_scroll && v_auto);
 		}
+
+		public void updateModel (Map map) {
+			map.panorama_use = input_enabled.get_active ();
+			//map.panorama_filename = input_image.get_file ().get_path ();
+			map.panorama_horizontal_loop = input_h_scroll.get_active ();
+			map.panorama_vertical_loop = input_v_scroll.get_active ();
+			map.panorama_horizontal_autoscroll = input_h_auto.get_active ();
+			map.panorama_vertical_autoscroll = input_v_auto.get_active ();
+			map.panorama_horizontal_autoscroll_speed = input_h_speed.get_value_as_int ();
+			map.panorama_vertical_autoscroll_speed = input_v_speed.get_value_as_int ();
+		}
 	}
 
 	private class OptionTable : Gtk.Table {
@@ -161,11 +198,11 @@ public class MapPropertiesDialog : Gtk.Dialog {
 		private Gtk.ComboBoxText      input_save;
 		private Gtk.ComboBoxText      input_wrapping;
 		private Gtk.ComboBoxText      input_music;
-		private Gtk.FileChooserButton input_music_file; /* TODO: use our own filer chooser button, which uses files from game database */
+		private Gtk.FileChooserButton input_music_file;
 		private Gtk.ComboBoxText      input_bbg;
-		private Gtk.FileChooserButton input_bbg_file;   /* TODO: use our own filer chooser button, which uses files from game database */
+		private Gtk.FileChooserButton input_bbg_file;
 
-		public OptionTable () {
+		public OptionTable (Map map) {
 			Object(n_rows: 6, n_columns:3, homogeneous:false);
 
 			var str_teleport = new Gtk.Label ("Teleport:");
@@ -198,20 +235,26 @@ public class MapPropertiesDialog : Gtk.Dialog {
 
 			input_teleport = new Gtk.ComboBoxText ();
 			input_teleport.append ("parent", "same as parent map");
+			input_teleport.append ("event", "entrust to event");
 			input_teleport.append ("allow", "allow");
 			input_teleport.append ("forbid", "forbid");
+			input_teleport.set_active (model_to_combobox (map.teleport_type, map.teleport_allow));
 			attach_defaults (input_teleport, 1, 3, 0, 1);
 
 			input_escape = new Gtk.ComboBoxText ();
 			input_escape.append ("parent", "same as parent map");
+			input_escape.append ("event", "entrust to event");
 			input_escape.append ("allow", "allow");
 			input_escape.append ("forbid", "forbid");
+			input_escape.set_active (model_to_combobox (map.escape_type, map.escape_allow));
 			attach_defaults (input_escape, 1, 3, 1, 2);
 
 			input_save = new Gtk.ComboBoxText ();
 			input_save.append ("parent", "same as parent map");
+			input_save.append ("event", "entrust to event");
 			input_save.append ("allow", "allow");
 			input_save.append ("forbid", "forbid");
+			input_save.set_active (model_to_combobox (map.save_type, map.save_allow));
 			attach_defaults (input_save, 1, 3, 2, 3);
 
 			input_wrapping = new Gtk.ComboBoxText ();
@@ -219,12 +262,14 @@ public class MapPropertiesDialog : Gtk.Dialog {
 			input_wrapping.append ("vertical", "Vertical");
 			input_wrapping.append ("horizontal", "Horizontal");
 			input_wrapping.append ("both", "Both");
+			input_wrapping.set_active (map.scroll_type);
 			attach_defaults (input_wrapping, 1, 3, 3, 4);
 
 			input_music = new Gtk.ComboBoxText ();
 			input_music.append ("parent", "same as parent map");
 			input_music.append ("event", "entrust to event");
 			input_music.append ("specify", "specify");
+			input_music.set_active (map.bgm_type);
 			attach_defaults (input_music, 1, 2, 4, 5);
 
 			input_music_file = new Gtk.FileChooserButton ("Choose Soundtrack", Gtk.FileChooserAction.OPEN);
@@ -234,6 +279,7 @@ public class MapPropertiesDialog : Gtk.Dialog {
 			input_bbg.append ("parent", "same as parent map");
 			input_bbg.append ("terrain", "use terrain settings");
 			input_bbg.append ("specify", "specify");
+			input_bbg.set_active (map.backdrop_type);
 			attach_defaults (input_bbg, 1, 2, 5, 6);
 
 			input_bbg_file = new Gtk.FileChooserButton ("Choose Image", Gtk.FileChooserAction.OPEN);
@@ -245,6 +291,23 @@ public class MapPropertiesDialog : Gtk.Dialog {
 			update_sensitivity ();
 		}
 
+		private int model_to_combobox (int type, bool allow) {
+			if (type == 2)
+				return allow ? 2 : 3;
+			else
+				return type;
+		}
+
+		private void combobox_to_model (int value, out int type, out bool allow) {
+			if (value == 2 || value == 3) {
+				type = 2;
+				allow = value == 2;
+			} else {
+				type = value;
+				allow = true;
+			}
+		}
+
 		private void update_sensitivity () {
 			bool music = input_music.get_active_id () == "specify";
 			bool bbg   = input_bbg.get_active_id () == "specify";
@@ -252,12 +315,39 @@ public class MapPropertiesDialog : Gtk.Dialog {
 			input_music_file.set_sensitive (music);
 			input_bbg_file.set_sensitive (bbg);
 		}
+
+		public void updateModel (Map map) {
+			int type;
+			bool allow;
+
+			map.scroll_type = input_wrapping.get_active ();
+
+			map.bgm_type = input_music.get_active ();
+			//map.bgm_filename = input_music_file.get_file ().get_path ();
+
+			map.backdrop_type = input_bbg.get_active ();
+			//map.backdrop_file = input_bbg_file.get_file ().get_path ();
+
+			combobox_to_model (input_teleport.get_active (), out type, out allow);
+			map.teleport_type = type;
+			map.teleport_allow = allow;
+
+			combobox_to_model (input_escape.get_active (), out type, out allow);
+			map.escape_type = type;
+			map.escape_allow = allow;
+
+			combobox_to_model (input_save.get_active (), out type, out allow);
+			map.save_type = type;
+			map.save_allow = allow;
+		}
 	}
 
 	/**
 	 * Builds the map properties window.
 	 */
-	public MapPropertiesDialog (Map map) {
+	public MapPropertiesDialog (MainController controller, Map map) {
+		this.model = map;
+
 		/* Initialize Dialog */
 		this.set_title ("Map Properties");
 		this.add_button (Gtk.Stock.CANCEL, Gtk.ResponseType.CANCEL);
@@ -266,7 +356,7 @@ public class MapPropertiesDialog : Gtk.Dialog {
 		/* Initialize Widgets */
 		this.notebook = new Gtk.Notebook ();
 		this.notebook.set_scrollable (true);
-		this.page1 = new BasicPage ();
+		this.page1 = new BasicPage (controller, map);
 
 		/* Dialog Layout */
 		Gtk.Box main_box = this.get_content_area () as Gtk.Box;		
@@ -277,5 +367,9 @@ public class MapPropertiesDialog : Gtk.Dialog {
 		this.notebook.append_page (new Gtk.Label ("This feature is not yet supported by the Editor."), new Gtk.Label ("Dungeon Generator"));
 
 		this.show_all ();
+	}
+
+	public void updateModel () {
+		page1.updateModel (model);
 	}
 }
