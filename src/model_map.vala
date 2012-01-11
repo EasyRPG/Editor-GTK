@@ -231,9 +231,10 @@ public class Map : Model {
 	/**
 	 * Creates a new map model
 	 */
-	public Map () {
+	public Map (string name="") {
 		this.lower_layer = new int[this.height, this.width];
 		this.upper_layer = new int[this.height, this.width];
+		this.name = name;
 	}
 
 	/**

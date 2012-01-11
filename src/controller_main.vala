@@ -442,7 +442,16 @@ public class MainController : Controller {
 		int result = dialog.run ();
 
 		if (result == Gtk.ResponseType.OK) {
+			/* update map model */
 			dialog.updateModel ();
+
+			/* update name in maptree */
+			var maptree_model = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
+			Gtk.TreeIter iter;
+			maptree_model.get_iter (out iter, this.map_references.get (map_id).get_path ());
+			maptree_model.set_value (iter, 2, map.name);
+
+			/* reload map (size or tileset may have changed) */
 			load_map (map_id);
 		}
 
@@ -453,15 +462,15 @@ public class MainController : Controller {
 	 * Manages the reactions to the map creation.
 	 */
 	public void on_map_new (int parent_map_id) {
-		/* create new map model */
-		Map map = new Map();
-
 		/* generate new map id */
 		int new_map_id = 1;
 		foreach (int key in maps.get_keys ()) {
 			if (key >= new_map_id)
 				new_map_id = key+1;
 		}
+
+		/* create new map model */
+		Map map = new Map("Map%d".printf(new_map_id));
 
 		var dialog = new MapPropertiesDialog (this, map);
 		int result = dialog.run ();
