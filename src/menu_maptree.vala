@@ -69,6 +69,14 @@ public class MapTreeMenu : Gtk.Menu {
 		item_shift.activate.connect(() => {map_shift ();});
 		append (item_shift);
 
+		/* no yet supported */
+		item_new_map.set_sensitive (false);
+		item_dungeon.set_sensitive (false);
+		item_copy.set_sensitive (false);
+		item_paste.set_sensitive (false);
+		item_delete.set_sensitive (false);
+		item_shift.set_sensitive (false);
+
 		show_all ();
 	}
 
@@ -88,6 +96,10 @@ public class MapTreeMenu : Gtk.Menu {
 		item_paste.set_label ("Paste Map");
 		item_paste.activate.connect(() => {map_paste ();});
 		append (item_paste);
+
+		/* no yet supported */
+		item_new_map.set_sensitive (false);
+		item_paste.set_sensitive (false);
 
 		show_all ();
 	}
