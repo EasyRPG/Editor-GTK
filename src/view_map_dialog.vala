@@ -85,8 +85,7 @@ public class MapPropertiesDialog : Gtk.Dialog {
 		public void updateModel (Map map) {
 			map.name = input_name.get_text ().dup ();
 			map.tileset = input_tileset.get_active_id ();
-			map.width = input_width.get_value_as_int ();
-			map.height = input_height.get_value_as_int ();
+			map.set_size (input_width.get_value_as_int (), input_height.get_value_as_int ());
 
 			options.updateModel (map);
 			panorama.updateModel (map);

@@ -572,6 +572,36 @@ public class Map : Model {
 		this.save_time = (save_time < 0) ? 0 : save_time;
 	}
 
+	public void set_size(int width, int height) requires (width > 1 && width < 500) requires (height > 1 && height < 500) {
+		/* no change needed */
+		if(this.width == width && this.height == height)
+			return;
+
+		/* new layer */
+		var lower_layer = new int[height, width];
+		var upper_layer = new int[height, width];
+
+		/* get bounding box for map copy */
+		var small_width  = this.width > width ? width : this.width;
+		var small_height = this.height > height ? height : this.height;
+
+		/* copy old map data */
+		for (int y = 0; y < small_height; y++) {
+			for (int x = 0; x < small_width; x++) {
+				lower_layer[y, x] = this.lower_layer[y, x];
+				upper_layer[y, x] = this.upper_layer[y, x];
+			}
+		}
+
+		/* set new size */
+		this.width = width;
+		this.height = height;
+
+		/* set new map data */
+		this.lower_layer = lower_layer;
+		this.upper_layer = upper_layer;
+	}
+
 	/**
 	 * Prints the map data.
 	 */
