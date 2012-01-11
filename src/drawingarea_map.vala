@@ -148,7 +148,7 @@ public class MapDrawingArea : Gtk.DrawingArea {
 		// Redraw the DrawingArea and don't react anymore to the draw signal
 		this.queue_draw ();
 		this.draw.disconnect (on_draw);
-		this.motion_notify_event.connect (on_motion);
+		this.motion_notify_event.disconnect (on_motion);
 	}
 
 	/**
