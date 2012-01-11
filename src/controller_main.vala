@@ -412,6 +412,10 @@ public class MainController : Controller {
 			return;
 		}
 
+		load_map (map_id);
+	}
+
+	private void load_map (int map_id) {
 		Map map = this.maps.get (map_id);
 
 		this.current_map = map_id;
@@ -440,6 +444,7 @@ public class MainController : Controller {
 		switch(result) {
 			case Gtk.ResponseType.OK:
 				dialog.updateModel ();
+				load_map (map_id);
 				break;
 			default:
 				break;
