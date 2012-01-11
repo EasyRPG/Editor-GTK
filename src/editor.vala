@@ -18,11 +18,13 @@
  */
 
 const OptionEntry[] option_entries = {
+	{ "version", 'v', OptionFlags.IN_MAIN, OptionArg.NONE, ref opt_version, "output version information and exit", null },
 	{ "", 0, 0, OptionArg.FILENAME_ARRAY, ref files, "input project file", "FILE" },
 	{null}
 };
 
 static string[] files;
+static bool opt_version;
 
 /**
  * Editor is the application class, the starting point for the app.
@@ -45,6 +47,13 @@ public class Editor {
 	}
 
 	/**
+	 * Print version information and exit
+	 */
+	static void show_version () {
+		stdout.printf("%s %s\n", Resources.APP_NAME, Resources.APP_VERSION);
+	}
+
+	/**
 	 * The application entry point.
 	 */
 	static int main (string[] args) {
@@ -61,6 +70,11 @@ public class Editor {
 		} catch(OptionError e) {
 			stderr.puts(e.message + "\n");
 			return 1;
+		}
+
+		if(opt_version) {
+			show_version ();
+			return 0;
 		}
 
 		var app = new Editor ();
