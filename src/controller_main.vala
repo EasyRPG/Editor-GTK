@@ -433,7 +433,7 @@ public class MainController : Controller {
 	}
 
 	/**
-	 * Manages the reactions to the map creation.
+	 * Manages the reactions to the map properties.
 	 */
 	public void on_map_properties (int map_id) {
 		Map map = this.maps.get (map_id);
@@ -441,13 +441,62 @@ public class MainController : Controller {
 		var dialog = new MapPropertiesDialog (this, map);
 		int result = dialog.run ();
 
-		switch(result) {
-			case Gtk.ResponseType.OK:
-				dialog.updateModel ();
-				load_map (map_id);
-				break;
-			default:
-				break;
+		if (result == Gtk.ResponseType.OK) {
+			dialog.updateModel ();
+			load_map (map_id);
+		}
+
+		dialog.destroy ();
+	}
+
+	/**
+	 * Manages the reactions to the map creation.
+	 */
+	public void on_map_new (int parent_map_id) {
+		/* create new map model */
+		Map map = new Map();
+
+		/* generate new map id */
+		int new_map_id = 1;
+		foreach (int key in maps.get_keys ()) {
+			if (key >= new_map_id)
+				new_map_id = key+1;
+		}
+
+		var dialog = new MapPropertiesDialog (this, map);
+		int result = dialog.run ();
+
+		if (result == Gtk.ResponseType.OK) {
+			/* load values from dialog */
+			dialog.updateModel ();
+
+			/* add map to list */
+			this.maps.set (new_map_id, map);
+
+			/* get maptree model */
+			var maptree_model = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
+			var map_icon = Resources.load_icon_as_pixbuf (Resources.ICON_MAP, 16);
+
+			/* get correct position */
+			Gtk.TreeIter iter;
+			Gtk.TreeIter parent_iter;
+			if(parent_map_id > 0)
+				maptree_model.get_iter (out parent_iter, this.map_references.get (parent_map_id).get_path ());
+			else
+				maptree_model.get_iter_first (out parent_iter);
+
+			/* append new map to parent */
+			maptree_model.insert_before (out iter, parent_iter, null);
+
+			/* set correct data */
+			maptree_model.set_value (iter, 0, new_map_id);
+			maptree_model.set_value (iter, 1, map_icon);
+			maptree_model.set_value (iter, 2, map.name);
+
+			/* save reference */
+			var path = new Gtk.TreePath.from_string (maptree_model.get_string_from_iter (iter));
+			var row_reference = new Gtk.TreeRowReference (maptree_model, path);
+			this.map_references.set (new_map_id, row_reference);
 		}
 
 		dialog.destroy ();

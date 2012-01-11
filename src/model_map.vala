@@ -229,6 +229,14 @@ public class Map : Model {
 	public int save_time {get; set;}
 
 	/**
+	 * Creates a new map model
+	 */
+	public Map () {
+		this.lower_layer = new int[this.height, this.width];
+		this.upper_layer = new int[this.height, this.width];
+	}
+
+	/**
 	 * Loads the map data from an XmlNode object.
 	 * 
 	 * @param data An XmlNode that contains the map data.

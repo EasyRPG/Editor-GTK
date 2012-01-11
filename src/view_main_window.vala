@@ -529,6 +529,7 @@ public class MainWindow : Gtk.Window {
 		// Map selected
 		this.treeview_maptree.map_selected.connect (this.controller.on_map_selected);
 		this.treeview_maptree.map_properties.connect (this.controller.on_map_properties);
+		this.treeview_maptree.map_new.connect (this.controller.on_map_new);
 
 		// Eraser menu callbacks
 		toolitem_menu_eraser.clicked.connect (menu_eraser_popup);
