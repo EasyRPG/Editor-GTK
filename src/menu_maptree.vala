@@ -73,7 +73,6 @@ public class MapTreeMenu : Gtk.Menu {
 		item_dungeon.set_sensitive (false);
 		item_copy.set_sensitive (false);
 		item_paste.set_sensitive (false);
-		item_delete.set_sensitive (false);
 		item_shift.set_sensitive (false);
 
 		show_all ();

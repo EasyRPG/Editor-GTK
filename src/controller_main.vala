@@ -512,6 +512,40 @@ public class MainController : Controller {
 	}
 
 	/**
+	 * Manages the reactions to the map deletion.
+	 */
+	public void on_map_delete (int map_id) {
+		Map map = this.maps.get (map_id);
+
+		var dialog = new Gtk.Dialog.with_buttons(
+			"Delete Map?", this.main_view,
+			Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
+			Gtk.Stock.CANCEL, Gtk.ResponseType.CANCEL,
+			Gtk.Stock.OK, Gtk.ResponseType.OK,
+			null
+		);
+		var content_area = dialog.get_content_area () as Gtk.Box;
+		content_area.pack_start (new Gtk.Label ("Map \"%s\" will be deleted. Proceed?".printf(map.name)), false);
+		content_area.show_all ();
+
+		int result = dialog.run ();
+		if (result == Gtk.ResponseType.OK) {
+			/* get maptree model and find correct entry */
+			var maptree_model = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
+			Gtk.TreeIter iter;
+			maptree_model.get_iter (out iter, this.map_references.get (map_id).get_path ());
+
+			/* remove node including all children */
+			foreach (int removed_map_id in maptree_model.remove_all (iter)) {
+				this.map_references.remove (removed_map_id);
+				this.maps.remove (removed_map_id);
+			}
+		}
+
+		dialog.destroy ();
+	}
+
+	/**
 	 * Instantiates and shows the database dialog.
 	 */
 	public void show_database () {

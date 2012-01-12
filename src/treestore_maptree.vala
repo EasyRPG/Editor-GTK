@@ -1,7 +1,7 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
  * treestore_maptree.vala
- * Copyright (C) EasyRPG Project 2011
+ * Copyright (C) EasyRPG Project 2011-2012
  *
  * EasyRPG is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -109,5 +109,26 @@ public class MaptreeTreeStore : Gtk.TreeStore, Gtk.TreeDragSource, Gtk.TreeDragD
 		}
 
 		return false;
+	}
+
+	/**
+	 * Removes Iter and all its children from the tree
+	 * @return list of removed map ids
+	 */
+	public List<int> remove_all (Gtk.TreeIter iter) {
+		var result = new List<int>();
+		Gtk.TreeIter child;
+		Value v;
+
+		/* recursively remove all children */
+		while(this.iter_children(out child, iter))
+			result.concat(this.remove_all(child));
+
+		/* remove ourselves */
+		this.get_value (iter, 0, out v);
+		result.append(v.get_int());
+		this.remove(iter);
+
+		return result;
 	}
 }
