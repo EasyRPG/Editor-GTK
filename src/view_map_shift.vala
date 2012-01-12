@@ -46,10 +46,16 @@ public class MapShiftDialog : Gtk.Dialog {
 		var frame_amount = new Gtk.Frame ("Number of Units");
 		var frame_dir    = new Gtk.Frame ("Direction");
 		var table_dir    = new Gtk.Table (3, 3, true);
-		button_up    = new Gtk.ToggleButton.with_label ("⇑");
-		button_down  = new Gtk.ToggleButton.with_label ("⇓");
-		button_left  = new Gtk.ToggleButton.with_label ("⇐");
-		button_right = new Gtk.ToggleButton.with_label ("⇒");
+		button_up    = new Gtk.ToggleButton ();
+		button_down  = new Gtk.ToggleButton ();
+		button_left  = new Gtk.ToggleButton ();
+		button_right = new Gtk.ToggleButton ();
+
+		/* load button images */
+		button_up.add (new Gtk.Image.from_stock (Gtk.Stock.GO_UP, Gtk.IconSize.BUTTON));
+		button_down.add (new Gtk.Image.from_stock (Gtk.Stock.GO_DOWN, Gtk.IconSize.BUTTON));
+		button_left.add (new Gtk.Image.from_stock (Gtk.Stock.GO_BACK, Gtk.IconSize.BUTTON));
+		button_right.add (new Gtk.Image.from_stock (Gtk.Stock.GO_FORWARD, Gtk.IconSize.BUTTON));
 
 		/* set inital button state */
 		updateDirection(this.dir);
