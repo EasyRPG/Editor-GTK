@@ -546,6 +546,25 @@ public class MainController : Controller {
 	}
 
 	/**
+	 * Manages the reactions to the map shift.
+	 */
+	public void on_map_shift (int map_id) {
+		var map = this.maps.get (map_id);
+		var dialog = new MapShiftDialog ();
+
+		int result = dialog.run ();
+		if (result == Gtk.ResponseType.OK) {
+			/* shift map */
+			map.shift (dialog.dir, dialog.amount);
+
+			/* rerender map */
+			load_map (map_id);
+		}
+
+		dialog.destroy ();
+	}
+
+	/**
 	 * Instantiates and shows the database dialog.
 	 */
 	public void show_database () {

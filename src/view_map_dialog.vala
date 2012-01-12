@@ -1,6 +1,6 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * view_database_dialog.vala
+ * view_map_dialog.vala
  * Copyright (C) EasyRPG Project 2012
  *
  * EasyRPG is free software: you can redistribute it and/or modify it

@@ -96,3 +96,11 @@ public enum DrawingTool {
 		}
 	}
 }
+
+public enum Direction {
+	NONE,
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT;
+}

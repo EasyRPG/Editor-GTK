@@ -531,6 +531,7 @@ public class MainWindow : Gtk.Window {
 		this.treeview_maptree.map_properties.connect (this.controller.on_map_properties);
 		this.treeview_maptree.map_new.connect (this.controller.on_map_new);
 		this.treeview_maptree.map_delete.connect (this.controller.on_map_delete);
+		this.treeview_maptree.map_shift.connect (this.controller.on_map_shift);
 
 		// Eraser menu callbacks
 		toolitem_menu_eraser.clicked.connect (menu_eraser_popup);

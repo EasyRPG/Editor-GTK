@@ -611,6 +611,66 @@ public class Map : Model {
 		this.upper_layer = upper_layer;
 	}
 
+	public void shift(Direction dir, int amount) {
+		switch (dir) {
+			case Direction.RIGHT:
+				for (int y = 0; y < this.height; y++) {
+					for (int x = this.width-1; x >= 0; x--) {
+						if (x - amount >= 0) {
+							this.lower_layer[y,x] = this.lower_layer[y,x-amount];
+							this.upper_layer[y,x] = this.upper_layer[y,x-amount];
+						} else {
+							this.lower_layer[y,x] = 0;
+							this.upper_layer[y,x] = 0;
+						}
+					}
+				}
+				break;
+			case Direction.LEFT:
+				for (int y = 0; y < this.height; y++) {
+					for (int x = 0; x < this.width; x++) {
+						if (x + amount < this.width) {
+							this.lower_layer[y,x] = this.lower_layer[y,x+amount];
+							this.upper_layer[y,x] = this.upper_layer[y,x+amount];
+						} else {
+							this.lower_layer[y,x] = 0;
+							this.upper_layer[y,x] = 0;
+						}
+					}
+				}
+				break;
+			case Direction.UP:
+				for (int y = 0; y < this.height; y++) {
+					for (int x = 0; x < this.width; x++) {
+						if (y + amount < this.height) {
+							this.lower_layer[y,x] = this.lower_layer[y+amount,x];
+							this.upper_layer[y,x] = this.upper_layer[y+amount,x];
+						} else {
+							this.lower_layer[y,x] = 0;
+							this.upper_layer[y,x] = 0;
+						}
+					}
+				}
+				break;
+			case Direction.DOWN:
+				for (int y = this.height-1; y >= 0; y--) {
+					for (int x = 0; x < this.width; x++) {
+						if (y - amount >= 0) {
+							this.lower_layer[y,x] = this.lower_layer[y-amount,x];
+							this.upper_layer[y,x] = this.upper_layer[y-amount,x];
+						} else {
+							this.lower_layer[y,x] = 0;
+							this.upper_layer[y,x] = 0;
+						}
+					}
+				}
+				break;
+			default:
+				warning ("Map Shift: Direction %s not supported!", dir.to_string());
+				break;
+		}
+	}
+
 	/**
 	 * Prints the map data.
 	 */
@@ -648,6 +708,15 @@ public class Map : Model {
 				print ("\n");
 			}
 			print ("%i ", lower_layer[i / lower_layer.length[1], i % lower_layer.length[1]]);
+			i++;
+		}
+		i = 0;
+		print ("\nUpper layer:");
+		while (i < upper_layer.length[0] * upper_layer.length[1]) {
+			if (i % upper_layer.length[1] == 0) {
+				print ("\n");
+			}
+			print ("%i ", upper_layer[i / upper_layer.length[1], i % upper_layer.length[1]]);
 			i++;
 		}
 		print ("\nEnemy encounter steps: %i\n", this.enemy_encounter_steps);
