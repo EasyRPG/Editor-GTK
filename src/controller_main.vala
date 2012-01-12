@@ -53,6 +53,12 @@ public class MainController : Controller {
 		this.maps = new GLib.HashTable<int, Map> (null, null);
 		this.map_references = new GLib.HashTable<int, Gtk.TreeRowReference> (null, null);
 
+		/* update map references for drag and drop */
+		var maptree_model = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
+		maptree_model.map_path_updated.connect ( (id, path) => {
+			map_references[id] = new Gtk.TreeRowReference(maptree_model, path);
+		});
+
 		if(project_file != null)
 			open_project_from_file (project_file);
 	}

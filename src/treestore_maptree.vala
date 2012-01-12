@@ -31,7 +31,12 @@ public class MaptreeTreeStore : Gtk.TreeStore, Gtk.TreeDragSource, Gtk.TreeDragD
 	 * The path of the last dragged row.
 	 */
 	private string dragged_row_path;
-	
+
+	/**
+	 * Send for Drag & Drop events
+	 */
+	public signal void map_path_updated (int map_id, Gtk.TreePath iter);
+
 	/**
 	 * Instantiates the Maptree TreeStore.
 	 */
@@ -105,10 +110,31 @@ public class MaptreeTreeStore : Gtk.TreeStore, Gtk.TreeDragSource, Gtk.TreeDragD
 			// Reselect the dragged map
 			this.maptree_treeview.set_cursor (dest, this.maptree_treeview.get_column (1), false); 
 
+			// inform controller about the changes
+			Gtk.TreeIter iter;
+			this.get_iter (out iter, dest);
+			map_position_update (iter);
+
 			return true;
 		}
 
 		return false;
+	}
+
+	/**
+	 * Send map_path_updated for iter and all of its children
+	 */
+	private void map_position_update (Gtk.TreeIter iter) {
+		Gtk.TreeIter child;
+		Value map_id;
+
+		/* recursively remove all children */
+		for(int i=0; i < this.iter_n_children (iter); i++)
+			if(this.iter_nth_child (out child, iter, i))
+				this.map_position_update(child);
+
+		this.get_value (iter, 0, out map_id);
+		map_path_updated (map_id.get_int (), this.get_path (iter));
 	}
 
 	/**
