@@ -75,6 +75,7 @@ public class MaptreeTreeView : Gtk.TreeView {
 		// Connect signals
 		this.cursor_changed.connect (on_change);
 		this.button_press_event.connect (on_button_press);
+		this.key_press_event.connect (on_key_press);
 		this.popup_menu.connect (on_popup_menu);
 
 		// Forward context menu signals together with selected map id
@@ -135,6 +136,18 @@ public class MaptreeTreeView : Gtk.TreeView {
 				this.on_popup_menu ();
 			}
 
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * This method is triggerd by pressing any key while TreeView is focused
+	 */
+	public bool on_key_press (Gdk.EventKey event) {
+		if (Gdk.keyval_name(event.keyval) == "Delete" && this.map_id != 0) {
+			map_delete (this.map_id);
 			return true;
 		}
 
