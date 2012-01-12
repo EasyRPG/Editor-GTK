@@ -106,9 +106,9 @@ public class MainWindow : Gtk.Window {
 		var action_show_title = new Gtk.ToggleAction ("ActionShowTitle", "_Show Title", "Show title in play test mode", null);
 		action_show_title.set_icon_name (Resources.ICON_TITLE);
 		var action_content = new Gtk.Action ("ActionContent", "_Content", "View help contents", null);
-		action_content.set_icon_name (Resources.ICON_HELP);
+		action_content.set_icon_name (Gtk.Stock.HELP);
 		var action_about = new Gtk.Action ("ActionAbout", "_About", "See information about this program's current version", null);
-		action_about.set_icon_name (Resources.ICON_ABOUT);
+		action_about.set_icon_name (Gtk.Stock.ABOUT);
 		var action_undo = new Gtk.Action ("ActionUndo", "_Undo", "Undo last change", null);
 		action_undo.set_icon_name (Resources.ICON_UNDO);
 		var action_select = new Gtk.RadioAction ("ActionSelect", "_Select", "Select a part of the map", null, DrawingTool.SELECT);
