@@ -318,6 +318,9 @@ public class MainController : Controller {
 				depth--;
 			}
 		}
+
+		/* expand root element */
+		this.main_view.treeview_maptree.expand_to_path (new Gtk.TreePath.from_string ("0"));
 	}
 
 	/**
