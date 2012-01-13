@@ -146,9 +146,17 @@ public class MaptreeTreeView : Gtk.TreeView {
 	 * This method is triggerd by pressing any key while TreeView is focused
 	 */
 	public bool on_key_press (Gdk.EventKey event) {
-		if (Gdk.keyval_name(event.keyval) == "Delete" && this.map_id != 0) {
+		if (Gdk.keyval_name (event.keyval) == "Delete" && this.map_id != 0) {
 			map_delete (this.map_id);
 			return true;
+		} else if (event.state == Gdk.ModifierType.CONTROL_MASK) {
+			if (event.keyval == 'c') {
+				map_copy (this.map_id);
+				return true;
+			} else if (event.keyval == 'v') {
+				map_paste (this.map_id);
+				return true;
+			}
 		}
 
 		return false;
