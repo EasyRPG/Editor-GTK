@@ -373,4 +373,11 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 
 		return true;
 	}
+
+	/**
+	 * Returns tile id for a position in the tileset
+	 */
+	public static int position_to_id (int x, int y) {
+		return y * 6 + x + 1;
+	}
 }

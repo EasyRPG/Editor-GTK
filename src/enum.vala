@@ -95,6 +95,13 @@ public enum DrawingTool {
 				error("Unknown drawing tool: %d", this);
 		}
 	}
+
+	public bool needsDrawingLayer () {
+		if (this == SELECT || this == ZOOM)
+			return false;
+		else
+			return true;
+	}
 }
 
 public enum Direction {
