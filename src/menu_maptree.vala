@@ -21,7 +21,6 @@
  * The maptree menu.
  */
 public class MapTreeMenu : Gtk.Menu {
-
 	/**
 	 * Builds the maptree Menu for map nodes.
 	 */
@@ -69,6 +68,12 @@ public class MapTreeMenu : Gtk.Menu {
 		item_shift.activate.connect(() => {map_shift ();});
 		append (item_shift);
 
+		/* show keybindings in menu */
+		accel_group = new Gtk.AccelGroup();
+		item_delete.add_accelerator ("activate", accel_group, Gdk.keyval_from_name("Delete"), 0, Gtk.AccelFlags.VISIBLE);
+		item_copy.add_accelerator ("activate", accel_group, 'C', Gdk.ModifierType.CONTROL_MASK, Gtk.AccelFlags.VISIBLE);
+		item_paste.add_accelerator ("activate", accel_group, 'V', Gdk.ModifierType.CONTROL_MASK, Gtk.AccelFlags.VISIBLE);
+
 		/* no yet supported */
 		item_dungeon.set_sensitive (false);
 		item_copy.set_sensitive (false);
@@ -93,6 +98,10 @@ public class MapTreeMenu : Gtk.Menu {
 		item_paste.set_label ("Paste Map");
 		item_paste.activate.connect(() => {map_paste ();});
 		append (item_paste);
+
+		/* show keybindings in menu */
+		accel_group = new Gtk.AccelGroup();
+		item_paste.add_accelerator ("activate", accel_group, 'V', Gdk.ModifierType.CONTROL_MASK, Gtk.AccelFlags.VISIBLE);
 
 		/* no yet supported */
 		item_paste.set_sensitive (false);
