@@ -76,7 +76,7 @@ public class MainController : Controller {
 	public void open_project_from_file (string project_file) {
 		File file = File.new_for_path (project_file);
 
-		if(file.query_exists()) {
+		try {
 			this.project_filename = file.get_basename ();
 			this.base_path = file.get_parent ().get_path () + "/";
 
@@ -87,8 +87,13 @@ public class MainController : Controller {
 			// Enable/disable some widgets
 			this.main_view.set_project_status ("open");
 			this.main_view.update_statusbar_current_frame();
-		} else {
-			warning("project file does not exist!");
+		} catch(Error e) {
+			/* Show Error Dialog */
+			var edialog = new Gtk.MessageDialog (this.main_view,
+				Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT,
+				Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, e.message);
+			edialog.run ();
+			edialog.destroy ();
 		}
 	}
 
@@ -123,12 +128,13 @@ public class MainController : Controller {
 	/**
 	 * Loads XML data from the .rproject and game.xml files.
 	 */
-	private void load_project_data () {
+	private void load_project_data () throws Error {
 		XmlParser parser = new XmlParser ();
 
 		// Load data from the .rproject file
 		parser.parse_file (this.base_path + this.project_filename);
 		this.project_data = parser.get_root ();
+
 //		int current_map = int.parse (this.project_data.get_node_by_name ("current_map").content);
 
 		// If the scale value found in the .rproject file is valid, set it.
@@ -172,8 +178,11 @@ public class MainController : Controller {
 			while((entry = dir.read_name ()) != null) {
 				this.tilesets += entry;
 			}
-		} catch (GLib.FileError e) {
-			error ("Could not open tileset directory: %s", e.message);
+		} catch (FileError e) {
+			if (e is FileError.NOENT)
+				; /* Directory may not exist in new, empty projects. */
+			else
+				error ("Could not open tileset directory: %s", e.message);
 		}
 
 		/* TODO: sort tilesets alphabetically */
@@ -184,31 +193,14 @@ public class MainController : Controller {
 	/**
 	 * Loads XML data from the maptree file.
 	 */
-	public void load_maptree_data () {
+	public void load_maptree_data () throws Error {
+		XmlNode maptree;
+
+		string maptreefile = this.base_path + "data/maps/maptree.xml";
 		var maptree_model = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
 		XmlParser parser = new XmlParser ();
 
-		// Load data from the .rproject file
-		parser.parse_file (this.base_path + "data/maps/maptree.xml");
-		XmlNode maptree = parser.get_root ();
-
-		/* FIXME: this lines are for testing XmlWriter, remove after
-		 * the writer is complete
-		 */
-/*
-		var writer = new XmlWriter();
-		print("Test XmlWriter:\n");
-		print("--------Full Tree writing-------\n");
-		writer.set_root(maptree);
-		writer.write_file();
-		writer.save_to_file(this.base_path + "data/maps/maptree2.xml");
-		print("-----Use a subnode as root------\n");
-		writer.set_root((((maptree.children).next).next).next);
-		writer.write_file();
-		writer.save_to_file(this.base_path + "data/maps/maptree3.xml");
-*/	
-
-		// Load "folder" and "map" icons before using them in the maptree treestore
+		// Load icons for maptree treestore
 		var folder_icon = Resources.load_icon_as_pixbuf (Resources.ICON_FOLDER, 16);
 		var map_icon = Resources.load_icon_as_pixbuf (Resources.ICON_MAP, 16);
 
@@ -227,8 +219,33 @@ public class MainController : Controller {
 		maptree_model.set_value (iter, 2, this.game_title);
 		iter_table.set (depth, iter);
 
+		// We are done if maptree file does not exist (=> new, empty project)
+		if(!FileUtils.test (maptreefile, FileTest.IS_REGULAR))
+			return;
+
+		// Load data from the .rproject file
+		parser.parse_file (maptreefile);
+		maptree = parser.get_root ();
+
+/*
+		// FIXME: this lines are for testing XmlWriter, remove after
+		// the writer is complete
+
+		var writer = new XmlWriter();
+		print("Test XmlWriter:\n");
+		print("--------Full Tree writing-------\n");
+		writer.set_root(maptree);
+		writer.write_file();
+		writer.save_to_file(this.base_path + "data/maps/maptree2.xml");
+		print("-----Use a subnode as root------\n");
+		writer.set_root((((maptree.children).next).next).next);
+		writer.write_file();
+		writer.save_to_file(this.base_path + "data/maps/maptree3.xml");
+*/
+
 		// Append a new row, the next while block will set the data
 		maptree_model.append (out iter, iter);
+
 
 		// Get ready for the first map row
 		XmlNode current_ref = maptree.children;
@@ -302,6 +319,7 @@ public class MainController : Controller {
 			}
 		}
 	}
+
 	/**
 	 * Loads XML data from a map file.
 	 *  
@@ -318,12 +336,18 @@ public class MainController : Controller {
 		}
 
 		// Parse the xml file and load map data
-		parser.parse_file (map_filename);
-		XmlNode map_node = parser.get_root ();
+		try {
+			parser.parse_file (map_filename);
+			XmlNode map_node = parser.get_root ();
 
-		var map = new Map ();
-		map.load_data (map_node);
-		this.maps.set (map_id, map);
+			var map = new Map ();
+			map.load_data (map_node);
+			this.maps.set (map_id, map);
+		} catch (Error e) {
+			warning ("map %d could not be loaded: %s", map_id, e.message);
+			/* TODO: show dialog? */
+			return false;
+		}
 
 		return true;
 	}
@@ -367,6 +391,64 @@ public class MainController : Controller {
 		this.main_view.set_fullscreen_status (false);
 		this.main_view.set_show_title_status (false);
 		this.main_view.update_statusbar_current_frame();
+	}
+
+	/**
+	 * Opens a dialog to create a new project and opens this project afterwards
+	 */
+	public void create_project () {
+		var dialog = new CreateProjectDialog ();
+		bool exit = false;
+
+		while (!exit) {
+			int result = dialog.run ();
+
+			if(result == Gtk.ResponseType.OK) {
+				try {
+					/* Verify that project_path is a directory */
+					var path = File.new_for_path (dialog.project_path);
+					if (path.query_file_type (FileQueryInfoFlags.NONE) != FileType.DIRECTORY)
+						throw new FileError.NOTDIR ("Project path is not a directory!");
+
+					/* Verify that project_path is empty */
+					var dir = Dir.open (dialog.project_path);
+					if (dir.read_name () != null)
+						throw new FileError.FAILED ("Initial project directory is not empty!");
+
+					/* Create project description file */
+					var unix_name = path.get_basename ();
+					var rproject_path = path.get_child ("%s.rproject".printf (unix_name));
+					var rproject_data = Resources.RPROJECT_DATA.printf(0, 0, 0);
+					rproject_path.replace_contents (rproject_data, rproject_data.length, null, false, FileCreateFlags.NONE, null, null);
+
+					/* Create data/ */
+					var data_path = path.get_child ("data");
+					data_path.make_directory ();
+
+					/* Create data/game.xml */
+					var game_data = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n<game>\n\t<title>%s</title>\n</game>".printf(dialog.project_name);
+					var game_path = data_path.get_child ("game.xml");
+					game_path.replace_contents (game_data, game_data.length, null, false, FileCreateFlags.NONE, null, null);
+
+					/* Load the new project */
+					open_project_from_file (rproject_path.get_path ());
+
+					/* Project created */
+					exit = true;
+				} catch(Error e) {
+					/* Show Error Dialog */
+					var edialog = new Gtk.MessageDialog (dialog,
+						Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT,
+						Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, e.message);
+					edialog.run ();
+					edialog.destroy ();
+				}
+			} else {
+				exit = true;
+			}
+		}
+
+		dialog.destroy ();
 	}
 
 	/**

@@ -58,6 +58,8 @@ namespace Resources {
 	public const string ICON_FOLDER = "old_folder";
 	public const string ICON_MAP = "old_map";
 
+	public const string RPROJECT_DATA = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n<project>\n\t<current_layer>%d</current_layer>\n\t<current_map>%d</current_map>\n\t<current_scale>%d</current_scale>\n</project>";
+
 	/**
 	 * Looks for an icon in the icon theme search path and loads it as a Pixbuf
 	 * with the selected size, if found.

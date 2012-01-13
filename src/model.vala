@@ -27,5 +27,5 @@ public abstract class Model {
 	 * 
 	 * @param data An XmlNode that represents some XML data. 
 	 */
-	public abstract void load_data (XmlNode data);
+	public abstract void load_data (XmlNode? data);
 }

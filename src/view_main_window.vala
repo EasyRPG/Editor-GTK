@@ -515,6 +515,7 @@ public class MainWindow : Gtk.Window {
 		// Open/Close project
 		action_open.activate.connect (this.controller.open_project);
 		action_close.activate.connect (this.controller.close_project);
+		action_new.activate.connect (this.controller.create_project);
 
 		// Show database dialog
 		action_database.activate.connect (this.controller.show_database);

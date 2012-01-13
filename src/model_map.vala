@@ -242,7 +242,7 @@ public class Map : Model {
 	 * 
 	 * @param data An XmlNode that contains the map data.
 	 */
-	public override void load_data (XmlNode data) {
+	public override void load_data (XmlNode? data) {
 		string name = "";
 		int width = 0;
 		int height = 0;
@@ -269,6 +269,11 @@ public class Map : Model {
 		string[] upper_layer_string = {};
 		int enemy_encounter_steps = 0;
 		int save_time = 0;
+
+		if(data == null) {
+			/* TODO: handle this better */
+			error ("broken map!");
+		}
 
 		XmlNode node = data.children;
 		while (node != null) {
