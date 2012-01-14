@@ -774,6 +774,10 @@ public class MapDrawingArea : Gtk.DrawingArea {
 		int x = ((int) event.x) / this.tile_size;
 		int y = ((int) event.y) / this.tile_size;
 
+		/* bounding check */
+		if (x >= this.tile_width || y >= this.tile_height || x < 0 || y < 0)
+			return false;
+
 		if (x != cursor.x || y != cursor.y) {
 			cursor.x = x;
 			cursor.y = y;

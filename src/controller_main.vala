@@ -714,8 +714,6 @@ public class MainController : Controller {
 	}
 
 	private void updateUndoRedoButtons () {
-		stdout.printf("update undo/redo buttons\n");
-
 		bool can_undo = this.map_changes.get (this.current_map).can_undo ();
 		this.main_view.set_undo_available (can_undo);
 
