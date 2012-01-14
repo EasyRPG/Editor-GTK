@@ -39,6 +39,7 @@ public class MainController : Controller {
 	private XmlNode game_data;
 	private string[] tilesets;
 	private GLib.HashTable<int, Map> maps;
+	private GLib.HashTable<int, ActionStack> map_changes;
 	private GLib.HashTable<int, Gtk.TreeRowReference> map_references;
 	private int current_map;
 
@@ -52,6 +53,7 @@ public class MainController : Controller {
 		this.main_view = new MainWindow (this);
 		this.maps = new GLib.HashTable<int, Map> (null, null);
 		this.map_references = new GLib.HashTable<int, Gtk.TreeRowReference> (null, null);
+		this.map_changes = new GLib.HashTable<int, ActionStack> (null, null);
 
 		/* update map references for drag and drop */
 		var maptree_model = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
@@ -346,6 +348,11 @@ public class MainController : Controller {
 			var map = new Map ();
 			map.load_data (map_node);
 			this.maps.set (map_id, map);
+			this.map_changes.set (map_id, new ActionStack (map));
+
+			/* bind undo/redo changed signal handlers */
+			this.map_changes.get (map_id).can_undo_changed.connect (updateUndoRedoButtons);
+			this.map_changes.get (map_id).can_redo_changed.connect (updateUndoRedoButtons);
 		} catch (Error e) {
 			warning ("map %d could not be loaded: %s", map_id, e.message);
 			/* TODO: show dialog? */
@@ -374,6 +381,7 @@ public class MainController : Controller {
 
 		// Empty the hashtables
 		this.maps.remove_all ();
+		this.map_changes.remove_all ();
 		this.map_references.remove_all ();
 
 		// Empty the maptree TreeView
@@ -521,6 +529,8 @@ public class MainController : Controller {
 		maprender.load_map_scheme (map.lower_layer, map.upper_layer);
 		maprender.set_layer (this.main_view.get_current_layer ());
 		maprender.set_scale (this.main_view.get_current_scale ());
+
+		updateUndoRedoButtons ();
 	}
 
 	/**
@@ -572,6 +582,11 @@ public class MainController : Controller {
 
 			/* add map to list */
 			this.maps.set (new_map_id, map);
+			this.map_changes.set (new_map_id, new ActionStack (map));
+
+			/* bind undo/redo changed signal handlers */
+			this.map_changes.get (new_map_id).can_undo_changed.connect (updateUndoRedoButtons);
+			this.map_changes.get (new_map_id).can_redo_changed.connect (updateUndoRedoButtons);
 
 			/* get maptree model */
 			var maptree_model = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
@@ -630,6 +645,7 @@ public class MainController : Controller {
 			foreach (int removed_map_id in maptree_model.remove_all (iter)) {
 				this.map_references.remove (removed_map_id);
 				this.maps.remove (removed_map_id);
+				this.map_changes.remove (removed_map_id);
 			}
 		}
 
@@ -687,6 +703,28 @@ public class MainController : Controller {
 
 	public string[] getTilesets () {
 		return this.tilesets;
+	}
+
+	public unowned Map getMap () {
+		return this.maps.get (current_map);
+	}
+
+	public unowned ActionStack getMapChanges () {
+		return this.map_changes.get (current_map);
+	}
+
+	private void updateUndoRedoButtons () {
+		stdout.printf("update undo/redo buttons\n");
+
+		bool can_undo = this.map_changes.get (this.current_map).can_undo ();
+		this.main_view.set_undo_available (can_undo);
+
+		bool can_redo = this.map_changes.get (this.current_map).can_redo ();
+		this.main_view.set_redo_available (can_redo);
+	}
+
+	public void reload_map () {
+		load_map (current_map);
 	}
 }
 

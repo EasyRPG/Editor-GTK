@@ -102,6 +102,18 @@ public enum DrawingTool {
 		else
 			return true;
 	}
+
+	public bool isEraser () {
+		switch (this) {
+			case ERASER_NORMAL:
+			case ERASER_RECTANGLE:
+			case ERASER_CIRCLE:
+			case ERASER_FILL:
+				return true;
+			default:
+				return false;
+		}
+	}
 }
 
 public enum Direction {

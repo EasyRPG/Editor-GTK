@@ -44,7 +44,6 @@ namespace Resources {
 	public const string ICON_PLAYTEST = "old_playtest";
 	public const string ICON_FULLSCREEN = "old_fullscreen";
 	public const string ICON_TITLE = "old_title";
-	public const string ICON_UNDO = "old_undo";
 	public const string ICON_SELECT = "old_select";
 	public const string ICON_ZOOM = "old_zoom";
 	public const string ICON_PEN = "old_pen";

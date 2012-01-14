@@ -49,6 +49,9 @@ public class MainWindow : Gtk.Window {
 	private Gtk.ActionGroup actiongroup_project_open;
 	private Gtk.ActionGroup actiongroup_project_closed;
 
+	private Gtk.ToolButton toolitem_undo;
+	private Gtk.ToolButton toolitem_redo;
+
 	/**
 	 * Builds the main interface.
 	 * 
@@ -109,8 +112,8 @@ public class MainWindow : Gtk.Window {
 		action_content.set_icon_name (Gtk.Stock.HELP);
 		var action_about = new Gtk.Action ("ActionAbout", "_About", "See information about this program's current version", null);
 		action_about.set_icon_name (Gtk.Stock.ABOUT);
-		var action_undo = new Gtk.Action ("ActionUndo", "_Undo", "Undo last change", null);
-		action_undo.set_icon_name (Resources.ICON_UNDO);
+		var action_undo = new Gtk.Action ("ActionUndo", "_Undo", "Undo last change", Gtk.Stock.UNDO);
+		var action_redo = new Gtk.Action ("ActionRedo", "_Redo", "Redo last change", Gtk.Stock.REDO);
 		var action_select = new Gtk.RadioAction ("ActionSelect", "_Select", "Select a part of the map", null, DrawingTool.SELECT);
 		action_select.set_icon_name (Resources.ICON_SELECT);
 		var action_zoom = new Gtk.RadioAction ("ActionZoom", "_Zoom", "Increase or decrease map zoom", null, DrawingTool.ZOOM);
@@ -197,7 +200,8 @@ public class MainWindow : Gtk.Window {
 		/*
 		 * Initialize drawing toolbar
 		 */
-		var toolitem_undo = action_undo.create_tool_item () as Gtk.ToolButton;
+		toolitem_undo = action_undo.create_tool_item () as Gtk.ToolButton;
+		toolitem_redo = action_redo.create_tool_item () as Gtk.ToolButton;
 		var toolitem_select = action_select.create_tool_item () as Gtk.ToolButton;
 		var toolitem_zoom = action_zoom.create_tool_item () as Gtk.ToolButton;
 		var toolitem_pen = action_pen.create_tool_item () as Gtk.ToolButton;
@@ -376,6 +380,7 @@ public class MainWindow : Gtk.Window {
 
 		// Add buttons
 		this.toolbar_sidebar.add (toolitem_undo);
+		this.toolbar_sidebar.add (toolitem_redo);
 		this.toolbar_sidebar.add (new Gtk.SeparatorToolItem());
 		this.toolbar_sidebar.add (toolitem_select);
 		this.toolbar_sidebar.add (toolitem_zoom);
@@ -398,7 +403,7 @@ public class MainWindow : Gtk.Window {
 		var scrolled_maptree = new Gtk.ScrolledWindow (null, null);
 
 		this.drawingarea_palette = new TilePaletteDrawingArea ();
-		this.drawingarea_maprender = new MapDrawingArea (scrolled_maprender, this.drawingarea_palette);
+		this.drawingarea_maprender = new MapDrawingArea (controller, scrolled_maprender, this.drawingarea_palette);
 		this.paned_palette_maptree = new Gtk.Paned (Gtk.Orientation.VERTICAL);
 		this.statusbar_tooltip = new Gtk.Statusbar ();
 		this.statusbar_current_frame = new Gtk.Statusbar ();
@@ -487,6 +492,7 @@ public class MainWindow : Gtk.Window {
 		this.actiongroup_project_open.add_action (action_fullscreen);
 		this.actiongroup_project_open.add_action (action_show_title);
 		this.actiongroup_project_open.add_action (action_undo);
+		this.actiongroup_project_open.add_action (action_redo);
 		this.actiongroup_project_open.add_action (action_select);
 		this.actiongroup_project_open.add_action (action_zoom);
 		this.actiongroup_project_open.add_action (action_pen);
@@ -534,6 +540,16 @@ public class MainWindow : Gtk.Window {
 		this.treeview_maptree.map_delete.connect (this.controller.on_map_delete);
 		this.treeview_maptree.map_shift.connect (this.controller.on_map_shift);
 
+		toolitem_undo.clicked.connect (() => {
+			controller.getMapChanges ().undo ();
+			controller.reload_map ();
+		});
+
+		toolitem_redo.clicked.connect (() => {
+			controller.getMapChanges ().redo ();
+			controller.reload_map ();
+		});
+
 		// Eraser menu callbacks
 		toolitem_menu_eraser.clicked.connect (menu_eraser_popup);
 		menuitem_eraser_normal.activate.connect		(() => {set_current_drawing_tool(DrawingTool.ERASER_NORMAL);});
@@ -579,6 +595,14 @@ public class MainWindow : Gtk.Window {
 		// Close application
 		action_quit.activate.connect (on_close);
 		this.destroy.connect (on_close);
+	}
+
+	public void set_undo_available(bool status) {
+		this.toolitem_undo.set_sensitive (status);
+	}
+
+	public void set_redo_available(bool status) {
+		this.toolitem_redo.set_sensitive (status);
 	}
 
 	/**
