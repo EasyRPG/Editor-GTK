@@ -834,8 +834,8 @@ public class MapDrawingArea : Gtk.DrawingArea {
 		tmp = (cursor.y + selected.height) - tile_height;
 		height = (tmp <= 0) ? selected.height : tmp;
 
-		for (int y=0; y <= width; y++) {
-			for (int x=0; x <= height; x++) {
+		for (int y=0; y <= height; y++) {
+			for (int x=0; x <= width; x++) {
 				int tile = this.palette.position_to_id (selected.x+x, selected.y+y);
 				this.drawing_layer[cursor.y + y, cursor.x + x] = tile;
 				this.draw_status[cursor.y + y, cursor.x + x] = false;
