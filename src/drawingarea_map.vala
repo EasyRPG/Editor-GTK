@@ -759,10 +759,7 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	 */
 	public bool on_button_released (Gdk.EventButton event) {
 		/* commit changes to the layer */
-		commit_any ();
-
-		/* clear drawing layer */
-		drawing_layer = null;
+		commit_drawing_layer ();
 
 		return true;
 	}
@@ -815,17 +812,6 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	}
 
 	/**
-	 * Calls the commit function based on the currently selected drawing tool.
-	 */
-	public void commit_any () {
-		MainWindow window = (MainWindow) this.get_toplevel ();
-		DrawingTool action = (DrawingTool) window.get_current_drawing_tool ();
-
-		if (action.needsDrawingLayer ())
-			commit_drawing_layer ();
-	}
-
-	/**
 	 * The pen tool action handler
 	 */
 	public void action_pen () {
@@ -868,6 +854,10 @@ public class MapDrawingArea : Gtk.DrawingArea {
 		weak int[,] layer;
 		weak int[,] map_layer;
 
+		/* check if commit is actually needed */
+		if (!tool.needsDrawingLayer ())
+			return;
+
 		switch (current_layer) {
 			case LayerType.LOWER:
 				layer = lower_layer;
@@ -901,8 +891,15 @@ public class MapDrawingArea : Gtk.DrawingArea {
 			}
 		}
 
+		/* avoid empty edits on the ActionStack (they are useless) */
+		if (changes == 0)
+			return;
+
 		/* add Action to MapChanges */
 		var action = new MapEditAction (current_layer, drawing_layer, changes);
 		controller.getMapChanges ().push (action);
+
+		/* clean drawing layer */
+		drawing_layer = null;
 	}
 }
