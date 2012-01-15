@@ -80,10 +80,10 @@ public abstract class EditTool : Tool {
 				return false;
 		}
 
-		/* update layer in map and widget, put diff into drawing_layer */
 		for (int y=0; y < height; y++) {
 			for (int x=0; x < width; x++) {
 				if (drawing_layer[y,x] != 0) {
+					/* update layer and put diff into drawing_layer */
 					if (this.is_eraser) {
 						drawing_layer[y,x] = layer[y,x];
 						map_layer[y,x] = 0;
@@ -94,7 +94,9 @@ public abstract class EditTool : Tool {
 						map_layer[y,x] = layer[y,x];
 					}
 
-					changes++;
+					/* only count as difference if something changed */
+					if (drawing_layer[y,x] != 0)
+						changes++;
 				}
 			}
 		}
