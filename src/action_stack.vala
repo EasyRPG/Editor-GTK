@@ -17,117 +17,119 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * The History for undo/redo operations.
- */
-public class ActionStack {
-	private Queue<Action> actions;
-	private Map map;
-
+namespace UndoManager {
 	/**
-	 * Points to the last applied Action
+	 * The History for undo/redo operations.
 	 */
-	private int current;
+	public class Stack {
+		private Queue<UndoManager.Action> actions;
+		private Map map;
 
-	/**
-	 * Send if undo availability changes
-	 */
-	public signal void can_undo_changed ();
+		/**
+		 * Points to the last applied Action
+		 */
+		private int current;
 
-	/**
-	 * Send if redo availability changes
-	 */
-	public signal void can_redo_changed ();
+		/**
+		 * Send if undo availability changes
+		 */
+		public signal void can_undo_changed ();
 
-	/**
-	 * ActionStack providing Undo/Redo abilities.
-	 */
-	public ActionStack (Map map) {
-		this.actions = new Queue<Action> ();
-		this.current = -1;
-		this.map = map;
-	}
+		/**
+		 * Send if redo availability changes
+		 */
+		public signal void can_redo_changed ();
 
-	/**
-	 * Clears the whole ActionStack.
-	 */
-	public void clear () {
-		actions.clear ();
-		current = -1;
-	}
+		/**
+		 * ActionStack providing Undo/Redo abilities.
+		 */
+		public Stack (Map map) {
+			this.actions = new Queue<UndoManager.Action> ();
+			this.current = -1;
+			this.map = map;
+		}
 
-	/**
-	 * Push a Action on the ActionStack.
-	 */
-	public void push (Action action) {
-		bool redo_changed = current < (((int) actions.length)-1);
+		/**
+		 * Clears the whole ActionStack.
+		 */
+		public void clear () {
+			actions.clear ();
+			current = -1;
+		}
 
-		/* drop all Actions, which are currently unapplied */
-		while (current < (((int) actions.length)-1))
-			actions.pop_tail ();
+		/**
+		 * Push a Action on the ActionStack.
+		 */
+		public void push (UndoManager.Action action) {
+			bool redo_changed = current < (((int) actions.length)-1);
 
-		/* append action */
-		actions.push_tail (action);
+			/* drop all Actions, which are currently unapplied */
+			while (current < (((int) actions.length)-1))
+				actions.pop_tail ();
 
-		current++;
+			/* append action */
+			actions.push_tail (action);
 
-		/* update redo/undo state */
-		if (redo_changed)
-			can_redo_changed ();
+			current++;
 
-		if (current == 0)
-			can_undo_changed ();
-	}
+			/* update redo/undo state */
+			if (redo_changed)
+				can_redo_changed ();
 
-	/**
-	 * Perform a single undo.
-	 */
-	public void undo () {
-		if (current < 0)
-			return;
+			if (current == 0)
+				can_undo_changed ();
+		}
 
-		current--;
-		actions.peek_nth (current+1).unapply (map);
+		/**
+		 * Perform a single undo.
+		 */
+		public void undo () {
+			if (current < 0)
+				return;
 
-		/* is undo unavailable now? */
-		if (current < 0)
-			can_undo_changed ();
+			current--;
+			actions.peek_nth (current+1).unapply (map);
 
-		/* was redo unavailable before? */
-		if (current == actions.length-2)
-			can_redo_changed ();
-	}
+			/* is undo unavailable now? */
+			if (current < 0)
+				can_undo_changed ();
 
-	/**
-	 * Perform a single redo.
-	 */
-	public void redo () {
-		if (current >= (((int) actions.length)-1))
-			return;
+			/* was redo unavailable before? */
+			if (current == actions.length-2)
+				can_redo_changed ();
+		}
 
-		current++;
-		actions.peek_nth (current).apply (map);
+		/**
+		 * Perform a single redo.
+		 */
+		public void redo () {
+			if (current >= (((int) actions.length)-1))
+				return;
 
-		/* is redo unavailable now? */
-		if (current >= actions.length-1)
-			can_redo_changed ();
+			current++;
+			actions.peek_nth (current).apply (map);
 
-		/* was undo unavailable before? */
-		if (current == 0)
-			can_undo_changed ();
-	}
+			/* is redo unavailable now? */
+			if (current >= actions.length-1)
+				can_redo_changed ();
 
-	/**
-	 * Get whether there are redo operations available.
-	 */
-	public bool can_redo () {
-		return (current < (((int) actions.length)-1));
-	}
+			/* was undo unavailable before? */
+			if (current == 0)
+				can_undo_changed ();
+		}
 
-	/**
-	 * Get whether there are undo operations available.
-	 */
-	public bool can_undo () {
-		return (current > -1);
+		/**
+		 * Get whether there are redo operations available.
+		 */
+		public bool can_redo () {
+			return (current < (((int) actions.length)-1));
+		}
+
+		/**
+		 * Get whether there are undo operations available.
+		 */
+		public bool can_undo () {
+			return (current > -1);
+		}
 	}
 }

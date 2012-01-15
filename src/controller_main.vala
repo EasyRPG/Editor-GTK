@@ -39,7 +39,7 @@ public class MainController : Controller {
 	private XmlNode game_data;
 	private string[] tilesets;
 	private GLib.HashTable<int, Map> maps;
-	private GLib.HashTable<int, ActionStack> map_changes;
+	private GLib.HashTable<int, UndoManager.Stack> map_changes;
 	private GLib.HashTable<int, Gtk.TreeRowReference> map_references;
 	private int current_map;
 
@@ -53,7 +53,7 @@ public class MainController : Controller {
 		this.main_view = new MainWindow (this);
 		this.maps = new GLib.HashTable<int, Map> (null, null);
 		this.map_references = new GLib.HashTable<int, Gtk.TreeRowReference> (null, null);
-		this.map_changes = new GLib.HashTable<int, ActionStack> (null, null);
+		this.map_changes = new GLib.HashTable<int, UndoManager.Stack> (null, null);
 
 		/* update map references for drag and drop */
 		var maptree_model = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
@@ -356,7 +356,7 @@ public class MainController : Controller {
 			var map = new Map ();
 			map.load_data (map_node);
 			this.maps.set (map_id, map);
-			this.map_changes.set (map_id, new ActionStack (map));
+			this.map_changes.set (map_id, new UndoManager.Stack (map));
 
 			/* bind undo/redo changed signal handlers */
 			this.map_changes.get (map_id).can_undo_changed.connect (updateUndoRedoButtons);
@@ -590,7 +590,7 @@ public class MainController : Controller {
 
 			/* add map to list */
 			this.maps.set (new_map_id, map);
-			this.map_changes.set (new_map_id, new ActionStack (map));
+			this.map_changes.set (new_map_id, new UndoManager.Stack (map));
 
 			/* bind undo/redo changed signal handlers */
 			this.map_changes.get (new_map_id).can_undo_changed.connect (updateUndoRedoButtons);
@@ -717,7 +717,7 @@ public class MainController : Controller {
 		return this.maps.get (current_map);
 	}
 
-	public unowned ActionStack getMapChanges () {
+	public unowned UndoManager.Stack getMapChanges () {
 		return this.map_changes.get (current_map);
 	}
 

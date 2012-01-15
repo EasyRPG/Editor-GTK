@@ -17,22 +17,24 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * The parent class for Actions used by the History for undo/redo.
- */
-public abstract class Action {
-
+namespace UndoManager {
 	/**
-	 * Every action must have an apply method
-	 * 
-	 * @param map The map object being changed
+	 * The parent class for Actions used by the History for undo/redo.
 	 */
-	public abstract void apply (Map map);
+	public abstract class Action {
 
-	/**
-	 * Every action must have an unapply method
-	 * 
-	 * @param map The map object being changed
-	 */
-	public abstract void unapply (Map map);
+		/**
+		 * Every action must have an apply method
+		 * 
+		 * @param map The map object being changed
+		 */
+		public abstract void apply (Map map);
+
+		/**
+		 * Every action must have an unapply method
+		 * 
+		 * @param map The map object being changed
+		 */
+		public abstract void unapply (Map map);
+	}
 }

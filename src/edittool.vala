@@ -105,7 +105,7 @@ public abstract class EditTool : Tool {
 		if (changes == 0)
 			return true;
 
-		var action = new MapEditAction (current_layer, drawing_layer, changes);
+		var action = new UndoManager.MapEditAction (current_layer, drawing_layer, changes);
 		controller.getMapChanges ().push (action);
 
 		/* clean drawing layer */
