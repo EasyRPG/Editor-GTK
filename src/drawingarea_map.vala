@@ -58,6 +58,7 @@ public class MapDrawingArea : Gtk.DrawingArea {
 		this.tools = new HashTable<DrawingTool,Tool> (null, null);
 
 		this.tools[DrawingTool.PEN] = new PenTool (controller, palette);
+		this.tools[DrawingTool.RECTANGLE] = new RectangleTool (controller, palette);
 		this.tools[DrawingTool.ERASER_NORMAL] = new EraserTool (controller, palette);
 	}
 

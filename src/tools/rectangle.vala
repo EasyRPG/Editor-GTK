@@ -21,6 +21,8 @@
  * The RectangleTool used by the Editor
  */
 public class RectangleTool : EditTool {
+	Point start;
+	Point old;
 
 	public RectangleTool (MainController controller, TilePaletteDrawingArea palette) {
 		this.controller = controller;
@@ -28,11 +30,46 @@ public class RectangleTool : EditTool {
 	}
 
 	public override bool on_button1_pressed (Point cursor, bool[,] status_layer) {
-		return false;
+		this.drawing_layer = new int[status_layer.length[1], status_layer.length[0]];
+		this.start = cursor;
+		this.old   = cursor;
+
+		status_layer[cursor.y, cursor.x] = false;
+		drawing_layer[cursor.y, cursor.x] = this.palette.position_to_id(this.palette.getSelected ().x, this.palette.getSelected ().y);
+
+		return true;
 	}
 
 	public override bool on_button1_motion (Point cursor, bool[,] status_layer) {
-		return false;
+		Rect selected = this.palette.getSelected ().normalize ();
+
+		/* old area */
+		Rect area_old = Rect (start.x, start.y, old.x-start.x, old.y-start.y).normalize ();
+		area_old.width++;
+		area_old.height++;
+
+		/* new area */
+		Rect area_new = Rect (start.x, start.y, cursor.x-start.x, cursor.y-start.y).normalize ();
+		area_new.width++;
+		area_new.height++;
+
+		/* merged */
+		Rect area_all = area_new.union (area_old);
+
+		/* recheck all involved tiles */
+		foreach(Point p in area_all) {
+			if (p in area_new) {
+				int off_x = (p.x - area_new.x) % (selected.width+1);
+				int off_y = (p.y - area_new.y) % (selected.height+1);
+				drawing_layer[p.y,p.x] = this.palette.position_to_id (selected.x+off_x, selected.y+off_y);
+			} else
+				drawing_layer[p.y,p.x] = 0;
+
+			status_layer[p.y,p.x] = false;
+		}
+
+		old = cursor;
+		return true;
 	}
 
 	public override bool on_button2_pressed (Point cursor, bool[,] status_layer) {
@@ -46,5 +83,4 @@ public class RectangleTool : EditTool {
 	public override bool on_key_pressed (Point cursor, uint key, Gdk.ModifierType modifier, bool[,] status_layer, int[,] layer) {
 		return false;
 	}
-
 }
