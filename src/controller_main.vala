@@ -61,6 +61,14 @@ public class MainController : Controller {
 			map_references[id] = new Gtk.TreeRowReference(maptree_model, path);
 		});
 
+		/* update zoom/layer when requested by drawingarea_map */
+		this.main_view.drawingarea_maprender.request_scale.connect ((s) => {
+			this.main_view.set_current_scale (s);
+		});
+		this.main_view.drawingarea_maprender.request_layer.connect ((l) => {
+			this.main_view.set_current_layer (l);
+		});
+
 		if(project_file != null)
 			open_project_from_file (project_file);
 	}

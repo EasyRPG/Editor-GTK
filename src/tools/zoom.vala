@@ -1,6 +1,6 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * tools/pen.vala
+ * tools/zoom.vala
  * Copyright (C) EasyRPG Project 2012
  *
  * EasyRPG is free software: you can redistribute it and/or modify it
@@ -18,47 +18,34 @@
  */
 
 /**
- * The PenTool used by the Editor
+ * The ZoomTool used by the Editor
  */
-public class PenTool : EditTool {
-
-	public PenTool (MainController controller, TilePaletteDrawingArea palette) {
+public class ZoomTool : Tool {
+	public ZoomTool (MainController controller, TilePaletteDrawingArea palette) {
 		this.controller = controller;
 		this.palette = palette;
 	}
 
-	private bool pen (Point cursor, bool[,] status_layer) {
-		Rect selected = this.palette.getSelected ();
-		int width, height, tmp;
-
-		tmp = (cursor.x + selected.width) - drawing_layer.length[1];
-		width = (tmp <= 0) ? selected.width : tmp;
-
-		tmp = (cursor.y + selected.height) - drawing_layer.length[0];
-		height = (tmp <= 0) ? selected.height : tmp;
-
-		for (int y=0; y <= height; y++) {
-			for (int x=0; x <= width; x++) {
-				int tile = this.palette.position_to_id (selected.x+x, selected.y+y);
-				drawing_layer[cursor.y + y, cursor.x + x] = tile;
-				status_layer[cursor.y + y, cursor.x + x] = false;
-			}
-		}
+	public override bool on_button1_pressed (Point cursor, bool[,] status_layer) {
+		if (current_scale > Scale.1_1)
+			request_scale (current_scale-1);
 
 		return true;
 	}
 
-	public override bool on_button1_pressed (Point cursor, bool[,] status_layer) {
-		this.drawing_layer = new int[status_layer.length[1], status_layer.length[0]];
-		return pen (cursor, status_layer);
+	public override bool on_button1_motion (Point cursor, bool[,] status_layer) {
+		return false;
 	}
 
-	public override bool on_button1_motion (Point cursor, bool[,] status_layer) {
-		return pen (cursor, status_layer);
+	public override bool on_button1_released (Point cursor, int[,] layer) {
+		return false;
 	}
 
 	public override bool on_button2_pressed (Point cursor, bool[,] status_layer) {
-		return false;
+		if (current_scale < Scale.1_8)
+			request_scale (current_scale+1);
+
+		return true;
 	}
 
 	public override bool on_button2_released (Point cursor, bool[,] status_layer) {
@@ -66,6 +53,11 @@ public class PenTool : EditTool {
 	}
 
 	public override bool on_key_pressed (Point cursor, uint key, Gdk.ModifierType modifier, bool[,] status_layer, int[,] layer) {
+		return false;
+	}
+
+	public override bool on_draw (Point location, out int tile_id) {
+		tile_id = 0;
 		return false;
 	}
 
