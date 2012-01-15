@@ -114,6 +114,10 @@ public enum DrawingTool {
 				return false;
 		}
 	}
+
+	public static DrawingTool[] all () {
+		return { SELECT, ZOOM, PEN, ERASER_NORMAL, ERASER_RECTANGLE, ERASER_CIRCLE, ERASER_FILL, RECTANGLE, CIRCLE, FILL };
+	}
 }
 
 public enum Direction {

@@ -43,4 +43,12 @@ public struct Rect {
 public struct Point {
 	public int x;
 	public int y;
+
+	/**
+	 * Builds the point.
+	 */
+	public Point (int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
 }

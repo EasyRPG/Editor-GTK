@@ -29,7 +29,6 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	private int tile_size;
 	private int[,] lower_layer;
 	private int[,] upper_layer;
-	private int[,] drawing_layer;
 	private bool[,] draw_status;
 	private Cairo.ImageSurface surface_lower_layer;
 	private Cairo.ImageSurface surface_upper_layer;
@@ -37,7 +36,7 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	private Scale current_scale;
 	private Rect drawn_rect;
 	private Point cursor;
-	private Point cursor_start;
+	private HashTable<DrawingTool,Tool> tools;
 
 	/**
 	 * Builds the map DrawingArea.
@@ -55,6 +54,11 @@ public class MapDrawingArea : Gtk.DrawingArea {
 		this.add_events(Gdk.EventMask.BUTTON1_MOTION_MASK);
 		this.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
 		this.add_events(Gdk.EventMask.BUTTON_RELEASE_MASK);
+
+		this.tools = new HashTable<DrawingTool,Tool> (null, null);
+
+		this.tools[DrawingTool.PEN] = new PenTool (controller, palette);
+		this.tools[DrawingTool.ERASER_NORMAL] = new EraserTool (controller, palette);
 	}
 
 	/**
@@ -81,6 +85,11 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	 */
 	public void set_layer (LayerType layer) {
 		this.current_layer = layer;
+
+		// Update current layer of tools
+		foreach (DrawingTool index in DrawingTool.all ())
+			if (tools[index] != null)
+				tools[index].set_layer (layer);
 
 		// Redraw the DrawingArea
 		this.queue_draw ();
@@ -134,6 +143,11 @@ public class MapDrawingArea : Gtk.DrawingArea {
 		int drawing_width = this.tile_width * this.tile_size;
 		int drawing_height = this.tile_height * this.tile_size;
 		this.set_size_request (drawing_width, drawing_height);
+
+		// Update current scale of tools
+		foreach (DrawingTool index in DrawingTool.all ())
+			if (tools[index] != null)
+				tools[index].set_scale (scale);
 
 		// Redraw the DrawingArea
 		this.queue_draw ();
@@ -450,7 +464,8 @@ public class MapDrawingArea : Gtk.DrawingArea {
 		int row = 0;
 
 		MainWindow window = (MainWindow) this.get_toplevel ();
-		DrawingTool tool = (DrawingTool) window.get_current_drawing_tool ();
+		DrawingTool toolid = (DrawingTool) window.get_current_drawing_tool ();
+		Tool tool = tools[toolid];
 
 		while (row < rect.height) {
 			bool is_drawn = this.draw_status[rect.y + row, rect.x + col];
@@ -460,21 +475,14 @@ public class MapDrawingArea : Gtk.DrawingArea {
 				// Get the tile ids
 				int lower_tile_id = this.lower_layer[rect.y + row, rect.x + col];
 				int upper_tile_id = this.upper_layer[rect.y + row, rect.x + col];
+				int drawing_tile_id = 0;
 
-				// update according to drawing_layer
-				if (this.drawing_layer != null) {
-					int drawing_tile_id = drawing_layer[rect.y + row, rect.x + col];
-					if (drawing_tile_id != 0) {
-						if (tool.isEraser ())
-							drawing_tile_id = 0;
-
-						if (current_layer == LayerType.LOWER) {
-							lower_tile_id = drawing_tile_id;
-						} else if (current_layer == LayerType.UPPER) {
-							upper_tile_id = drawing_tile_id;
-						}
-					}
-				}
+				// give tools the possibility to overwrite tile of the selected layer
+				if (tool != null && tool.on_draw (Point (rect.x + col, rect.y + row), out drawing_tile_id))
+					if (current_layer == LayerType.LOWER)
+						lower_tile_id = drawing_tile_id;
+					else if (current_layer == LayerType.UPPER)
+						upper_tile_id = drawing_tile_id;
 
 				// Get and draw the lower layer tile, if any
 				if (lower_tile_id != 0) {
@@ -734,23 +742,23 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	 */
 	public bool on_button_pressed (Gdk.EventButton event) {
 		MainWindow window = (MainWindow) this.get_toplevel ();
-		DrawingTool action = (DrawingTool) window.get_current_drawing_tool ();
-		int x = ((int) event.x) / this.tile_size;
-		int y = ((int) event.y) / this.tile_size;
+		DrawingTool toolid = (DrawingTool) window.get_current_drawing_tool ();
+		Tool tool = tools[toolid];
 
-		/* update cursor information */
-		cursor.x = x;
-		cursor.y = y;
-		cursor_start.x = x;
-		cursor_start.y = y;
+		if (tool != null) {
+			int x = ((int) event.x) / this.tile_size;
+			int y = ((int) event.y) / this.tile_size;
+			bool status = tool.on_button1_pressed (Point(x, y), draw_status);
 
-		/* create drawing layer if needed */
-		if (action.needsDrawingLayer ())
-			drawing_layer = new int[tile_height,tile_width];
+			if (status) {
+				this.drawn_rect = Rect (0, 0, 0, 0);
+				this.queue_draw ();
+			}
 
-		action_any ();
-		this.queue_draw ();
+			return status;
+		}
 
+		/* no tool found */
 		return false;
 	}
 
@@ -758,18 +766,44 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	 * Manages the reactions to button release signals.
 	 */
 	public bool on_button_released (Gdk.EventButton event) {
-		/* commit changes to the layer */
-		commit_drawing_layer ();
+		MainWindow window = (MainWindow) this.get_toplevel ();
+		DrawingTool toolid = (DrawingTool) window.get_current_drawing_tool ();
+		Tool tool = tools[toolid];
 
-		return true;
+		if (tool != null) {
+			int x = ((int) event.x) / this.tile_size;
+			int y = ((int) event.y) / this.tile_size;
+			unowned int[,] layer;
+
+			switch (current_layer) {
+				case LayerType.LOWER:
+					layer = lower_layer;
+					break;
+				case LayerType.UPPER:
+					layer = upper_layer;
+					break;
+				default:
+					return false;
+			}
+
+			return tool.on_button1_released (Point(x, y), layer);
+		}
+
+		/* no tool found */
+		return false;
 	}
 
 	/**
 	 * Manages the reactions to the pointer motion signal.
 	 */
 	public bool on_motion (Gdk.EventMotion event) {
+		MainWindow window = (MainWindow) this.get_toplevel ();
+		DrawingTool toolid = (DrawingTool) window.get_current_drawing_tool ();
+		Tool tool = tools[toolid];
+
 		int x = ((int) event.x) / this.tile_size;
 		int y = ((int) event.y) / this.tile_size;
+		bool status = true;
 
 		/* bounding check */
 		if (x >= this.tile_width || y >= this.tile_height || x < 0 || y < 0)
@@ -779,127 +813,15 @@ public class MapDrawingArea : Gtk.DrawingArea {
 			cursor.x = x;
 			cursor.y = y;
 
-			if (event.state == Gdk.ModifierType.BUTTON1_MASK)
-				action_any ();
-
-			this.queue_draw ();
-		}
-
-		return true;
-	}
-
-	/**
-	 * Calls the action based on the currently selected drawing tool.
-	 */
-	public void action_any () {
-		MainWindow window = (MainWindow) this.get_toplevel ();
-		DrawingTool action = (DrawingTool) window.get_current_drawing_tool ();
-
-		switch (action) {
-			case DrawingTool.PEN:
-				action_pen ();
-				break;
-			case DrawingTool.ERASER_NORMAL:
-				action_eraser_normal ();
-				break;
-			default:
-				warning ("unsupported action!");
-				break;
-		}
-
-		/* clear the drawn information */
-		this.drawn_rect = Rect (0, 0, 0, 0);
-	}
-
-	/**
-	 * The pen tool action handler
-	 */
-	public void action_pen () {
-		Rect selected = this.palette.getSelected ();
-		int width, height, tmp;
-
-		tmp = (cursor.x + selected.width) - tile_width;
-		width = (tmp <= 0) ? selected.width : tmp;
-
-		tmp = (cursor.y + selected.height) - tile_height;
-		height = (tmp <= 0) ? selected.height : tmp;
-
-		for (int y=0; y <= height; y++) {
-			for (int x=0; x <= width; x++) {
-				int tile = this.palette.position_to_id (selected.x+x, selected.y+y);
-				this.drawing_layer[cursor.y + y, cursor.x + x] = tile;
-				this.draw_status[cursor.y + y, cursor.x + x] = false;
+			if (event.state == Gdk.ModifierType.BUTTON1_MASK && tool != null) {
+				status = tool.on_button1_motion (Point(x, y), draw_status);
+				this.drawn_rect = Rect (0, 0, 0, 0);
 			}
-		}
-	}
 
-	/**
-	 * The normal eraser tool action handler
-	 */
-	public void action_eraser_normal () {
-		this.drawing_layer[cursor.y, cursor.x] = 1;
-		this.draw_status[cursor.y, cursor.x] = false;
-	}
-
-	/**
-	 * The pen tool commit handler
-	 */
-	public void commit_drawing_layer () {
-		MainWindow window = (MainWindow) this.get_toplevel ();
-		DrawingTool tool = (DrawingTool) window.get_current_drawing_tool ();
-
-		int height  = drawing_layer.length[0];
-		int width   = drawing_layer.length[1];
-		int changes = 0;
-		weak int[,] layer;
-		weak int[,] map_layer;
-
-		/* check if commit is actually needed */
-		if (!tool.needsDrawingLayer ())
-			return;
-
-		switch (current_layer) {
-			case LayerType.LOWER:
-				layer = lower_layer;
-				map_layer = controller.getMap ().lower_layer;
-				break;
-			case LayerType.UPPER:
-				layer = upper_layer;
-				map_layer = controller.getMap ().upper_layer;
-				break;
-			default:
-				warning ("unsupported Layer!");
-				return;
+			if (status)
+				this.queue_draw ();
 		}
 
-		/* update layer in map and widget, put diff into drawing_layer */
-		for (int y=0; y < height; y++) {
-			for (int x=0; x < width; x++) {
-				if (drawing_layer[y,x] != 0) {
-					if (tool.isEraser ()) {
-						drawing_layer[y,x] = layer[y,x];
-						map_layer[y,x] = 0;
-						layer[y,x] = 0;
-					} else {
-						layer[y,x] = drawing_layer[y,x];
-						drawing_layer[y,x] = map_layer[y,x] - drawing_layer[y,x];
-						map_layer[y,x] = layer[y,x];
-					}
-
-					changes++;
-				}
-			}
-		}
-
-		/* avoid empty edits on the ActionStack (they are useless) */
-		if (changes == 0)
-			return;
-
-		/* add Action to MapChanges */
-		var action = new MapEditAction (current_layer, drawing_layer, changes);
-		controller.getMapChanges ().push (action);
-
-		/* clean drawing layer */
-		drawing_layer = null;
+		return status;
 	}
 }
