@@ -96,6 +96,7 @@ public class MainController : Controller {
 
 			// Enable/disable some widgets
 			this.main_view.set_project_status ("open");
+			updateUndoRedoButtons ();
 			this.main_view.update_statusbar_current_frame();
 		} catch(Error e) {
 			/* Show Error Dialog */
@@ -722,10 +723,15 @@ public class MainController : Controller {
 	}
 
 	private void updateUndoRedoButtons () {
-		bool can_undo = this.map_changes.get (this.current_map).can_undo ();
+		bool can_undo = false, can_redo = false;
+
+		if (current_map != 0) {
+			can_undo = this.map_changes.get (current_map).can_undo ();
+			can_redo = this.map_changes.get (current_map).can_redo ();
+		}
+
 		this.main_view.set_undo_available (can_undo);
 
-		bool can_redo = this.map_changes.get (this.current_map).can_redo ();
 		this.main_view.set_redo_available (can_redo);
 	}
 
