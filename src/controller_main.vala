@@ -212,7 +212,7 @@ public class MainController : Controller {
 		XmlParser parser = new XmlParser ();
 
 		// Load icons for maptree treestore
-		var folder_icon = Resources.load_icon_as_pixbuf (Resources.ICON_FOLDER, 16);
+		var folder_icon = Resources.load_icon_as_pixbuf (Gtk.Stock.DIRECTORY, 16);
 		var map_icon = Resources.load_icon_as_pixbuf (Resources.ICON_MAP, 16);
 
 		/*

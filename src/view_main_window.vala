@@ -69,19 +69,19 @@ public class MainWindow : Gtk.Window {
 		 * Initialize actions
 		 */
 		var action_new = new Gtk.Action ("ActionNew", "_New", "Create a new project", null);
-		action_new.set_icon_name (Resources.ICON_NEW);
+		action_new.set_icon_name (Gtk.Stock.NEW);
 		var action_open = new Gtk.Action ("ActionOpen", "_Open", "Open a saved project", null);
-		action_open.set_icon_name (Resources.ICON_OPEN);
+		action_open.set_icon_name (Gtk.Stock.OPEN);
 		var action_close = new Gtk.Action ("ActionClose", "_Close", "Close current project", null);
-		action_close.set_icon_name (Resources.ICON_CLOSE);
+		action_close.set_icon_name (Gtk.Stock.CLOSE);
 		var action_create_game_disk = new Gtk.Action ("ActionCreateGameDisk", "_Create Game Disk", "", null);
 		action_create_game_disk.set_icon_name (Resources.ICON_BUILD_PROJECT);
 		var action_quit = new Gtk.Action ("ActionQuit", "_Quit", "Quit EasyRPG Game Editor", null);
-		action_quit.set_icon_name (Resources.ICON_QUIT);
+		action_quit.set_icon_name (Gtk.Stock.QUIT);
 		var action_save = new Gtk.Action ("ActionSave", "_Save", "Save all maps changes", null);
-		action_save.set_icon_name (Resources.ICON_SAVE);
+		action_save.set_icon_name (Gtk.Stock.SAVE);
 		var action_revert = new Gtk.Action ("ActionRevert", "_Revert", "Revert maps to last saved state", null);
-		action_revert.set_icon_name (Resources.ICON_REVERT);
+		action_revert.set_icon_name (Gtk.Stock.CLEAR);
 		var action_lower_layer = new Gtk.RadioAction ("ActionLowerLayer", "_Lower Layer", "Edit lower layer", null, LayerType.LOWER);
 		action_lower_layer.set_icon_name (Resources.ICON_LOWER_LAYER);
 		var action_upper_layer = new Gtk.RadioAction ("ActionUpperLayer", "_Upper Layer", "Edit upper layer", null, LayerType.UPPER);
@@ -105,7 +105,7 @@ public class MainWindow : Gtk.Window {
 		var action_playtest = new Gtk.Action ("ActionPlaytest", "_Play test", "Make a test of your game", null);
 		action_playtest.set_icon_name (Resources.ICON_PLAYTEST);
 		var action_fullscreen = new Gtk.ToggleAction ("ActionFullScreen", "_Full Screen", "Use full screen in play test mode", null);
-		action_fullscreen.set_icon_name (Resources.ICON_FULLSCREEN);
+		action_fullscreen.set_icon_name (Gtk.Stock.FULLSCREEN);
 		var action_show_title = new Gtk.ToggleAction ("ActionShowTitle", "_Show Title", "Show title in play test mode", null);
 		action_show_title.set_icon_name (Resources.ICON_TITLE);
 		var action_content = new Gtk.Action ("ActionContent", "_Content", "View help contents", null);
