@@ -541,13 +541,19 @@ public class MainWindow : Gtk.Window {
 		this.treeview_maptree.map_shift.connect (this.controller.on_map_shift);
 
 		toolitem_undo.clicked.connect (() => {
-			controller.getMapChanges ().undo ();
-			controller.reload_map ();
+			var stack = controller.getMapChanges ();
+			if (stack != null) {
+				stack.undo ();
+				controller.reload_map ();
+			}
 		});
 
 		toolitem_redo.clicked.connect (() => {
-			controller.getMapChanges ().redo ();
-			controller.reload_map ();
+			var stack = controller.getMapChanges ();
+			if (stack != null) {
+				stack.redo ();
+				controller.reload_map ();
+			}
 		});
 
 		// Eraser menu callbacks

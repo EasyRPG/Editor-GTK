@@ -730,7 +730,8 @@ public class MainController : Controller {
 	}
 
 	public void reload_map () {
-		load_map (current_map);
+		if (current_map != 0)
+			load_map (current_map);
 	}
 }
 
