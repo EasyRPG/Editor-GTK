@@ -28,17 +28,16 @@ public class PenTool : EditTool {
 	}
 
 	private bool pen (Point cursor, bool[,] status_layer) {
-		Rect selected = this.palette.getSelected ();
-		int width, height, tmp;
+		Rect selected = this.palette.getSelected ().normalize ();
 
-		tmp = (cursor.x + selected.width) - drawing_layer.length[1];
-		width = (tmp <= 0) ? selected.width : tmp;
+		if (drawing_layer.length[0] <= cursor.x + selected.width)
+			selected.width = drawing_layer.length[0] - cursor.x - 1;
 
-		tmp = (cursor.y + selected.height) - drawing_layer.length[0];
-		height = (tmp <= 0) ? selected.height : tmp;
+		if (drawing_layer.length[1] <= cursor.y + selected.height)
+			selected.height = drawing_layer.length[1] - cursor.y - 1;
 
-		for (int y=0; y <= height; y++) {
-			for (int x=0; x <= width; x++) {
+		for (int y=0; y <= selected.height; y++) {
+			for (int x=0; x <= selected.width; x++) {
 				int tile = this.palette.position_to_id (selected.x+x, selected.y+y);
 				drawing_layer[cursor.y + y, cursor.x + x] = tile;
 				status_layer[cursor.y + y, cursor.x + x] = false;
