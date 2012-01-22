@@ -30,10 +30,10 @@ public class PenTool : EditTool {
 	private bool pen (Point cursor, bool[,] status_layer) {
 		Rect selected = this.palette.getSelected ().normalize ();
 
-		if (drawing_layer.length[0] <= cursor.x + selected.width)
+		if (drawing_layer.length[1] <= cursor.x + selected.width)
 			selected.width = drawing_layer.length[0] - cursor.x - 1;
 
-		if (drawing_layer.length[1] <= cursor.y + selected.height)
+		if (drawing_layer.length[0] <= cursor.y + selected.height)
 			selected.height = drawing_layer.length[1] - cursor.y - 1;
 
 		for (int y=0; y <= selected.height; y++) {
@@ -48,7 +48,7 @@ public class PenTool : EditTool {
 	}
 
 	public override bool on_button1_pressed (Point cursor, bool[,] status_layer) {
-		this.drawing_layer = new int[status_layer.length[1], status_layer.length[0]];
+		this.drawing_layer = new int[status_layer.length[0], status_layer.length[1]];
 		return pen (cursor, status_layer);
 	}
 

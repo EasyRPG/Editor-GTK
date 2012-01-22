@@ -33,7 +33,7 @@ public class EraserTool : EditTool {
 	}
 
 	public override bool on_button1_pressed (Point cursor, bool[,] status_layer) {
-		this.drawing_layer = new int[status_layer.length[1], status_layer.length[0]];
+		this.drawing_layer = new int[status_layer.length[0], status_layer.length[1]];
 		eraser (cursor, status_layer);
 		return true;
 	}
