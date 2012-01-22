@@ -846,7 +846,6 @@ public class MapDrawingArea : Gtk.DrawingArea {
 			cursor.y = y;
 
 			if ((event.state & Gdk.ModifierType.BUTTON1_MASK) == Gdk.ModifierType.BUTTON1_MASK && tool != null) {
-				stdout.printf("motion: button1!\n");
 				status = tool.on_button1_motion (Point(x, y), draw_status);
 				this.drawn_rect = Rect (0, 0, 0, 0);
 			}
