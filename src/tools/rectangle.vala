@@ -29,18 +29,17 @@ public class RectangleTool : EditTool {
 		this.palette = palette;
 	}
 
-	public override bool on_button1_pressed (Point cursor, bool[,] status_layer) {
-		this.drawing_layer = new int[status_layer.length[0], status_layer.length[1]];
+	public override bool on_button1_pressed (Point cursor) {
+		this.drawing_layer = new int[height, width];
 		this.start = cursor;
 		this.old   = cursor;
 
-		status_layer[cursor.y, cursor.x] = false;
 		drawing_layer[cursor.y, cursor.x] = this.palette.position_to_id(this.palette.getSelected ().x, this.palette.getSelected ().y);
 
 		return true;
 	}
 
-	public override bool on_button1_motion (Point cursor, bool[,] status_layer) {
+	public override bool on_button1_motion (Point cursor) {
 		Rect selected = this.palette.getSelected ().normalize ();
 
 		/* old area */
@@ -62,25 +61,24 @@ public class RectangleTool : EditTool {
 				int off_x = (p.x - area_new.x) % (selected.width+1);
 				int off_y = (p.y - area_new.y) % (selected.height+1);
 				drawing_layer[p.y,p.x] = this.palette.position_to_id (selected.x+off_x, selected.y+off_y);
-			} else
+			} else {
 				drawing_layer[p.y,p.x] = 0;
-
-			status_layer[p.y,p.x] = false;
+			}
 		}
 
 		old = cursor;
 		return true;
 	}
 
-	public override bool on_button2_pressed (Point cursor, bool[,] status_layer) {
+	public override bool on_button2_pressed (Point cursor) {
 		return false;
 	}
 
-	public override bool on_button2_released (Point cursor, bool[,] status_layer) {
+	public override bool on_button2_released (Point cursor, int[,] layer) {
 		return false;
 	}
 
-	public override bool on_key_pressed (Point cursor, uint key, Gdk.ModifierType modifier, bool[,] status_layer, int[,] layer) {
+	public override bool on_key_pressed (Point cursor, uint key, Gdk.ModifierType modifier, int[,] layer) {
 		return false;
 	}
 }

@@ -101,6 +101,11 @@ public class MapDrawingArea : Gtk.DrawingArea {
 		this.tile_width = this.lower_layer.length[1];
 		this.tile_height = this.lower_layer.length[0];
 
+		// Update size information of tools
+		foreach (DrawingTool tool in DrawingTool.all ())
+			if (this.tools[tool] != null)
+				this.tools[tool].set_size(this.tile_width, this.tile_height);
+
 		this.draw.connect (on_draw);
 		this.motion_notify_event.connect (on_motion);
 		this.button_release_event.connect (on_button_released);
@@ -778,11 +783,12 @@ public class MapDrawingArea : Gtk.DrawingArea {
 			bool status = false;
 
 			if (event.button == 1)
-				status = tool.on_button1_pressed (Point(x, y), draw_status);
+				status = tool.on_button1_pressed (Point(x, y));
 			else
-				status = tool.on_button2_pressed (Point(x, y), draw_status);
+				status = tool.on_button2_pressed (Point(x, y));
 
 			if (status) {
+				this.draw_status = new bool[this.tile_height, this.tile_width];
 				this.drawn_rect = Rect (0, 0, 0, 0);
 				this.queue_draw ();
 			}
@@ -845,13 +851,14 @@ public class MapDrawingArea : Gtk.DrawingArea {
 			cursor.x = x;
 			cursor.y = y;
 
-			if ((event.state & Gdk.ModifierType.BUTTON1_MASK) == Gdk.ModifierType.BUTTON1_MASK && tool != null) {
-				status = tool.on_button1_motion (Point(x, y), draw_status);
-				this.drawn_rect = Rect (0, 0, 0, 0);
-			}
+			if ((event.state & Gdk.ModifierType.BUTTON1_MASK) == Gdk.ModifierType.BUTTON1_MASK && tool != null)
+				status = tool.on_button1_motion (Point(x, y));
 
-			if (status)
+			if (status) {
+				this.draw_status = new bool[this.tile_height, this.tile_width];
+				this.drawn_rect = Rect (0, 0, 0, 0);
 				this.queue_draw ();
+			}
 		}
 
 		return status;

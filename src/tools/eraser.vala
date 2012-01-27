@@ -27,31 +27,30 @@ public class EraserTool : EditTool {
 		this.palette = palette;
 	}
 
-	private void eraser (Point cursor, bool[,] status_layer) {
+	private void eraser (Point cursor) {
 		drawing_layer[cursor.y, cursor.x] = 1;
-		status_layer[cursor.y, cursor.x] = false;
 	}
 
-	public override bool on_button1_pressed (Point cursor, bool[,] status_layer) {
-		this.drawing_layer = new int[status_layer.length[0], status_layer.length[1]];
-		eraser (cursor, status_layer);
+	public override bool on_button1_pressed (Point cursor) {
+		this.drawing_layer = new int[height, width];
+		eraser (cursor);
 		return true;
 	}
 
-	public override bool on_button1_motion (Point cursor, bool[,] status_layer) {
-		eraser (cursor, status_layer);
+	public override bool on_button1_motion (Point cursor) {
+		eraser (cursor);
 		return true;
 	}
 
-	public override bool on_button2_pressed (Point cursor, bool[,] status_layer) {
+	public override bool on_button2_pressed (Point cursor) {
 		return false;
 	}
 
-	public override bool on_button2_released (Point cursor, bool[,] status_layer) {
+	public override bool on_button2_released (Point cursor, int[,] layer) {
 		return false;
 	}
 
-	public override bool on_key_pressed (Point cursor, uint key, Gdk.ModifierType modifier, bool[,] status_layer, int[,] layer) {
+	public override bool on_key_pressed (Point cursor, uint key, Gdk.ModifierType modifier, int[,] layer) {
 		return false;
 	}
 

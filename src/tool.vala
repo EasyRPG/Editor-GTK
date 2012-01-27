@@ -27,6 +27,8 @@ public abstract class Tool {
 	protected Scale current_scale;
 	protected Rect current_selection;
 	protected int[,] current_selection_data;
+	protected int width;
+	protected int height;
 
 	/**
 	 * Send if an area should be selected on the map
@@ -53,17 +55,15 @@ public abstract class Tool {
 	 * Called if the left mouse button is pressed somewhere on the map
 	 * 
 	 * @param cursor The current cursor position on the map in tiles
-	 * @param status_layer The layer, which contains informations, which tiles should be rerendered
 	 */
-	public abstract bool on_button1_pressed (Point cursor, bool[,] status_layer);
+	public abstract bool on_button1_pressed (Point cursor);
 
 	/**
 	 * Called if the cursor moves to another tile while the left mouse button is pressed
 	 * 
 	 * @param cursor The current cursor position on the map in tiles
-	 * @param status_layer The layer, which contains informations, which tiles should be rerendered
 	 */
-	public abstract bool on_button1_motion (Point cursor, bool[,] status_layer);
+	public abstract bool on_button1_motion (Point cursor);
 
 	/**
 	 * Called if the left mouse button is released again
@@ -77,17 +77,16 @@ public abstract class Tool {
 	 * Called if the right mouse button is pressed somewhere on the map
 	 * 
 	 * @param cursor The current cursor position on the map in tiles
-	 * @param status_layer The layer, which contains informations, which tiles should be rerendered
 	 */
-	public abstract bool on_button2_pressed (Point cursor, bool[,] status_layer);
+	public abstract bool on_button2_pressed (Point cursor);
 
 	/**
 	 * Called if the right mouse button is released again
 	 * 
 	 * @param cursor The current cursor position on the map in tiles
-	 * @param layer The drawingarea's currently selected layer
+	 * @param current_layer The drawingarea's currently selected layer
 	 */
-	public abstract bool on_button2_released (Point cursor, int[,] layer);
+	public abstract bool on_button2_released (Point cursor, int[,] current_layer);
 
 	/**
 	 * Called if any key is pressed
@@ -95,10 +94,9 @@ public abstract class Tool {
 	 * @param cursor The current cursor position on the map in tiles
 	 * @param key Contains the key information as Gdk keyval
 	 * @param modifier Contains the key modifier information
-	 * @param status_layer The layer, which contains informations, which tiles should be rerendered
 	 * @param layer The drawingarea's currently selected layer
 	 */
-	public abstract bool on_key_pressed (Point cursor, uint key, Gdk.ModifierType modifier, bool[,] status_layer, int[,] layer);
+	public abstract bool on_key_pressed (Point cursor, uint key, Gdk.ModifierType modifier, int[,] layer);
 
 	/**
 	 * Called to modify the rendered tile
@@ -107,6 +105,17 @@ public abstract class Tool {
 	 * @param tile_id set to tile_id to render it. Do not touch to use the current layer's tile
 	 */
 	public abstract bool on_draw (Point location, out int tile_id);
+
+	/**
+	 * Inform about current map size
+	 *
+	 * @param width the map's width in tiles
+	 * @param height the map's height in tiles
+	 */
+	public void set_size (int width, int height) {
+		this.width = width;
+		this.height = height;
+	}
 
 	/**
 	 * Inform which layer is currently edited

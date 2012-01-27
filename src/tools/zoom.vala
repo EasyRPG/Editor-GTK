@@ -26,14 +26,14 @@ public class ZoomTool : Tool {
 		this.palette = palette;
 	}
 
-	public override bool on_button1_pressed (Point cursor, bool[,] status_layer) {
+	public override bool on_button1_pressed (Point cursor) {
 		if (current_scale > Scale.1_1)
 			request_scale (current_scale-1);
 
 		return true;
 	}
 
-	public override bool on_button1_motion (Point cursor, bool[,] status_layer) {
+	public override bool on_button1_motion (Point cursor) {
 		return false;
 	}
 
@@ -41,18 +41,18 @@ public class ZoomTool : Tool {
 		return false;
 	}
 
-	public override bool on_button2_pressed (Point cursor, bool[,] status_layer) {
+	public override bool on_button2_pressed (Point cursor) {
 		if (current_scale < Scale.1_8)
 			request_scale (current_scale+1);
 
 		return true;
 	}
 
-	public override bool on_button2_released (Point cursor, bool[,] status_layer) {
+	public override bool on_button2_released (Point cursor, int[,] layer) {
 		return false;
 	}
 
-	public override bool on_key_pressed (Point cursor, uint key, Gdk.ModifierType modifier, bool[,] status_layer, int[,] layer) {
+	public override bool on_key_pressed (Point cursor, uint key, Gdk.ModifierType modifier, int[,] layer) {
 		return false;
 	}
 
