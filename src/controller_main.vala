@@ -552,6 +552,11 @@ public class MainController : Controller {
 		int result = dialog.run ();
 
 		if (result == Gtk.ResponseType.OK) {
+			int width, height;
+
+			/* get information about map size change */
+			dialog.getSizeChange(out width, out height);
+
 			/* update map model */
 			dialog.updateModel ();
 
@@ -561,8 +566,14 @@ public class MainController : Controller {
 			maptree_model.get_iter (out iter, this.map_references.get (map_id).get_path ());
 			maptree_model.set_value (iter, 2, map.name);
 
+			if (width != 0 || height != 0) {
+				/* Reset UndoManager (TODO: make map size changes undoable) */
+				this.map_changes.set (map_id, new UndoManager.Stack (map));
+				updateUndoRedoButtons ();
+			}
+
 			/* reload map (size or tileset may have changed) */
-			load_map (map_id);
+			reload_map ();
 		}
 
 		dialog.destroy ();
@@ -672,6 +683,10 @@ public class MainController : Controller {
 		if (result == Gtk.ResponseType.OK) {
 			/* shift map */
 			map.shift (dialog.dir, dialog.amount);
+			
+			/* Reset UndoManager (TODO: make map shift undoable) */
+			this.map_changes.set (map_id, new UndoManager.Stack (map));
+			updateUndoRedoButtons ();
 
 			/* rerender map */
 			load_map (map_id);

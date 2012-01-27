@@ -90,6 +90,11 @@ public class MapPropertiesDialog : Gtk.Dialog {
 			options.updateModel (map);
 			panorama.updateModel (map);
 		}
+
+		public void getSize (out int width, out int height) {
+			width = input_width.get_value_as_int ();
+			height = input_height.get_value_as_int ();
+		}
 	}
 
 	private class PanoramaTable : Gtk.Table {
@@ -370,5 +375,11 @@ public class MapPropertiesDialog : Gtk.Dialog {
 
 	public void updateModel () {
 		page1.updateModel (model);
+	}
+
+	public void getSizeChange (out int width, out int height) {
+		page1.getSize (out width, out height);
+		width  -= model.width;
+		height -= model.height;
 	}
 }
