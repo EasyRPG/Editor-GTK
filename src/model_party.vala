@@ -72,4 +72,14 @@ public class Party : Model {
 		this.x = x;
 		this.y = y;
 	}
+
+	/**
+	 * Saves the party data to an XmlNode object.
+	 *
+	 * @param data An XmlNode that contains the party data.
+	 */
+	public override void save_data (out XmlNode data) {
+		/* TODO */
+		data = null;
+	}
 }

@@ -72,4 +72,14 @@ public class Vehicle : Model {
 		this.x = x;
 		this.y = y;
 	}
+
+	/**
+	 * Saves the vehicle data to an XmlNode object.
+	 * 
+	 * @param data An XmlNode that contains the vehicle data.
+	 */
+	public override void save_data (out XmlNode data) {
+		/* TODO */
+		data = null;
+	}
 }

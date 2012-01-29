@@ -74,7 +74,7 @@ public class MainController : Controller {
 	}
 
 	/**
-	 * Shows the main view. 
+	 * Shows the main view.
 	 */
 	public override void run () {
 		this.main_view.show_all ();
@@ -98,7 +98,31 @@ public class MainController : Controller {
 			this.main_view.set_project_status ("open");
 			updateUndoRedoButtons ();
 			this.main_view.update_statusbar_current_frame();
-		} catch(Error e) {
+		} catch (Error e) {
+			/* Show Error Dialog */
+			var edialog = new Gtk.MessageDialog (this.main_view,
+				Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT,
+				Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, e.message);
+			edialog.run ();
+			edialog.destroy ();
+		}
+	}
+
+	/**
+	 * Saves the project
+	 */
+	public void save_project () {
+		try {
+			/* Manages all the XML write stuff */
+			this.save_project_data ();
+			this.save_maptree_data ();
+
+			/* Clear Undo History */
+			maps.foreach((key, val) => {
+				this.map_changes.set (key, new UndoManager.Stack (val));
+			});
+			updateUndoRedoButtons ();
+		} catch (Error e) {
 			/* Show Error Dialog */
 			var edialog = new Gtk.MessageDialog (this.main_view,
 				Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT,
@@ -120,7 +144,7 @@ public class MainController : Controller {
 		 * FIXME
 		 * FileFilter.set_filter_name is not implemented yet but will work soon.
 		 * More info: https://bugzilla.gnome.org/show_bug.cgi?id=647122
-		 * 
+		 *
 		 * Using proposed workaround "gtk_file_filter_set_name".
 		 */
 		var file_filter = new Gtk.FileFilter();
@@ -202,6 +226,14 @@ public class MainController : Controller {
 	}
 
 	/**
+	 * Saves XML data to the .rproject and game.xml files.
+	 */
+	private void save_project_data () throws Error {
+		/* TODO */
+		warning("saving of project data not yet supported!");
+	}
+
+	/**
 	 * Loads XML data from the maptree file.
 	 */
 	public void load_maptree_data () throws Error {
@@ -238,9 +270,9 @@ public class MainController : Controller {
 		parser.parse_file (maptreefile);
 		maptree = parser.get_root ();
 
-/*
-		// FIXME: this lines are for testing XmlWriter, remove after
-		// the writer is complete
+#if 0
+		/* FIXME: this lines are for testing XmlWriter, remove after
+		   the writer is complete */
 
 		var writer = new XmlWriter();
 		print("Test XmlWriter:\n");
@@ -252,7 +284,7 @@ public class MainController : Controller {
 		writer.set_root((((maptree.children).next).next).next);
 		writer.write_file();
 		writer.save_to_file(this.base_path + "data/maps/maptree3.xml");
-*/
+#endif
 
 		// Append a new row, the next while block will set the data
 		maptree_model.append (out iter, iter);
@@ -275,7 +307,7 @@ public class MainController : Controller {
 			/*
 			 * If the map exists in the map_references table, let's check the next one
 			 * or go back to its parent.
-			 * 
+			 *
 			 * This allows to return to the correct map after adding child maps.
 			 */
 			if (this.map_references.get (map_id) != null) {
@@ -334,9 +366,21 @@ public class MainController : Controller {
 		this.main_view.treeview_maptree.expand_to_path (new Gtk.TreePath.from_string ("0"));
 	}
 
+	public void save_maptree_data () throws Error {
+		var maptree_model = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
+
+		warning("saving maptree is not yet supported!");
+
+		/* TODO:
+		 * - save data/maps/maptree.xml
+		 * - save data/maps/map<mapid>.xml
+		 * - delete all maps not referenced in data/maps/maptree.xml
+		 */
+	}
+
 	/**
 	 * Loads XML data from a map file.
-	 *  
+	 *
 	 * @param The id of the map to load.
 	 */
 	public bool load_map_data (int map_id) {
@@ -683,7 +727,7 @@ public class MainController : Controller {
 		if (result == Gtk.ResponseType.OK) {
 			/* shift map */
 			map.shift (dialog.dir, dialog.amount);
-			
+
 			/* Reset UndoManager (TODO: make map shift undoable) */
 			this.map_changes.set (map_id, new UndoManager.Stack (map));
 			updateUndoRedoButtons ();
