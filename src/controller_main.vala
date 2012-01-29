@@ -278,11 +278,11 @@ public class MainController : Controller {
 		print("Test XmlWriter:\n");
 		print("--------Full Tree writing-------\n");
 		writer.set_root(maptree);
-		writer.write_file();
+		writer.generate();
 		writer.save_to_file(this.base_path + "data/maps/maptree2.xml");
 		print("-----Use a subnode as root------\n");
 		writer.set_root((((maptree.children).next).next).next);
-		writer.write_file();
+		writer.generate();
 		writer.save_to_file(this.base_path + "data/maps/maptree3.xml");
 #endif
 
@@ -300,9 +300,7 @@ public class MainController : Controller {
 
 		// This while block sets the map data and appends new rows to the maptree
 		while (current_ref != null && depth > 0) {
-
-			// attr_values[0] stores the map id
-			map_id = int.parse (current_ref.attr_values[0]);
+			map_id = int.parse (current_ref.attributes["id"]);
 
 			/*
 			 * If the map exists in the map_references table, let's check the next one
@@ -328,7 +326,7 @@ public class MainController : Controller {
 			}
 			else {
 				// TODO: create&load a blank map in order to ensure tree integrity
-				map_name = current_ref.attr_values[1];
+				map_name = current_ref.attributes["name"];
 			}
 
 			// Add map data to the row
@@ -342,7 +340,7 @@ public class MainController : Controller {
 			// A TreeRowReference is created and stored in map_references
 			var path = new Gtk.TreePath.from_string (maptree_model.get_string_from_iter (iter_table.get (depth)));
 			var row_reference = new Gtk.TreeRowReference (maptree_model, path);
-			this.map_references.set (int.parse (current_ref.attr_values[0]), row_reference);
+			this.map_references.set (int.parse (current_ref.attributes["id"]), row_reference);
 
 			// If this map has children, manage them
 			if (current_ref.children != null) {
@@ -367,15 +365,74 @@ public class MainController : Controller {
 	}
 
 	public void save_maptree_data () throws Error {
-		var maptree_model = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
+		var maptree = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
+		var root = new XmlNode ("maptree");
+		var parent = root;
+		var writer = new XmlWriter ();
+		Value maptree_val;
+		Gtk.TreeIter tmp, iter;
+		bool exit = false;
+		string mapspath = base_path + "data/maps/";
 
-		warning("saving maptree is not yet supported!");
+		/* 1. remove all map*.xml files in data/maps/ */
+		var dir = Dir.open (mapspath, 0);
+		string file = dir.read_name();
+		while (file != null) {
+			if(FileUtils.remove(mapspath + file) != 0)
+				throw new FileError.FAILED("Couldn't remove old map files!");
+			file = dir.read_name();
+		}
 
-		/* TODO:
-		 * - save data/maps/maptree.xml
-		 * - save data/maps/map<mapid>.xml
-		 * - delete all maps not referenced in data/maps/maptree.xml
-		 */
+		/* 2. build maptree.xml */
+		maptree.get_iter_first (out iter);
+		if(maptree.iter_children (out iter, iter)) {
+			while (!exit) {
+				/* create and add node */
+				var node = new XmlNode ("map");
+				maptree.get_value (iter, 0, out maptree_val);
+				node.attributes["id"] = maptree_val.get_int ().to_string ();
+				maptree.get_value (iter, 2, out maptree_val);
+				node.attributes["name"] = maptree_val.get_string ();
+				parent.add_child(node);
+
+				/* process children */
+				if (maptree.iter_children (out tmp, iter)) {
+					iter = tmp;
+					parent = node;
+					continue;
+				}
+
+				/* process siblings */
+				tmp = iter;
+				if (maptree.iter_next (ref iter))
+					continue;
+				iter = tmp;
+
+				/* process siblings of parent nodes we descendend into */
+				while (!(exit = !maptree.iter_parent (out tmp, iter))) {
+					iter = tmp;
+					parent = parent.parent;
+
+					tmp = iter;
+					if (maptree.iter_next (ref iter)) {
+						break;
+					}
+					iter = tmp;
+				}
+			}
+		}
+
+		writer.set_root (root);
+		writer.generate ();
+		writer.write (mapspath + "maptree.xml");
+
+		/* 3. create map<mapid>.xml files */
+		foreach(int id in this.maps.get_keys ()) {
+			this.maps[id].save_data (out root);
+			writer.set_root (root);
+			writer.generate ();
+			writer.write (mapspath + "map%d.xml".printf(id));
+		}
 	}
 
 	/**

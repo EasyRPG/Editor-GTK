@@ -54,7 +54,7 @@ public class MaptreeTreeStore : Gtk.TreeStore, Gtk.TreeDragSource, Gtk.TreeDragD
 	 * Defines wheter the row is draggable.
 	 */
 	public bool row_draggable (Gtk.TreePath path) {
-		// The game_title row (the only one with depth 1) should not be draggable 
+		// The game_title row (the only one with depth 1) should not be draggable
 		if (path.get_depth () == 1) {
 			return false;
 		}
@@ -76,7 +76,7 @@ public class MaptreeTreeStore : Gtk.TreeStore, Gtk.TreeDragSource, Gtk.TreeDragD
 		if (dest_path.to_string () == "0") {
 			return false;
 		}
-		
+
 		var source_path = new Gtk.TreePath.from_string (this.dragged_row_path);
 
 		// A descendant of the dragged row is not a possible place
@@ -108,7 +108,7 @@ public class MaptreeTreeStore : Gtk.TreeStore, Gtk.TreeDragSource, Gtk.TreeDragD
 			this.maptree_treeview.expand_to_path (dest);
 
 			// Reselect the dragged map
-			this.maptree_treeview.set_cursor (dest, this.maptree_treeview.get_column (1), false); 
+			this.maptree_treeview.set_cursor (dest, this.maptree_treeview.get_column (1), false);
 
 			// inform controller about the changes
 			Gtk.TreeIter iter;

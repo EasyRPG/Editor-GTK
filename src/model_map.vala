@@ -18,7 +18,7 @@
  */
 
 /**
- * Represents a map object in the editor. 
+ * Represents a map object in the editor.
  */
 public class Map : Model {
 	/**
@@ -28,28 +28,28 @@ public class Map : Model {
 
 	/**
 	 * Map width in tiles.
-	 * 
+	 *
 	 * Default is 20.
 	 */
 	public int width {get; set; default = 20;}
 
 	/**
 	 * Map height in tiles.
-	 * 
+	 *
 	 * Default is 15.
 	 */
 	public int height {get; set; default = 15;}
 
 	/**
 	 * Tileset used to design the map.
-	 * 
-	 * TODO: This should be replaced by an int id in the future 
+	 *
+	 * TODO: This should be replaced by an int id in the future
 	 */
 	public string tileset {get; set; default = "";}
 
 	/**
 	 * Scroll type of the map.
-	 * 
+	 *
 	 * 0: No scroll. (Default)
 	 * 1: Vertical loop only.
 	 * 2: Horizontal loop only.
@@ -59,46 +59,46 @@ public class Map : Model {
 
 	/**
 	 * Defines whether the map uses a panorama.
-	 * 
+	 *
 	 * Default is false.
 	 */
 	public bool panorama_use {get; set; default = false;}
 
 	/**
 	 * Panorama filename.
-	 * 
+	 *
 	 * This property is ignored if panorama_use is false.
 	 */
 	public string panorama_filename {get; set; default = "";}
 
 	/**
 	 * Defines whether the panorama loops horizontally.
-	 * 
+	 *
 	 * Default is false.
 	 */
 	public bool panorama_horizontal_loop {get; set; default = false;}
 
 	/**
 	 * Defines whether the panorama loops vertically.
-	 * 
+	 *
 	 * Default is false.
 	 */
 	public bool panorama_vertical_loop {get; set; default = false;}
 
 	/**
 	 * Defines whether the panorama autoscrolls horizontally.
-	 * 
+	 *
 	 * Default is false.
-	 * 
+	 *
 	 * This property is ignored if panorama_horizontal_loop is false.
 	 */
 	public bool panorama_horizontal_autoscroll {get; set; default = false;}
 
 	/**
 	 * Horizontal autoscroll speed.
-	 * 
+	 *
 	 * Default is 0. It must be a number between -8 and 8.
-	 * 
+	 *
 	 * This property is ignored if panorama_horizontal_loop is false or
 	 * panorama_horizontal_autoscroll is true.
 	 */
@@ -106,18 +106,18 @@ public class Map : Model {
 
 	/**
 	 * Defines whether the panorama autoscrolls vertically.
-	 * 
+	 *
 	 * Default is false.
-	 * 
+	 *
 	 * This property is ignored if panorama_vertical_loop is false.
 	 */
 	public bool panorama_vertical_autoscroll {get; set; default = false;}
 
 	/**
 	 * Vertical autoscroll speed.
-	 * 
+	 *
 	 * Default is 0. It must be a number between -8 and 8.
-	 * 
+	 *
 	 * This property is ignored if panorama_vertical_loop is false or
 	 * panorama_vertical_autoscroll is true.
 	 */
@@ -125,7 +125,7 @@ public class Map : Model {
 
 	/**
 	 * BGM type.
-	 * 
+	 *
 	 * 0: Same as parent map. (Default)
 	 * 1: Entrust to event.
 	 * 2: Specify.
@@ -134,14 +134,14 @@ public class Map : Model {
 
 	/**
 	 * BGM filename.
-	 * 
+	 *
 	 * This property is ignored if bgm_type != 2.
 	 */
 	public string bgm_filename {get; set; default = "";}
 
 	/**
 	 * Backdrop type.
-	 * 
+	 *
 	 * 0: Same as parent map. (Default)
 	 * 1: Entrust to event.
 	 * 2: Specify.
@@ -150,14 +150,14 @@ public class Map : Model {
 
 	/**
 	 * Backdrop filename.
-	 * 
+	 *
 	 * This property is ignored if backdrop_type != 2.
 	 */
 	public string backdrop_filename {get; set; default = "";}
 
 	/**
 	 * Teleport type.
-	 * 
+	 *
 	 * 0: Same as parent map. Unavailable if there is no parent map.
 	 * 1: Entrust to event.
 	 * 2: Specify.
@@ -166,16 +166,16 @@ public class Map : Model {
 
 	/**
 	 * Defines whether teleport is allowed.
-	 * 
+	 *
 	 * Default is true.
-	 * 
+	 *
 	 * This property is ignored if teleport_type != 2.
 	 */
 	public bool teleport_allow {get; set; default = true;}
 
 	/**
 	 * Escape type.
-	 * 
+	 *
 	 * 0: Same as parent map. Unavailable if there is no parent map.
 	 * 1: Entrust to event.
 	 * 2: Specify.
@@ -184,16 +184,16 @@ public class Map : Model {
 
 	/**
 	 * Defines whether escape from battle is allowed.
-	 * 
+	 *
 	 * Default is true.
-	 * 
+	 *
 	 * This property is ignored if escape_type != 2.
 	 */
 	public bool escape_allow {get; set; default = true;}
 
 	/**
 	 * Save type.
-	 * 
+	 *
 	 * 0: Same as parent map. Unavailable if there is no parent map.
 	 * 1: Entrust to event.
 	 * 2: Specify.
@@ -202,9 +202,9 @@ public class Map : Model {
 
 	/**
 	 * Defines whether save is allowed.
-	 * 
+	 *
 	 * Default is true.
-	 * 
+	 *
 	 * This property is ignored if save_type != 2.
 	 */
 	public bool save_allow {get; set; default = true;}
@@ -217,7 +217,7 @@ public class Map : Model {
 
 	/**
 	 * Determines how often a battle will happen.
-	 * 
+	 *
 	 * Default is 25.
 	 */
 	public int enemy_encounter_steps {get; set; default = 25;}
@@ -239,7 +239,7 @@ public class Map : Model {
 
 	/**
 	 * Loads the map data from an XmlNode object.
-	 * 
+	 *
 	 * @param data An XmlNode that contains the map data.
 	 */
 	public override void load_data (XmlNode? data) {
@@ -434,7 +434,7 @@ public class Map : Model {
 
 		/*
 		 * Check the parsed values to make sure they are valid.
-		 * 
+		 *
 		 * It is not neccessary to modify a property if the parsed value match
 		 * the default one or is not valid. Also, some dependent properties
 		 * can be ignored if they are not going to be used.
@@ -522,7 +522,7 @@ public class Map : Model {
 
 		/*
 		 * Adjusts the length of the array to the size of the map.
-		 * 
+		 *
 		 * This will discard any extra tile or create undefined tiles.
 		 */
 		if (lower_layer_string.length != (width * height)) {
@@ -545,13 +545,13 @@ public class Map : Model {
 			col = i % width;
 			row = i / width;
 
-			// Lower layer		
+			// Lower layer
 			if (lower_layer_string[i] == null) {
 				tile_id = 0;
 			}
 			else {
 				tile_id = int.parse (lower_layer_string[i]);
-				
+
 				// Tile ids cannot be negative
 				if (tile_id < 0) {
 					tile_id = 0;
@@ -560,13 +560,13 @@ public class Map : Model {
 
 			lower_layer[row, col] = tile_id;
 
-			// Upper layer	
+			// Upper layer
 			if (upper_layer_string[i] == null) {
 				tile_id = 0;
 			}
 			else {
 				tile_id = int.parse (upper_layer_string[i]);
-				
+
 				// Tile ids cannot be negative
 				if (tile_id < 0) {
 					tile_id = 0;
@@ -592,8 +592,143 @@ public class Map : Model {
 	 * @param data An XmlNode that contains the map data.
 	 */
 	public override void save_data(out XmlNode data) {
-		/* TODO */
-		data = null;
+		XmlNode node, sub;
+		string layer_data;
+
+		data = new XmlNode ("map");
+
+		node = new XmlNode ("name");
+		node.content = this.name;
+		data.add_child (node);
+
+		node = new XmlNode ("width");
+		node.content = this.width.to_string ();
+		data.add_child (node);
+
+		node = new XmlNode ("height");
+		node.content = this.height.to_string ();
+		data.add_child (node);
+
+		node = new XmlNode ("tileset");
+		node.content = this.tileset;
+		data.add_child (node);
+
+		node = new XmlNode ("scroll_type");
+		node.content = this.scroll_type.to_string ();
+		data.add_child (node);
+
+		var panorama = new XmlNode ("panorama");
+		data.add_child (panorama);
+
+		node = new XmlNode ("filename");
+		node.content = panorama_filename;
+		panorama.add_child (node);
+
+		node = new XmlNode ("horizontal_loop");
+		node.content = panorama_horizontal_loop.to_string ();
+		panorama.add_child (node);
+
+		node = new XmlNode ("horizontal_autoscroll");
+		node.content = panorama_horizontal_autoscroll.to_string ();
+		panorama.add_child (node);
+
+		node = new XmlNode ("horizontal_autoscroll_speed");
+		node.content = panorama_horizontal_autoscroll_speed.to_string ();
+		panorama.add_child (node);
+
+		node = new XmlNode ("vertical_loop");
+		node.content = panorama_vertical_loop.to_string ();
+		panorama.add_child (node);
+
+		node = new XmlNode ("vertical_autoscroll");
+		node.content = panorama_vertical_autoscroll.to_string ();
+		panorama.add_child (node);
+
+		node = new XmlNode ("vertical_autoscroll_speed");
+		node.content = panorama_vertical_autoscroll_speed.to_string ();
+		panorama.add_child (node);
+
+		sub = new XmlNode("bgm");
+		data.add_child (sub);
+
+		node = new XmlNode ("type");
+		node.content = bgm_type.to_string ();
+		sub.add_child (node);
+
+		node = new XmlNode ("filename");
+		node.content = bgm_filename;
+		sub.add_child (node);
+
+		sub = new XmlNode("backdrop");
+		data.add_child (sub);
+
+		node = new XmlNode ("type");
+		node.content = backdrop_type.to_string ();
+		sub.add_child (node);
+
+		node = new XmlNode ("filename");
+		node.content = backdrop_filename;
+		sub.add_child (node);
+
+		sub = new XmlNode("teleport");
+		data.add_child (sub);
+
+		node = new XmlNode ("type");
+		node.content = teleport_type.to_string ();
+		sub.add_child (node);
+
+		node = new XmlNode ("allow");
+		node.content = teleport_allow.to_string ();
+		sub.add_child (node);
+
+		sub = new XmlNode("escape");
+		data.add_child (sub);
+
+		node = new XmlNode ("type");
+		node.content = escape_type.to_string ();
+		sub.add_child (node);
+
+		node = new XmlNode ("allow");
+		node.content = escape_allow.to_string ();
+		sub.add_child (node);
+
+		sub = new XmlNode("save");
+		data.add_child (sub);
+
+		node = new XmlNode ("type");
+		node.content = save_type.to_string ();
+		sub.add_child (node);
+
+		node = new XmlNode ("allow");
+		node.content = save_allow.to_string ();
+		sub.add_child (node);
+
+		sub = new XmlNode("layers");
+		data.add_child (sub);
+
+		node = new XmlNode ("lower");
+		layer_data = "";
+		for (int y = 0; y < lower_layer.length[0]; y++)
+			for (int x = 0; x < lower_layer.length[1]; x++)
+				layer_data += lower_layer[y,x].to_string () + " ";
+		node.content = layer_data;._chomp ();
+		sub.add_child (node);
+
+		node = new XmlNode ("upper");
+		layer_data = "";
+		for (int y = 0; y < upper_layer.length[0]; y++)
+			for (int x = 0; x < upper_layer.length[1]; x++)
+				layer_data += upper_layer[y,x].to_string () + " ";
+		node.content = layer_data;._chomp ();
+		sub.add_child (node);
+
+		node = new XmlNode ("enemy_encounter_steps");
+		node.content = enemy_encounter_steps.to_string ();
+		data.add_child (node);
+
+		node = new XmlNode ("save_time");
+		node.content = save_time.to_string ();
+		data.add_child (node);
 	}
 
 	public void set_size(int width, int height) requires (width > 1 && width < 500) requires (height > 1 && height < 500) {
