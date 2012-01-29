@@ -18,7 +18,7 @@
  */
 
 /**
- * Represents the party object in the editor. 
+ * Represents the party object in the editor.
  */
 public class Party : Model {
 	/*
@@ -39,7 +39,7 @@ public class Party : Model {
 
 	/**
 	 * Loads the party data from an XmlNode object.
-	 * 
+	 *
 	 * @param data An XmlNode that contains the party data.
 	 */
 	public override void load_data (XmlNode? data) {
@@ -79,7 +79,19 @@ public class Party : Model {
 	 * @param data An XmlNode that contains the party data.
 	 */
 	public override void save_data (out XmlNode data) {
-		/* TODO */
-		data = null;
+		XmlNode node;
+		data = new XmlNode("party");
+
+		node = new XmlNode("map");
+		node.content = this.map_id.to_string ();
+		data.add_child(node);
+
+		node = new XmlNode("x_coordinate");
+		node.content = this.x.to_string ();
+		data.add_child(node);
+
+		node = new XmlNode("y_coordinate");
+		node.content = this.y.to_string ();
+		data.add_child(node);
 	}
 }

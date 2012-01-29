@@ -229,8 +229,52 @@ public class MainController : Controller {
 	 * Saves XML data to the .rproject and game.xml files.
 	 */
 	private void save_project_data () throws Error {
-		/* TODO */
-		warning("saving of project data not yet supported!");
+		XmlNode root, node;
+		string path_game = base_path + "data/game.xml";
+		string path_project = base_path + project_filename;
+		var writer = new XmlWriter ();
+
+		/* update project file */
+		root = new XmlNode ("project");
+
+		node = new XmlNode ("current_layer");
+		node.content = this.main_view.get_current_layer ().to_int ().to_string ();
+		root.add_child (node);
+
+		node = new XmlNode ("current_map");
+		node.content = this.current_map.to_string ();
+		root.add_child (node);
+
+		node = new XmlNode ("current_scale");
+		node.content = this.main_view.get_current_scale ().to_int ().to_string ();
+		root.add_child (node);
+
+		writer.set_root (root);
+		writer.generate ();
+		writer.write (path_project);
+
+		/* update game file */
+		root = new XmlNode ("game");
+
+		node = new XmlNode ("title");
+		node.content = this.game_title;
+		root.add_child (node);
+
+		this.party.save_data(out node);
+		root.add_child (node);
+
+		this.boat.save_data(out node);
+		root.add_child (node);
+
+		this.ship.save_data(out node);
+		root.add_child (node);
+
+		this.airship.save_data(out node);
+		root.add_child (node);
+
+		writer.set_root (root);
+		writer.generate ();
+		writer.write (path_game);
 	}
 
 	/**
