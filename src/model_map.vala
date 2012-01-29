@@ -593,7 +593,7 @@ public class Map : Model {
 	 */
 	public override void save_data(out XmlNode data) {
 		XmlNode node, sub;
-		string layer_data;
+		char* layer_data, pos;
 
 		data = new XmlNode ("map");
 
@@ -707,19 +707,31 @@ public class Map : Model {
 		data.add_child (sub);
 
 		node = new XmlNode ("lower");
-		layer_data = "";
-		for (int y = 0; y < lower_layer.length[0]; y++)
-			for (int x = 0; x < lower_layer.length[1]; x++)
-				layer_data += lower_layer[y,x].to_string () + " ";
-		node.content = layer_data;._chomp ();
+		layer_data = new char[lower_layer.length[0] * lower_layer.length[1] * 10 + 1];
+		pos = layer_data;
+		for (int y = 0; y < lower_layer.length[0]; y++) {
+			for (int x = 0; x < lower_layer.length[1]; x++) {
+				string str = "%d ".printf (lower_layer[y,x]);
+				Memory.copy (pos, str, str.length);
+				pos += str.length;
+			}
+		}
+		*(pos-1) = '\0';
+		node.content = (string) layer_data;
 		sub.add_child (node);
 
 		node = new XmlNode ("upper");
-		layer_data = "";
-		for (int y = 0; y < upper_layer.length[0]; y++)
-			for (int x = 0; x < upper_layer.length[1]; x++)
-				layer_data += upper_layer[y,x].to_string () + " ";
-		node.content = layer_data;._chomp ();
+		layer_data = new char[lower_layer.length[0] * lower_layer.length[1] * 10 + 1];
+		pos = layer_data;
+		for (int y = 0; y < upper_layer.length[0]; y++) {
+			for (int x = 0; x < upper_layer.length[1]; x++) {
+				string str = "%d ".printf (upper_layer[y,x]);
+				Memory.copy (pos, str, str.length);
+				pos += str.length;
+			}
+		}
+		*(pos-1) = '\0';
+		node.content = (string) layer_data;
 		sub.add_child (node);
 
 		node = new XmlNode ("enemy_encounter_steps");
