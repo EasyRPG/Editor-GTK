@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 
 project("editor_vala" CXX C)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake_module)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake_module)
 find_package(Vala REQUIRED)
 include(${VALA_USE_FILE})
 
