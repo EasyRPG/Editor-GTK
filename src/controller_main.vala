@@ -109,6 +109,15 @@ public class MainController : Controller {
 	}
 
 	/**
+	 * Reloads the project
+	 */
+	public void reload_project () {
+		var file = base_path + project_filename;
+		close_project ();
+		open_project_from_file (file);
+	}
+
+	/**
 	 * Saves the project
 	 */
 	public void save_project () {
