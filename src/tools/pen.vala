@@ -31,10 +31,10 @@ public class PenTool : EditTool {
 		Rect selected = this.palette.getSelected ().normalize ();
 
 		if (drawing_layer.length[1] <= cursor.x + selected.width)
-			selected.width = drawing_layer.length[0] - cursor.x - 1;
+			selected.width = drawing_layer.length[1] - cursor.x - 1;
 
 		if (drawing_layer.length[0] <= cursor.y + selected.height)
-			selected.height = drawing_layer.length[1] - cursor.y - 1;
+			selected.height = drawing_layer.length[0] - cursor.y - 1;
 
 		for (int y=0; y <= selected.height; y++) {
 			for (int x=0; x <= selected.width; x++) {
