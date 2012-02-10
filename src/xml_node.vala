@@ -19,9 +19,9 @@
 
 /**
  * Represents an XML element.
- * 
+ *
  * An XmlNode instance stores the name, content, attributes and relationships of an XML element.
- * 
+ *
  * More information can be found at [[http://en.wikipedia.org/wiki/XML#Key_terminology]]
  */
 public class XmlNode {
@@ -29,13 +29,13 @@ public class XmlNode {
 	 * The name of the XML element.
 	 *
 	 * For example:
-	 * If the XML element is <width>30</width>, the name would be "width". 
+	 * If the XML element is <width>30</width>, the name would be "width".
 	 */
 	public string name;
 
 	/**
 	 * The content of the XML element.
-	 * 
+	 *
 	 * For example:
 	 * If the XML element is <width>30</width>, the content would be "30".
 	 */
@@ -48,7 +48,7 @@ public class XmlNode {
 
 	/**
 	 * A reference to the first child.
-	 * 
+	 *
 	 * The rest of the children should be accessed using next ().
 	 */
 	public XmlNode children;
@@ -64,23 +64,17 @@ public class XmlNode {
 	public weak XmlNode prev;
 
 	/**
-	 * An array containing the attribute names of the element.
+	 * A hashtable containing the attributes of the element.
 	 */
-	public string[] attr_names;
-
-	/**
-	 * An array containing the attribute values of the element.
-	 */
-	public string[] attr_values;
+	public HashTable<string,string> attributes;
 
 	/**
 	 * Instantiates the name and content properties.
 	 */
-	public XmlNode () {
-		this.name = "";
+	public XmlNode (string name = "") {
+		this.name = name;
 		this.content = "";
-		this.attr_names = {};
-		this.attr_values = {};
+		this.attributes = new HashTable<string,string>(str_hash, str_equal);
 	}
 
 	/**
@@ -116,7 +110,7 @@ public class XmlNode {
 		XmlNode? wanted_node = null;
 		XmlNode? current_node = node_ref;
 
-		/* 
+		/*
 		 * The first time get_node_by_name is called, node_ref should be null. This
 		 * connects it to the root.
 		 */
@@ -162,9 +156,9 @@ public class XmlNode {
 		if (this.children == null) {
 			return null;
 		}
-		
+
 		XmlNode child = this.children;
- 
+
 		while (child.next != null) {
 			child = child.next;
 		}
