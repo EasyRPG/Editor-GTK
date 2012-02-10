@@ -1,7 +1,7 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
  * view_main_window.vala
- * Copyright (C) EasyRPG Project 2011
+ * Copyright (C) EasyRPG Project 2011-2012
  *
  * EasyRPG is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -49,6 +49,9 @@ public class MainWindow : Gtk.Window {
 	private Gtk.ActionGroup actiongroup_project_open;
 	private Gtk.ActionGroup actiongroup_project_closed;
 
+	private Gtk.ToolButton toolitem_undo;
+	private Gtk.ToolButton toolitem_redo;
+
 	/**
 	 * Builds the main interface.
 	 * 
@@ -66,19 +69,19 @@ public class MainWindow : Gtk.Window {
 		 * Initialize actions
 		 */
 		var action_new = new Gtk.Action ("ActionNew", "_New", "Create a new project", null);
-		action_new.set_icon_name (Resources.ICON_NEW);
+		action_new.set_icon_name (Gtk.Stock.NEW);
 		var action_open = new Gtk.Action ("ActionOpen", "_Open", "Open a saved project", null);
-		action_open.set_icon_name (Resources.ICON_OPEN);
+		action_open.set_icon_name (Gtk.Stock.OPEN);
 		var action_close = new Gtk.Action ("ActionClose", "_Close", "Close current project", null);
-		action_close.set_icon_name (Resources.ICON_CLOSE);
+		action_close.set_icon_name (Gtk.Stock.CLOSE);
 		var action_create_game_disk = new Gtk.Action ("ActionCreateGameDisk", "_Create Game Disk", "", null);
 		action_create_game_disk.set_icon_name (Resources.ICON_BUILD_PROJECT);
 		var action_quit = new Gtk.Action ("ActionQuit", "_Quit", "Quit EasyRPG Game Editor", null);
-		action_quit.set_icon_name (Resources.ICON_QUIT);
+		action_quit.set_icon_name (Gtk.Stock.QUIT);
 		var action_save = new Gtk.Action ("ActionSave", "_Save", "Save all maps changes", null);
-		action_save.set_icon_name (Resources.ICON_SAVE);
+		action_save.set_icon_name (Gtk.Stock.SAVE);
 		var action_revert = new Gtk.Action ("ActionRevert", "_Revert", "Revert maps to last saved state", null);
-		action_revert.set_icon_name (Resources.ICON_REVERT);
+		action_revert.set_icon_name (Gtk.Stock.CLEAR);
 		var action_lower_layer = new Gtk.RadioAction ("ActionLowerLayer", "_Lower Layer", "Edit lower layer", null, LayerType.LOWER);
 		action_lower_layer.set_icon_name (Resources.ICON_LOWER_LAYER);
 		var action_upper_layer = new Gtk.RadioAction ("ActionUpperLayer", "_Upper Layer", "Edit upper layer", null, LayerType.UPPER);
@@ -102,15 +105,15 @@ public class MainWindow : Gtk.Window {
 		var action_playtest = new Gtk.Action ("ActionPlaytest", "_Play test", "Make a test of your game", null);
 		action_playtest.set_icon_name (Resources.ICON_PLAYTEST);
 		var action_fullscreen = new Gtk.ToggleAction ("ActionFullScreen", "_Full Screen", "Use full screen in play test mode", null);
-		action_fullscreen.set_icon_name (Resources.ICON_FULLSCREEN);
+		action_fullscreen.set_icon_name (Gtk.Stock.FULLSCREEN);
 		var action_show_title = new Gtk.ToggleAction ("ActionShowTitle", "_Show Title", "Show title in play test mode", null);
 		action_show_title.set_icon_name (Resources.ICON_TITLE);
 		var action_content = new Gtk.Action ("ActionContent", "_Content", "View help contents", null);
-		action_content.set_icon_name (Resources.ICON_HELP);
+		action_content.set_icon_name (Gtk.Stock.HELP);
 		var action_about = new Gtk.Action ("ActionAbout", "_About", "See information about this program's current version", null);
-		action_about.set_icon_name (Resources.ICON_ABOUT);
-		var action_undo = new Gtk.Action ("ActionUndo", "_Undo", "Undo last change", null);
-		action_undo.set_icon_name (Resources.ICON_UNDO);
+		action_about.set_icon_name (Gtk.Stock.ABOUT);
+		var action_undo = new Gtk.Action ("ActionUndo", "_Undo", "Undo last change", Gtk.Stock.UNDO);
+		var action_redo = new Gtk.Action ("ActionRedo", "_Redo", "Redo last change", Gtk.Stock.REDO);
 		var action_select = new Gtk.RadioAction ("ActionSelect", "_Select", "Select a part of the map", null, DrawingTool.SELECT);
 		action_select.set_icon_name (Resources.ICON_SELECT);
 		var action_zoom = new Gtk.RadioAction ("ActionZoom", "_Zoom", "Increase or decrease map zoom", null, DrawingTool.ZOOM);
@@ -197,7 +200,8 @@ public class MainWindow : Gtk.Window {
 		/*
 		 * Initialize drawing toolbar
 		 */
-		var toolitem_undo = action_undo.create_tool_item () as Gtk.ToolButton;
+		toolitem_undo = action_undo.create_tool_item () as Gtk.ToolButton;
+		toolitem_redo = action_redo.create_tool_item () as Gtk.ToolButton;
 		var toolitem_select = action_select.create_tool_item () as Gtk.ToolButton;
 		var toolitem_zoom = action_zoom.create_tool_item () as Gtk.ToolButton;
 		var toolitem_pen = action_pen.create_tool_item () as Gtk.ToolButton;
@@ -371,10 +375,12 @@ public class MainWindow : Gtk.Window {
 		 */
 		this.toolbar_sidebar = new Gtk.Toolbar ();
 		this.toolbar_sidebar.set_show_arrow (true);
-		this.toolbar_sidebar.get_style_context ().add_class (Gtk.STYLE_CLASS_PRIMARY_TOOLBAR);
+		this.toolbar_sidebar.set_style (Gtk.ToolbarStyle.ICONS);
+		this.toolbar_sidebar.set_icon_size (Gtk.IconSize.SMALL_TOOLBAR);
 
 		// Add buttons
 		this.toolbar_sidebar.add (toolitem_undo);
+		this.toolbar_sidebar.add (toolitem_redo);
 		this.toolbar_sidebar.add (new Gtk.SeparatorToolItem());
 		this.toolbar_sidebar.add (toolitem_select);
 		this.toolbar_sidebar.add (toolitem_zoom);
@@ -397,7 +403,7 @@ public class MainWindow : Gtk.Window {
 		var scrolled_maptree = new Gtk.ScrolledWindow (null, null);
 
 		this.drawingarea_palette = new TilePaletteDrawingArea ();
-		this.drawingarea_maprender = new MapDrawingArea (scrolled_maprender, this.drawingarea_palette);
+		this.drawingarea_maprender = new MapDrawingArea (controller, scrolled_maprender, this.drawingarea_palette);
 		this.paned_palette_maptree = new Gtk.Paned (Gtk.Orientation.VERTICAL);
 		this.statusbar_tooltip = new Gtk.Statusbar ();
 		this.statusbar_current_frame = new Gtk.Statusbar ();
@@ -486,6 +492,7 @@ public class MainWindow : Gtk.Window {
 		this.actiongroup_project_open.add_action (action_fullscreen);
 		this.actiongroup_project_open.add_action (action_show_title);
 		this.actiongroup_project_open.add_action (action_undo);
+		this.actiongroup_project_open.add_action (action_redo);
 		this.actiongroup_project_open.add_action (action_select);
 		this.actiongroup_project_open.add_action (action_zoom);
 		this.actiongroup_project_open.add_action (action_pen);
@@ -514,6 +521,7 @@ public class MainWindow : Gtk.Window {
 		// Open/Close project
 		action_open.activate.connect (this.controller.open_project);
 		action_close.activate.connect (this.controller.close_project);
+		action_new.activate.connect (this.controller.create_project);
 
 		// Show database dialog
 		action_database.activate.connect (this.controller.show_database);
@@ -527,6 +535,26 @@ public class MainWindow : Gtk.Window {
 
 		// Map selected
 		this.treeview_maptree.map_selected.connect (this.controller.on_map_selected);
+		this.treeview_maptree.map_properties.connect (this.controller.on_map_properties);
+		this.treeview_maptree.map_new.connect (this.controller.on_map_new);
+		this.treeview_maptree.map_delete.connect (this.controller.on_map_delete);
+		this.treeview_maptree.map_shift.connect (this.controller.on_map_shift);
+
+		toolitem_undo.clicked.connect (() => {
+			var stack = controller.getMapChanges ();
+			if (stack != null) {
+				stack.undo ();
+				controller.reload_map ();
+			}
+		});
+
+		toolitem_redo.clicked.connect (() => {
+			var stack = controller.getMapChanges ();
+			if (stack != null) {
+				stack.redo ();
+				controller.reload_map ();
+			}
+		});
 
 		// Eraser menu callbacks
 		toolitem_menu_eraser.clicked.connect (menu_eraser_popup);
@@ -573,6 +601,14 @@ public class MainWindow : Gtk.Window {
 		// Close application
 		action_quit.activate.connect (on_close);
 		this.destroy.connect (on_close);
+	}
+
+	public void set_undo_available(bool status) {
+		this.toolitem_undo.set_sensitive (status);
+	}
+
+	public void set_redo_available(bool status) {
+		this.toolitem_redo.set_sensitive (status);
 	}
 
 	/**
@@ -688,7 +724,7 @@ public class MainWindow : Gtk.Window {
 	/**
 	 * Shows the view and makes small fixes to the layout.
 	 */
-	public void show_all () {
+	public new void show_all () {
 		base.show_all ();
 
 		// Sets the paned_palette_maptree handle position to middle

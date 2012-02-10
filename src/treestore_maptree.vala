@@ -1,7 +1,7 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
  * treestore_maptree.vala
- * Copyright (C) EasyRPG Project 2011
+ * Copyright (C) EasyRPG Project 2011-2012
  *
  * EasyRPG is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -31,7 +31,12 @@ public class MaptreeTreeStore : Gtk.TreeStore, Gtk.TreeDragSource, Gtk.TreeDragD
 	 * The path of the last dragged row.
 	 */
 	private string dragged_row_path;
-	
+
+	/**
+	 * Send for Drag & Drop events
+	 */
+	public signal void map_path_updated (int map_id, Gtk.TreePath iter);
+
 	/**
 	 * Instantiates the Maptree TreeStore.
 	 */
@@ -105,9 +110,51 @@ public class MaptreeTreeStore : Gtk.TreeStore, Gtk.TreeDragSource, Gtk.TreeDragD
 			// Reselect the dragged map
 			this.maptree_treeview.set_cursor (dest, this.maptree_treeview.get_column (1), false); 
 
+			// inform controller about the changes
+			Gtk.TreeIter iter;
+			this.get_iter (out iter, dest);
+			map_position_update (iter);
+
 			return true;
 		}
 
 		return false;
+	}
+
+	/**
+	 * Send map_path_updated for iter and all of its children
+	 */
+	private void map_position_update (Gtk.TreeIter iter) {
+		Gtk.TreeIter child;
+		Value map_id;
+
+		/* recursively remove all children */
+		for(int i=0; i < this.iter_n_children (iter); i++)
+			if(this.iter_nth_child (out child, iter, i))
+				this.map_position_update(child);
+
+		this.get_value (iter, 0, out map_id);
+		map_path_updated (map_id.get_int (), this.get_path (iter));
+	}
+
+	/**
+	 * Removes Iter and all its children from the tree
+	 * @return list of removed map ids
+	 */
+	public List<int> remove_all (Gtk.TreeIter iter) {
+		var result = new List<int>();
+		Gtk.TreeIter child;
+		Value v;
+
+		/* recursively remove all children */
+		while(this.iter_children(out child, iter))
+			result.concat(this.remove_all(child));
+
+		/* remove ourselves */
+		this.get_value (iter, 0, out v);
+		result.append(v.get_int());
+		this.remove(iter);
+
+		return result;
 	}
 }

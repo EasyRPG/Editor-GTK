@@ -1,7 +1,7 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * model.vala
- * Copyright (C) EasyRPG Project 2011
+ * action.vala
+ * Copyright (C) EasyRPG Project 2012
  *
  * EasyRPG is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -17,15 +17,24 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * The parent class for models.
- */
-public abstract class Model {
-
+namespace UndoManager {
 	/**
-	 * Every model must have its load data method, with a XmlNode data parameter.
-	 * 
-	 * @param data An XmlNode that represents some XML data. 
+	 * The parent class for Actions used by the History for undo/redo.
 	 */
-	public abstract void load_data (XmlNode? data);
+	public abstract class Action {
+
+		/**
+		 * Every action must have an apply method
+		 * 
+		 * @param map The map object being changed
+		 */
+		public abstract void apply (Map map);
+
+		/**
+		 * Every action must have an unapply method
+		 * 
+		 * @param map The map object being changed
+		 */
+		public abstract void unapply (Map map);
+	}
 }

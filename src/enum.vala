@@ -95,4 +95,35 @@ public enum DrawingTool {
 				error("Unknown drawing tool: %d", this);
 		}
 	}
+
+	public bool needsDrawingLayer () {
+		if (this == SELECT || this == ZOOM)
+			return false;
+		else
+			return true;
+	}
+
+	public bool isEraser () {
+		switch (this) {
+			case ERASER_NORMAL:
+			case ERASER_RECTANGLE:
+			case ERASER_CIRCLE:
+			case ERASER_FILL:
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	public static DrawingTool[] all () {
+		return { SELECT, ZOOM, PEN, ERASER_NORMAL, ERASER_RECTANGLE, ERASER_CIRCLE, ERASER_FILL, RECTANGLE, CIRCLE, FILL };
+	}
+}
+
+public enum Direction {
+	NONE,
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT;
 }

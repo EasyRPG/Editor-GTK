@@ -1,7 +1,7 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
  * controller_main.vala
- * Copyright (C) EasyRPG Project 2011
+ * Copyright (C) EasyRPG Project 2011-2012
  *
  * EasyRPG is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -37,18 +37,40 @@ public class MainController : Controller {
 	private string project_filename;
 	private XmlNode project_data;
 	private XmlNode game_data;
+	private string[] tilesets;
 	private GLib.HashTable<int, Map> maps;
+	private GLib.HashTable<int, UndoManager.Stack> map_changes;
 	private GLib.HashTable<int, Gtk.TreeRowReference> map_references;
 	private int current_map;
 
 	/**
 	 * Instantiantes the MainWindow view.
 	 */
-	public MainController () {
+	public MainController (string? project_file = null) {
 		Gtk.IconTheme.get_default().append_search_path ("../data/icons");
+		Gtk.IconTheme.get_default().append_search_path ("data/icons");
+
 		this.main_view = new MainWindow (this);
 		this.maps = new GLib.HashTable<int, Map> (null, null);
 		this.map_references = new GLib.HashTable<int, Gtk.TreeRowReference> (null, null);
+		this.map_changes = new GLib.HashTable<int, UndoManager.Stack> (null, null);
+
+		/* update map references for drag and drop */
+		var maptree_model = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
+		maptree_model.map_path_updated.connect ( (id, path) => {
+			map_references[id] = new Gtk.TreeRowReference(maptree_model, path);
+		});
+
+		/* update zoom/layer when requested by drawingarea_map */
+		this.main_view.drawingarea_maprender.request_scale.connect ((s) => {
+			this.main_view.set_current_scale (s);
+		});
+		this.main_view.drawingarea_maprender.request_layer.connect ((l) => {
+			this.main_view.set_current_layer (l);
+		});
+
+		if(project_file != null)
+			open_project_from_file (project_file);
 	}
 
 	/**
@@ -59,7 +81,35 @@ public class MainController : Controller {
 	}
 
 	/**
-	 * Opens a project, loads its data and change the status of some widgets. 
+	 * Opens a project from file, loads its data and change the status of some widgets.
+	 */
+	public void open_project_from_file (string project_file) {
+		File file = File.new_for_path (project_file);
+
+		try {
+			this.project_filename = file.get_basename ();
+			this.base_path = file.get_parent ().get_path () + "/";
+
+			// Manages all the XML read stuff
+			this.load_project_data ();
+			this.load_maptree_data ();
+
+			// Enable/disable some widgets
+			this.main_view.set_project_status ("open");
+			updateUndoRedoButtons ();
+			this.main_view.update_statusbar_current_frame();
+		} catch(Error e) {
+			/* Show Error Dialog */
+			var edialog = new Gtk.MessageDialog (this.main_view,
+				Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT,
+				Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, e.message);
+			edialog.run ();
+			edialog.destroy ();
+		}
+	}
+
+	/**
+	 * Opens a project from dialog, loads its data and change the status of some widgets.
 	 */
 	public void open_project () {
 		var open_project_dialog = new Gtk.FileChooserDialog ("Open Project", this.main_view,
@@ -80,33 +130,22 @@ public class MainController : Controller {
 		file_filter.add_pattern ("*.rproject"); // for case-insensitive patterns -> add_custom()
 		open_project_dialog.add_filter (file_filter);
 
-		if (open_project_dialog.run () == Gtk.ResponseType.ACCEPT) {
-			// Get the base_path and project_filename from the selected file
-			string full_path = open_project_dialog.get_filename ();
-			string[] path_tokens = full_path.split ("/");
-			this.project_filename = path_tokens[path_tokens.length - 1];
-			this.base_path = full_path.replace (this.project_filename, "");
+		if (open_project_dialog.run () == Gtk.ResponseType.ACCEPT)
+			open_project_from_file (open_project_dialog.get_filename ());
 
-			// Manages all the XML read stuff
-			this.load_project_data ();
-			this.load_maptree_data ();
-
-			// Enable/disable some widgets
-			this.main_view.set_project_status ("open");
-			this.main_view.update_statusbar_current_frame();
-		}
 		open_project_dialog.destroy ();
 	}
 
 	/**
 	 * Loads XML data from the .rproject and game.xml files.
 	 */
-	private void load_project_data () {
+	private void load_project_data () throws Error {
 		XmlParser parser = new XmlParser ();
 
 		// Load data from the .rproject file
 		parser.parse_file (this.base_path + this.project_filename);
 		this.project_data = parser.get_root ();
+
 //		int current_map = int.parse (this.project_data.get_node_by_name ("current_map").content);
 
 		// If the scale value found in the .rproject file is valid, set it.
@@ -144,38 +183,36 @@ public class MainController : Controller {
 		XmlNode airship_node = this.game_data.get_node_by_name ("airship");
 		this.airship.load_data (airship_node);
 
+		try {
+			var dir = Dir.open(this.base_path + "graphics/tilesets", 0);
+			string entry;
+			while((entry = dir.read_name ()) != null) {
+				this.tilesets += entry;
+			}
+		} catch (FileError e) {
+			if (e is FileError.NOENT)
+				; /* Directory may not exist in new, empty projects. */
+			else
+				error ("Could not open tileset directory: %s", e.message);
+		}
+
+		/* TODO: sort tilesets alphabetically */
+
 		this.current_map = 0;
 	}
 
 	/**
 	 * Loads XML data from the maptree file.
 	 */
-	public void load_maptree_data () {
+	public void load_maptree_data () throws Error {
+		XmlNode maptree;
+
+		string maptreefile = this.base_path + "data/maps/maptree.xml";
 		var maptree_model = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
 		XmlParser parser = new XmlParser ();
 
-		// Load data from the .rproject file
-		parser.parse_file (this.base_path + "data/maps/maptree.xml");
-		XmlNode maptree = parser.get_root ();
-
-		/* FIXME: this lines are for testing XmlWriter, remove after
-		 * the writer is complete
-		 */
-/*
-		var writer = new XmlWriter();
-		print("Test XmlWriter:\n");
-		print("--------Full Tree writing-------\n");
-		writer.set_root(maptree);
-		writer.write_file();
-		writer.save_to_file(this.base_path + "data/maps/maptree2.xml");
-		print("-----Use a subnode as root------\n");
-		writer.set_root((((maptree.children).next).next).next);
-		writer.write_file();
-		writer.save_to_file(this.base_path + "data/maps/maptree3.xml");
-*/	
-
-		// Load "folder" and "map" icons before using them in the maptree treestore
-		var folder_icon = Resources.load_icon_as_pixbuf (Resources.ICON_FOLDER, 16);
+		// Load icons for maptree treestore
+		var folder_icon = Resources.load_icon_as_pixbuf (Gtk.Stock.DIRECTORY, 16);
 		var map_icon = Resources.load_icon_as_pixbuf (Resources.ICON_MAP, 16);
 
 		/*
@@ -193,8 +230,33 @@ public class MainController : Controller {
 		maptree_model.set_value (iter, 2, this.game_title);
 		iter_table.set (depth, iter);
 
+		// We are done if maptree file does not exist (=> new, empty project)
+		if(!FileUtils.test (maptreefile, FileTest.IS_REGULAR))
+			return;
+
+		// Load data from the .rproject file
+		parser.parse_file (maptreefile);
+		maptree = parser.get_root ();
+
+/*
+		// FIXME: this lines are for testing XmlWriter, remove after
+		// the writer is complete
+
+		var writer = new XmlWriter();
+		print("Test XmlWriter:\n");
+		print("--------Full Tree writing-------\n");
+		writer.set_root(maptree);
+		writer.write_file();
+		writer.save_to_file(this.base_path + "data/maps/maptree2.xml");
+		print("-----Use a subnode as root------\n");
+		writer.set_root((((maptree.children).next).next).next);
+		writer.write_file();
+		writer.save_to_file(this.base_path + "data/maps/maptree3.xml");
+*/
+
 		// Append a new row, the next while block will set the data
 		maptree_model.append (out iter, iter);
+
 
 		// Get ready for the first map row
 		XmlNode current_ref = maptree.children;
@@ -267,7 +329,11 @@ public class MainController : Controller {
 				depth--;
 			}
 		}
+
+		/* expand root element */
+		this.main_view.treeview_maptree.expand_to_path (new Gtk.TreePath.from_string ("0"));
 	}
+
 	/**
 	 * Loads XML data from a map file.
 	 *  
@@ -284,12 +350,23 @@ public class MainController : Controller {
 		}
 
 		// Parse the xml file and load map data
-		parser.parse_file (map_filename);
-		XmlNode map_node = parser.get_root ();
+		try {
+			parser.parse_file (map_filename);
+			XmlNode map_node = parser.get_root ();
 
-		var map = new Map ();
-		map.load_data (map_node);
-		this.maps.set (map_id, map);
+			var map = new Map ();
+			map.load_data (map_node);
+			this.maps.set (map_id, map);
+			this.map_changes.set (map_id, new UndoManager.Stack (map));
+
+			/* bind undo/redo changed signal handlers */
+			this.map_changes.get (map_id).can_undo_changed.connect (updateUndoRedoButtons);
+			this.map_changes.get (map_id).can_redo_changed.connect (updateUndoRedoButtons);
+		} catch (Error e) {
+			warning ("map %d could not be loaded: %s", map_id, e.message);
+			/* TODO: show dialog? */
+			return false;
+		}
 
 		return true;
 	}
@@ -313,6 +390,7 @@ public class MainController : Controller {
 
 		// Empty the hashtables
 		this.maps.remove_all ();
+		this.map_changes.remove_all ();
 		this.map_references.remove_all ();
 
 		// Empty the maptree TreeView
@@ -333,6 +411,64 @@ public class MainController : Controller {
 		this.main_view.set_fullscreen_status (false);
 		this.main_view.set_show_title_status (false);
 		this.main_view.update_statusbar_current_frame();
+	}
+
+	/**
+	 * Opens a dialog to create a new project and opens this project afterwards
+	 */
+	public void create_project () {
+		var dialog = new CreateProjectDialog ();
+		bool exit = false;
+
+		while (!exit) {
+			int result = dialog.run ();
+
+			if(result == Gtk.ResponseType.OK) {
+				try {
+					/* Verify that project_path is a directory */
+					var path = File.new_for_path (dialog.project_path);
+					if (path.query_file_type (FileQueryInfoFlags.NONE) != FileType.DIRECTORY)
+						throw new FileError.NOTDIR ("Project path is not a directory!");
+
+					/* Verify that project_path is empty */
+					var dir = Dir.open (dialog.project_path);
+					if (dir.read_name () != null)
+						throw new FileError.FAILED ("Initial project directory is not empty!");
+
+					/* Create project description file */
+					var unix_name = path.get_basename ();
+					var rproject_path = path.get_child ("%s.rproject".printf (unix_name));
+					var rproject_data = Resources.RPROJECT_DATA.printf(0, 0, 0);
+					rproject_path.replace_contents (rproject_data, rproject_data.length, null, false, FileCreateFlags.NONE, null, null);
+
+					/* Create data/ */
+					var data_path = path.get_child ("data");
+					data_path.make_directory ();
+
+					/* Create data/game.xml */
+					var game_data = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n<game>\n\t<title>%s</title>\n</game>".printf(dialog.project_name);
+					var game_path = data_path.get_child ("game.xml");
+					game_path.replace_contents (game_data, game_data.length, null, false, FileCreateFlags.NONE, null, null);
+
+					/* Load the new project */
+					open_project_from_file (rproject_path.get_path ());
+
+					/* Project created */
+					exit = true;
+				} catch(Error e) {
+					/* Show Error Dialog */
+					var edialog = new Gtk.MessageDialog (dialog,
+						Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT,
+						Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, e.message);
+					edialog.run ();
+					edialog.destroy ();
+				}
+			} else {
+				exit = true;
+			}
+		}
+
+		dialog.destroy ();
 	}
 
 	/**
@@ -384,6 +520,10 @@ public class MainController : Controller {
 			return;
 		}
 
+		load_map (map_id);
+	}
+
+	private void load_map (int map_id) {
 		Map map = this.maps.get (map_id);
 
 		this.current_map = map_id;
@@ -398,6 +538,161 @@ public class MainController : Controller {
 		maprender.load_map_scheme (map.lower_layer, map.upper_layer);
 		maprender.set_layer (this.main_view.get_current_layer ());
 		maprender.set_scale (this.main_view.get_current_scale ());
+
+		updateUndoRedoButtons ();
+	}
+
+	/**
+	 * Manages the reactions to the map properties.
+	 */
+	public void on_map_properties (int map_id) {
+		Map map = this.maps.get (map_id);
+
+		var dialog = new MapPropertiesDialog (this, map);
+		int result = dialog.run ();
+
+		if (result == Gtk.ResponseType.OK) {
+			int width, height;
+
+			/* get information about map size change */
+			dialog.getSizeChange(out width, out height);
+
+			/* update map model */
+			dialog.updateModel ();
+
+			/* update name in maptree */
+			var maptree_model = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
+			Gtk.TreeIter iter;
+			maptree_model.get_iter (out iter, this.map_references.get (map_id).get_path ());
+			maptree_model.set_value (iter, 2, map.name);
+
+			if (width != 0 || height != 0) {
+				/* Reset UndoManager (TODO: make map size changes undoable) */
+				this.map_changes.set (map_id, new UndoManager.Stack (map));
+				updateUndoRedoButtons ();
+			}
+
+			/* reload map (size or tileset may have changed) */
+			reload_map ();
+		}
+
+		dialog.destroy ();
+	}
+
+	/**
+	 * Manages the reactions to the map creation.
+	 */
+	public void on_map_new (int parent_map_id) {
+		/* generate new map id */
+		int new_map_id = 1;
+		foreach (int key in maps.get_keys ()) {
+			if (key >= new_map_id)
+				new_map_id = key+1;
+		}
+
+		/* create new map model */
+		Map map = new Map("Map%d".printf(new_map_id));
+
+		var dialog = new MapPropertiesDialog (this, map);
+		int result = dialog.run ();
+
+		if (result == Gtk.ResponseType.OK) {
+			/* load values from dialog */
+			dialog.updateModel ();
+
+			/* add map to list */
+			this.maps.set (new_map_id, map);
+			this.map_changes.set (new_map_id, new UndoManager.Stack (map));
+
+			/* bind undo/redo changed signal handlers */
+			this.map_changes.get (new_map_id).can_undo_changed.connect (updateUndoRedoButtons);
+			this.map_changes.get (new_map_id).can_redo_changed.connect (updateUndoRedoButtons);
+
+			/* get maptree model */
+			var maptree_model = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
+			var map_icon = Resources.load_icon_as_pixbuf (Resources.ICON_MAP, 16);
+
+			/* get correct position */
+			Gtk.TreeIter iter;
+			Gtk.TreeIter parent_iter;
+			if(parent_map_id > 0)
+				maptree_model.get_iter (out parent_iter, this.map_references.get (parent_map_id).get_path ());
+			else
+				maptree_model.get_iter_first (out parent_iter);
+
+			/* append new map to parent */
+			maptree_model.insert_before (out iter, parent_iter, null);
+
+			/* set correct data */
+			maptree_model.set_value (iter, 0, new_map_id);
+			maptree_model.set_value (iter, 1, map_icon);
+			maptree_model.set_value (iter, 2, map.name);
+
+			/* save reference */
+			var path = new Gtk.TreePath.from_string (maptree_model.get_string_from_iter (iter));
+			var row_reference = new Gtk.TreeRowReference (maptree_model, path);
+			this.map_references.set (new_map_id, row_reference);
+		}
+
+		dialog.destroy ();
+	}
+
+	/**
+	 * Manages the reactions to the map deletion.
+	 */
+	public void on_map_delete (int map_id) {
+		Map map = this.maps.get (map_id);
+
+		var dialog = new Gtk.Dialog.with_buttons(
+			"Delete Map?", this.main_view,
+			Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
+			Gtk.Stock.CANCEL, Gtk.ResponseType.CANCEL,
+			Gtk.Stock.OK, Gtk.ResponseType.OK,
+			null
+		);
+		var content_area = dialog.get_content_area () as Gtk.Box;
+		content_area.pack_start (new Gtk.Label ("Map \"%s\" will be deleted. Proceed?".printf(map.name)), false);
+		content_area.show_all ();
+
+		int result = dialog.run ();
+		if (result == Gtk.ResponseType.OK) {
+			/* get maptree model and find correct entry */
+			var maptree_model = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
+			Gtk.TreeIter iter;
+			maptree_model.get_iter (out iter, this.map_references.get (map_id).get_path ());
+
+			/* remove node including all children */
+			foreach (int removed_map_id in maptree_model.remove_all (iter)) {
+				this.map_references.remove (removed_map_id);
+				this.maps.remove (removed_map_id);
+				this.map_changes.remove (removed_map_id);
+			}
+		}
+
+		dialog.destroy ();
+	}
+
+	/**
+	 * Manages the reactions to the map shift.
+	 */
+	public void on_map_shift (int map_id) {
+		var map = this.maps.get (map_id);
+		var dialog = new MapShiftDialog ();
+
+		int result = dialog.run ();
+		if (result == Gtk.ResponseType.OK) {
+			/* shift map */
+			map.shift (dialog.dir, dialog.amount);
+			
+			/* Reset UndoManager (TODO: make map shift undoable) */
+			this.map_changes.set (map_id, new UndoManager.Stack (map));
+			updateUndoRedoButtons ();
+
+			/* rerender map */
+			load_map (map_id);
+		}
+
+		dialog.destroy ();
 	}
 
 	/**
@@ -421,13 +716,43 @@ public class MainController : Controller {
 		about_dialog.set_program_name (Resources.APP_NAME);
 		about_dialog.set_comments ("A role playing game editor");
 		about_dialog.set_website (Resources.APP_WEBSITE);
-		about_dialog.set_copyright ("© EasyRPG Project 2011");
+		about_dialog.set_copyright ("© EasyRPG Project 2011-2012");
 		about_dialog.set_authors (Resources.APP_AUTHORS);
 		about_dialog.set_artists (Resources.APP_ARTISTS);
 		about_dialog.set_logo (Resources.load_icon_as_pixbuf ("easyrpg", 48));
 
 		about_dialog.run ();
 		about_dialog.destroy ();
+	}
+
+	public string[] getTilesets () {
+		return this.tilesets;
+	}
+
+	public unowned Map getMap () {
+		return this.maps.get (current_map);
+	}
+
+	public unowned UndoManager.Stack getMapChanges () {
+		return this.map_changes.get (current_map);
+	}
+
+	private void updateUndoRedoButtons () {
+		bool can_undo = false, can_redo = false;
+
+		if (current_map != 0) {
+			can_undo = this.map_changes.get (current_map).can_undo ();
+			can_redo = this.map_changes.get (current_map).can_redo ();
+		}
+
+		this.main_view.set_undo_available (can_undo);
+
+		this.main_view.set_redo_available (can_redo);
+	}
+
+	public void reload_map () {
+		if (current_map != 0)
+			load_map (current_map);
 	}
 }
 

@@ -229,11 +229,20 @@ public class Map : Model {
 	public int save_time {get; set;}
 
 	/**
+	 * Creates a new map model
+	 */
+	public Map (string name="") {
+		this.lower_layer = new int[this.height, this.width];
+		this.upper_layer = new int[this.height, this.width];
+		this.name = name;
+	}
+
+	/**
 	 * Loads the map data from an XmlNode object.
 	 * 
 	 * @param data An XmlNode that contains the map data.
 	 */
-	public override void load_data (XmlNode data) {
+	public override void load_data (XmlNode? data) {
 		string name = "";
 		int width = 0;
 		int height = 0;
@@ -260,6 +269,11 @@ public class Map : Model {
 		string[] upper_layer_string = {};
 		int enemy_encounter_steps = 0;
 		int save_time = 0;
+
+		if(data == null) {
+			/* TODO: handle this better */
+			error ("broken map!");
+		}
 
 		XmlNode node = data.children;
 		while (node != null) {
@@ -572,6 +586,96 @@ public class Map : Model {
 		this.save_time = (save_time < 0) ? 0 : save_time;
 	}
 
+	public void set_size(int width, int height) requires (width > 1 && width < 500) requires (height > 1 && height < 500) {
+		/* no change needed */
+		if(this.width == width && this.height == height)
+			return;
+
+		/* new layer */
+		var lower_layer = new int[height, width];
+		var upper_layer = new int[height, width];
+
+		/* get bounding box for map copy */
+		var small_width  = this.width > width ? width : this.width;
+		var small_height = this.height > height ? height : this.height;
+
+		/* copy old map data */
+		for (int y = 0; y < small_height; y++) {
+			for (int x = 0; x < small_width; x++) {
+				lower_layer[y, x] = this.lower_layer[y, x];
+				upper_layer[y, x] = this.upper_layer[y, x];
+			}
+		}
+
+		/* set new size */
+		this.width = width;
+		this.height = height;
+
+		/* set new map data */
+		this.lower_layer = lower_layer;
+		this.upper_layer = upper_layer;
+	}
+
+	public void shift(Direction dir, int amount) {
+		switch (dir) {
+			case Direction.RIGHT:
+				for (int y = 0; y < this.height; y++) {
+					for (int x = this.width-1; x >= 0; x--) {
+						if (x - amount >= 0) {
+							this.lower_layer[y,x] = this.lower_layer[y,x-amount];
+							this.upper_layer[y,x] = this.upper_layer[y,x-amount];
+						} else {
+							this.lower_layer[y,x] = 0;
+							this.upper_layer[y,x] = 0;
+						}
+					}
+				}
+				break;
+			case Direction.LEFT:
+				for (int y = 0; y < this.height; y++) {
+					for (int x = 0; x < this.width; x++) {
+						if (x + amount < this.width) {
+							this.lower_layer[y,x] = this.lower_layer[y,x+amount];
+							this.upper_layer[y,x] = this.upper_layer[y,x+amount];
+						} else {
+							this.lower_layer[y,x] = 0;
+							this.upper_layer[y,x] = 0;
+						}
+					}
+				}
+				break;
+			case Direction.UP:
+				for (int y = 0; y < this.height; y++) {
+					for (int x = 0; x < this.width; x++) {
+						if (y + amount < this.height) {
+							this.lower_layer[y,x] = this.lower_layer[y+amount,x];
+							this.upper_layer[y,x] = this.upper_layer[y+amount,x];
+						} else {
+							this.lower_layer[y,x] = 0;
+							this.upper_layer[y,x] = 0;
+						}
+					}
+				}
+				break;
+			case Direction.DOWN:
+				for (int y = this.height-1; y >= 0; y--) {
+					for (int x = 0; x < this.width; x++) {
+						if (y - amount >= 0) {
+							this.lower_layer[y,x] = this.lower_layer[y-amount,x];
+							this.upper_layer[y,x] = this.upper_layer[y-amount,x];
+						} else {
+							this.lower_layer[y,x] = 0;
+							this.upper_layer[y,x] = 0;
+						}
+					}
+				}
+				break;
+			default:
+				warning ("Map Shift: Direction %s not supported!", dir.to_string());
+				break;
+		}
+	}
+
 	/**
 	 * Prints the map data.
 	 */
@@ -609,6 +713,15 @@ public class Map : Model {
 				print ("\n");
 			}
 			print ("%i ", lower_layer[i / lower_layer.length[1], i % lower_layer.length[1]]);
+			i++;
+		}
+		i = 0;
+		print ("\nUpper layer:");
+		while (i < upper_layer.length[0] * upper_layer.length[1]) {
+			if (i % upper_layer.length[1] == 0) {
+				print ("\n");
+			}
+			print ("%i ", upper_layer[i / upper_layer.length[1], i % upper_layer.length[1]]);
 			i++;
 		}
 		print ("\nEnemy encounter steps: %i\n", this.enemy_encounter_steps);

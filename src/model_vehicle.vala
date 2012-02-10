@@ -42,27 +42,29 @@ public class Vehicle : Model {
 	 * 
 	 * @param data An XmlNode that contains the vehicle data.
 	 */
-	public override void load_data (XmlNode data) {
+	public override void load_data (XmlNode? data) {
 		int map_id = 0;
 		int x = 0;
 		int y = 0;
 		
-		XmlNode node = data.children;
-		while (node != null) {
-			switch (node.name) {
-				case "map":
-					map_id = int.parse (node.content);
-					break;
-				case "x_coordinate":
-					x = int.parse (node.content);
-					break;
-				case "y_coordinate":
-					y = int.parse (node.content);
-					break;
-				default:
-					break;
+		if (data != null) {
+			XmlNode node = data.children;
+			while (node != null) {
+				switch (node.name) {
+					case "map":
+						map_id = int.parse (node.content);
+						break;
+					case "x_coordinate":
+						x = int.parse (node.content);
+						break;
+					case "y_coordinate":
+						y = int.parse (node.content);
+						break;
+					default:
+						break;
+				}
+				node = node.next;
 			}
-			node = node.next;
 		}
 
 		// Before this, there would be some value/type checking

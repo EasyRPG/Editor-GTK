@@ -1,7 +1,7 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
  * drawingarea_tile_palette.vala
- * Copyright (C) EasyRPG Project 2011
+ * Copyright (C) EasyRPG Project 2011-2012
  *
  * EasyRPG is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -26,10 +26,49 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 	private GLib.HashTable<int, Cairo.ImageSurface> autotiles;
 	private LayerType current_layer;
 
+	private Rect selected = Rect(0,0,0,0);
+
+	/**
+	 * Returns the rectangle of selected tiles
+	 */
+	public Rect getSelected() {
+		return selected;
+	}
+
+	/**
+	 * Returns the rectangle of selected tiles prepared
+	 * for Drawing to Surfaces.
+	 */
+	public Rect getSelectedArea (int tile_size) {
+		int x = selected.x * tile_size;
+		int y = selected.y * tile_size;
+		int w = selected.width * tile_size;
+		int h = selected.height * tile_size;
+
+		if(w < 0) {
+			w = -w;
+			x -= w;
+		}
+
+		if(h < 0) {
+			h *= -1;
+			y -= h;
+		}
+
+		w+=tile_size;
+		h+=tile_size;
+
+		return Rect(x, y, w, h);
+	}
+
 	/**
 	 * Builds the tile palette DrawingArea.
 	 */
 	public TilePaletteDrawingArea () {
+		this.add_events(
+			Gdk.EventMask.BUTTON_PRESS_MASK |
+			Gdk.EventMask.BUTTON1_MOTION_MASK
+		);
 		this.set_size_request (192, -1);
 		this.autotiles = new GLib.HashTable<int, Cairo.ImageSurface> (null, null);
 	}
@@ -56,6 +95,9 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 		this.load_upper_tiles (surface_tileset);
 
 		this.draw.connect (on_draw);
+
+		this.button_press_event.connect (on_button_press);
+		this.motion_notify_event.connect (on_button_motion);
 	}
 
 	/**
@@ -272,6 +314,29 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 		// Redraw the DrawingArea and don't react anymore to the draw signal	
 		this.queue_draw ();
 		this.draw.disconnect (on_draw);
+
+		// do not react anymore to the mouse signals
+		this.button_press_event.disconnect (on_button_press);
+		this.motion_notify_event.disconnect (on_button_motion);
+	}
+
+	public bool on_button_press (Gdk.EventButton event) {
+		selected.set_values(((int) event.x)/32, ((int) event.y)/32, 0, 0);
+		this.queue_draw();
+		return true;
+	}
+
+	public bool on_button_motion (Gdk.EventMotion event) {
+		int width  = ((int) event.x)/32 - selected.x;
+		int height = ((int) event.y)/32 - selected.y;
+
+		if(selected.width != width || selected.height != height) {
+			selected.width = width;
+			selected.height = height;
+			this.queue_draw();
+		}
+
+		return true;
 	}
 
 	/**
@@ -299,6 +364,20 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 		ctx.get_source ().set_filter (Cairo.Filter.FAST);
 		ctx.paint ();
 
+		// Mark selected tiles
+		ctx.set_source_rgb (1.0,1.0,1.0);
+		ctx.set_line_width (1.0);
+		Rect s = getSelectedArea (16);
+		ctx.rectangle ((double) s.x, (double) s.y, (double) s.width, (double) s.height);
+		ctx.stroke ();
+
 		return true;
+	}
+
+	/**
+	 * Returns tile id for a position in the tileset
+	 */
+	public static int position_to_id (int x, int y) {
+		return y * 6 + x + 1;
 	}
 }
