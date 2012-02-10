@@ -24,4 +24,11 @@ namespace Utils {
 
 		return clean_content;
 	}
+
+	public bool is_in_range (int x, int a, int b) {
+		if (a < b)
+			return a <= x && x <= b;
+		else
+			return a >= x && x >= b;
+	}
 }

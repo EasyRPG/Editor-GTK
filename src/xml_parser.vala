@@ -64,23 +64,18 @@ public class XmlParser {
 	 * 
 	 * @param path The path to the XML file.
 	 */
-	public void parse_file (string path) {
+	public void parse_file (string path) throws Error {
 		this.root = null;
 
-		try {
-//			GLib.File file = GLib.File.new_for_path (path);
+		//GLib.File file = GLib.File.new_for_path (path);
 
-			string file_content;
+		string file_content;
 
-			if (GLib.FileUtils.get_contents (path, out file_content)) {
-				file_content = Utils.clean_file_content(file_content);
+		if (GLib.FileUtils.get_contents (path, out file_content)) {
+			file_content = Utils.clean_file_content(file_content);
 
-				this.context.parse (file_content, -1);
-			}
+			this.context.parse (file_content, -1);
 		}
-		catch (GLib.Error e) {
-			stderr.printf ("File '%s' not found", path);
-		}	
 	}
 
 	/*
