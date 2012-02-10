@@ -18,7 +18,7 @@
  */
 
 /**
- * Represents a vehicle object in the editor. 
+ * Represents a vehicle object in the editor.
  */
 public class Vehicle : Model {
 	/*
@@ -38,16 +38,22 @@ public class Vehicle : Model {
 	public int y {get; set; default = 0;}
 
 	/**
+	 * The vehicle type
+	 */
+	private string type;
+
+	/**
 	 * Loads the vehicle data from an XmlNode object.
-	 * 
+	 *
 	 * @param data An XmlNode that contains the vehicle data.
 	 */
 	public override void load_data (XmlNode? data) {
 		int map_id = 0;
 		int x = 0;
 		int y = 0;
-		
+
 		if (data != null) {
+			type = data.name;
 			XmlNode node = data.children;
 			while (node != null) {
 				switch (node.name) {
@@ -71,5 +77,27 @@ public class Vehicle : Model {
 		this.map_id = map_id;
 		this.x = x;
 		this.y = y;
+	}
+
+	/**
+	 * Saves the vehicle data to an XmlNode object.
+	 *
+	 * @param data An XmlNode that contains the vehicle data.
+	 */
+	public override void save_data (out XmlNode data) {
+		XmlNode node;
+		data = new XmlNode(this.type);
+
+		node = new XmlNode("map");
+		node.content = this.map_id.to_string ();
+		data.add_child(node);
+
+		node = new XmlNode("x_coordinate");
+		node.content = this.x.to_string ();
+		data.add_child(node);
+
+		node = new XmlNode("y_coordinate");
+		node.content = this.y.to_string ();
+		data.add_child(node);
 	}
 }

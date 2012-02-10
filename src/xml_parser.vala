@@ -58,10 +58,10 @@ public class XmlParser {
 			null	// User data destroy notifier
 		);
 	}
-	
+
 	/**
 	 * Converts the XML file to a hierarchically organized list of XmlNodes.
-	 * 
+	 *
 	 * @param path The path to the XML file.
 	 */
 	public void parse_file (string path) throws Error {
@@ -80,7 +80,7 @@ public class XmlParser {
 
 	/*
 	 * This method is called each time the parser finds an opening tag.
-	 * 
+	 *
 	 * The parser defines some parameters containing the information related to the tag.
 	 */
 	private void opening_tag_callback (GLib.MarkupParseContext ctx, string tag_name,
@@ -112,8 +112,8 @@ public class XmlParser {
 		else {
 			XmlNode node = new XmlNode ();
 			node.name = tag_name;
-			node.attr_names = attr_names;
-			node.attr_values = attr_values;
+			for(int i = 0; i < attr_names.length ; i++)
+				node.attributes[attr_names[i]] = attr_values[i];
 			node.parent = this.current_ref;
 
 			this.current_ref.add_child (node);
@@ -125,7 +125,7 @@ public class XmlParser {
 
 	/*
 	 * This method is called each time the parser finds a closing tag.
-	 * 
+	 *
 	 * The parser defines some parameters containing the information related to the tag.
 	 */
 	private void closing_tag_callback (GLib.MarkupParseContext ctx, string tag_name)

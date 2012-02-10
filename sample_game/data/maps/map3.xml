@@ -16,11 +16,11 @@
 	</panorama>
 	<bgm>
 		<type>1</type>
-		<filename></filename>
+		<filename />
 	</bgm>
 	<backdrop>
 		<type>1</type>
-		<filename></filename>
+		<filename />
 	</backdrop>
 	<teleport>
 		<type>1</type>
