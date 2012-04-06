@@ -593,7 +593,11 @@ public class MainController : Controller {
 					var unix_name = path.get_basename ();
 					var rproject_path = path.get_child ("%s.rproject".printf (unix_name));
 					var rproject_data = Resources.RPROJECT_DATA.printf(0, 0, 0);
+					#if VALA_0_16
+					rproject_path.replace_contents (rproject_data.data, null, false, FileCreateFlags.NONE, null, null);
+					#else
 					rproject_path.replace_contents (rproject_data, rproject_data.length, null, false, FileCreateFlags.NONE, null, null);
+					#endif
 
 					/* Create data/ */
 					var data_path = path.get_child ("data");
@@ -602,7 +606,11 @@ public class MainController : Controller {
 					/* Create data/game.xml */
 					var game_data = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n<game>\n\t<title>%s</title>\n</game>".printf(dialog.project_name);
 					var game_path = data_path.get_child ("game.xml");
+					#if VALA_0_16
+					game_path.replace_contents (game_data.data, null, false, FileCreateFlags.NONE, null, null);
+					#else
 					game_path.replace_contents (game_data, game_data.length, null, false, FileCreateFlags.NONE, null, null);
+					#endif
 
 					/* Load the new project */
 					open_project_from_file (rproject_path.get_path ());
