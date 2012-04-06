@@ -1,0 +1,44 @@
+EasyRPG Editor
+==============
+
+EasyRPG Editor is a role playing game editor tool to create games with ease.
+
+EasyRPG Editor is part of the EasyRPG Project. More information is available
+at the project website:
+
+  https://easy-rpg.org/
+
+
+Documentation
+-------------
+
+Documentation is available at the documentation wiki:
+
+  https://easy-rpg.org/wiki/
+
+
+Requirements
+------------
+
+EasyRPG Editor is written in Vala and uses the GTK+ libraries.
+Current operating system supporting GTK+ are GNU/Linux and Unix, Windows and
+Mac OS X.
+
+See the documentation for further information.
+
+
+Development
+-----------
+
+EasyRPG Editor development is hosted by GitHub.
+Source code is available in Git repositories.
+
+  https://github.com/EasyRPG/editor
+
+See the documentation for further development information.
+
+
+License
+-------
+
+EasyRPG Editor is free software. See the file COPYING for copying conditions.
