@@ -27,6 +27,6 @@ install-sh
 missing
 src/.deps/
 src/Makefile.in
-src/editor
-src/editor_vala.stamp*
+src/easyrpg-editor
+src/easyrpg_editor_vala.stamp*
 stamp-h1

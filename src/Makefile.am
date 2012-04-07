@@ -8,18 +8,19 @@ AM_CPPFLAGS = \
 	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
 	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
 	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
-	$(EDITOR_CFLAGS)
+	$(EASYRPG_EDITOR_CFLAGS)
 
 AM_CFLAGS =\
 	 -Wall\
+	 -Wno-unused-but-set-variable\
 	 -g
 
 VALAFLAGS =  \
-	--pkg gtk+-3.0 --pkg libxml-2.0 --pkg gio-2.0 --vapidir . --pkg config
+	--pkg gtk+-3.0 --pkg gio-2.0 --vapidir . --pkg config
 
-bin_PROGRAMS = editor
+bin_PROGRAMS = easyrpg-editor
 
-editor_SOURCES = \
+easyrpg_editor_SOURCES = \
 	action_map_edit.vala \
 	action_stack.vala \
 	action.vala \
@@ -56,8 +57,8 @@ editor_SOURCES = \
 	xml_parser.vala \
 	xml_writer.vala
 
-editor_LDFLAGS = \
+easyrpg_editor_LDFLAGS = \
 	-Wl,--export-dynamic
 
-editor_LDADD = $(EDITOR_LIBS)
+easyrpg_editor_LDADD = $(EASYRPG_EDITOR_LIBS)
 
