@@ -12,6 +12,7 @@ cmake_install.cmake
 *.swp
 *.bak
 *~
+*.anjuta
 .anjuta/
 .anjuta_sym_db.db
 Makefile.in
