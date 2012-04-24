@@ -104,7 +104,7 @@ public class MapDrawingArea : Gtk.DrawingArea {
 
 	/**
 	 * Manages the reactions to the scale change.
-	 * 
+	 *
 	 * Updates the DrawingArea size based in the selected scale.
 	 */
 	public void set_scale (Scale scale) {

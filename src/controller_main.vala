@@ -40,7 +40,7 @@ public class MainController : Controller {
 	private string[] tilesets;
 
 	// Maps
-	private int current_map;
+	private int current_map_id;
 	private GLib.HashTable<int, Map> maps;
 	private GLib.HashTable<int, Gtk.TreeRowReference> map_references;
 	private GLib.HashTable<int, UndoManager.Stack> map_changes;
@@ -69,6 +69,13 @@ public class MainController : Controller {
 		if(project_file != null) {
 			this.open_project (project_file);
 		}
+	}
+
+	/**
+	 * Returns the current map id.
+	 */
+	public int get_current_map_id () {
+		return this.current_map_id;
 	}
 
 	/**
@@ -137,6 +144,51 @@ public class MainController : Controller {
 	}
 
 	/**
+	 * Closes the current project and restores the default status of some widgets.
+	 */
+	public void close_project () {
+		// Clear the main data
+		this.game_title = null;
+		this.project_filename = null;
+		this.base_path = null;
+		this.project_data = null;
+		this.game_data = null;
+
+		// Clear the vehicles data
+		this.party = null;
+		this.boat = null;
+		this.ship = null;
+		this.airship = null;
+
+		// Close current map
+		this.close_map ();
+
+		// Empty the hashtables
+		this.maps.remove_all ();
+		this.map_changes.remove_all ();
+		this.map_references.remove_all ();
+
+		// Empty the maptree TreeView
+		this.main_view.treeview_maptree.clear ();
+		this.current_map_id = 0;
+
+		// Clear the tile palette and map DrawingAreas
+		this.main_view.drawingarea_palette.clear ();
+		this.main_view.drawingarea_maprender.clear ();
+
+		// Enable/disable some widgets
+		this.main_view.set_project_status ("closed");
+
+		// Set default values for RadioActions and ToggleActions
+		this.main_view.set_current_layer (LayerType.LOWER);
+		this.main_view.set_current_scale (0);
+		this.main_view.set_current_drawing_tool (DrawingTool.PEN);
+		this.main_view.set_fullscreen_status (false);
+		this.main_view.set_show_title_status (false);
+		this.main_view.update_statusbar_current_frame();
+	}
+
+	/**
 	 * Reloads the project.
 	 */
 	public void reload_project () {
@@ -180,8 +232,8 @@ public class MainController : Controller {
 		parser.parse_file (this.base_path + this.project_filename);
 		this.project_data = parser.get_root ();
 
-//		int current_map = int.parse (this.project_data.get_node_by_name ("current_map").content);
-		this.current_map = 0;
+//		int current_map_id = int.parse (this.project_data.get_node_by_name ("current_map").content);
+		this.current_map_id = 0;
 
 		// If the scale value found in the .rproject file is valid, set it.
 		int current_scale = int.parse (this.project_data.get_node_by_name ("current_scale").content);
@@ -256,7 +308,7 @@ public class MainController : Controller {
 		root.add_child (node);
 
 		node = new XmlNode ("current_map");
-		node.content = this.current_map.to_string ();
+		node.content = this.current_map_id.to_string ();
 		root.add_child (node);
 
 		node = new XmlNode ("current_scale");
@@ -531,48 +583,6 @@ public class MainController : Controller {
 	}
 
 	/**
-	 * Closes the current project and restores the default status of some widgets.
-	 */
-	public void close_project () {
-		// Clear the main data
-		this.game_title = null;
-		this.project_filename = null;
-		this.base_path = null;
-		this.project_data = null;
-		this.game_data = null;
-
-		// Clear the vehicles data
-		this.party = null;
-		this.boat = null;
-		this.ship = null;
-		this.airship = null;
-
-		// Empty the hashtables
-		this.maps.remove_all ();
-		this.map_changes.remove_all ();
-		this.map_references.remove_all ();
-
-		// Empty the maptree TreeView
-		this.main_view.treeview_maptree.clear ();
-		this.current_map = 0;
-
-		// Clear the tile palette and map DrawingAreas
-		this.main_view.drawingarea_palette.clear ();
-		this.main_view.drawingarea_maprender.clear ();
-
-		// Enable/disable some widgets
-		this.main_view.set_project_status ("closed");
-
-		// Set default values for RadioActions and ToggleActions
-		this.main_view.set_current_layer (LayerType.LOWER);
-		this.main_view.set_current_scale (0);
-		this.main_view.set_current_drawing_tool (DrawingTool.PEN);
-		this.main_view.set_fullscreen_status (false);
-		this.main_view.set_show_title_status (false);
-		this.main_view.update_statusbar_current_frame();
-	}
-
-	/**
 	 * Opens a dialog to create a new project and opens this project afterwards
 	 */
 	public void create_project () {
@@ -639,74 +649,75 @@ public class MainController : Controller {
 	}
 
 	/**
-	 * Manages the reactions to the layer change.
-	 */
-	public void on_layer_change () {
-		this.main_view.update_statusbar_current_frame();
-
-		// Don't react if the current map is map 0 (game_title)
-		if (this.current_map == 0) {
-			return;
-		}
-
-		// Get the current layer
-		var layer = (LayerType) this.main_view.get_current_layer ();
-
-		// Update the palette
-		var palette = this.main_view.drawingarea_palette;
-		palette.set_layer (layer);
-
-		// Update the maprender
-		var maprender = this.main_view.drawingarea_maprender;
-		maprender.set_layer (layer);
-	}
-
-	/**
-	 * Manages the reactions to the scale change.
-	 */
-	public void on_scale_change () {
-		// Don't react if the current map is map 0 (game_title)
-		if (this.current_map == 0) {
-			return;
-		}
-
-		// Get the current scale
-		var scale = (Scale) this.main_view.get_current_scale ();
-
-		// Update the maprender
-		var maprender = this.main_view.drawingarea_maprender;
-		maprender.set_scale (scale);
-	}
-
-	/**
 	 * Manages the reactions to the map selection.
 	 */
 	public void on_map_selected (int map_id) {
-		// Don't react if the selected map is map 0 (game_title) or the current map
-		if (map_id == 0 || map_id == this.current_map) {
+		// Don't react if the selected map is the current map
+		if (map_id == this.current_map_id) {
 			return;
 		}
 
-		load_map (map_id);
+		this.close_map ();
+		this.open_map (map_id);
 	}
 
-	private void load_map (int map_id) {
+	public void open_map (int map_id) {
+		// If a map is already open, close it first
+		if (this.current_map_id != 0) {
+			this.close_map ();
+		}
+
+		// Don't try to open the map with id 0 (game_title)
+		if (map_id == 0) {
+			return;
+		}
+		
+		// Get the map instance
 		Map map = this.maps.get (map_id);
 
-		this.current_map = map_id;
-
+		// Load the tileset into the palette
 		var palette = this.main_view.drawingarea_palette;
-		palette.clear ();
 		palette.load_tileset (this.base_path + "graphics/tilesets/" + map.tileset);
 		palette.set_layer (this.main_view.get_current_layer ());
 
+		// Load the map scheme into the map render
 		var maprender = this.main_view.drawingarea_maprender;
-		maprender.clear ();
 		maprender.load_map_scheme (map.lower_layer, map.upper_layer);
 		maprender.set_layer (this.main_view.get_current_layer ());
 		maprender.set_scale (this.main_view.get_current_scale ());
 
+		// Update current_map id
+		this.current_map_id = map_id;
+
 		updateUndoRedoButtons ();
+	}
+
+	/**
+	 * Closes current map.
+	 */
+	public void close_map () {
+		// Clear the palette
+		var palette = this.main_view.drawingarea_palette;
+		palette.clear ();
+
+		// Clear the maprender
+		var maprender = this.main_view.drawingarea_maprender;
+		maprender.clear ();
+
+		this.current_map_id = 0;
+	}
+
+	/**
+	 * FIXME
+	 * This is a deprecated method that was being used for refreshing changes
+	 * made to maps. Instead it should be replaced by a method that refreshes
+	 * the map data, palette and/or maprender itself.
+	 */
+	public void reload_map () {
+		int map_id = this.current_map_id;
+
+		this.close_map ();
+		this.open_map (map_id);
 	}
 
 	/**
@@ -740,7 +751,8 @@ public class MainController : Controller {
 			}
 
 			/* reload map (size or tileset may have changed) */
-			reload_map ();
+			// FIXME: Re-render != open map again
+			this.reload_map ();
 		}
 
 		dialog.destroy ();
@@ -856,7 +868,8 @@ public class MainController : Controller {
 			updateUndoRedoButtons ();
 
 			/* rerender map */
-			load_map (map_id);
+			// FIXME: Re-render != open map again
+			this.reload_map ();
 		}
 
 		dialog.destroy ();
@@ -897,29 +910,24 @@ public class MainController : Controller {
 	}
 
 	public unowned Map getMap () {
-		return this.maps.get (current_map);
+		return this.maps.get (this.current_map_id);
 	}
 
 	public unowned UndoManager.Stack getMapChanges () {
-		return this.map_changes.get (current_map);
+		return this.map_changes.get (this.current_map_id);
 	}
 
 	private void updateUndoRedoButtons () {
 		bool can_undo = false, can_redo = false;
 
-		if (current_map != 0) {
-			can_undo = this.map_changes.get (current_map).can_undo ();
-			can_redo = this.map_changes.get (current_map).can_redo ();
+		if (this.current_map_id != 0) {
+			can_undo = this.map_changes.get (this.current_map_id).can_undo ();
+			can_redo = this.map_changes.get (this.current_map_id).can_redo ();
 		}
 
 		this.main_view.set_undo_available (can_undo);
 
 		this.main_view.set_redo_available (can_redo);
-	}
-
-	public void reload_map () {
-		if (current_map != 0)
-			load_map (current_map);
 	}
 
 	/**

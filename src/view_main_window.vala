@@ -532,8 +532,8 @@ public class MainWindow : Gtk.Window {
 		action_about.activate.connect (this.controller.on_about);
 
 		// Change edition mode
-		this.radio_layer.changed.connect (this.controller.on_layer_change);
-		this.radio_scale.changed.connect (this.controller.on_scale_change);
+		this.radio_layer.changed.connect (this.on_layer_change);
+		this.radio_scale.changed.connect (this.on_scale_change);
 
 		// Map selected
 		this.treeview_maptree.map_selected.connect (this.controller.on_map_selected);
@@ -628,6 +628,27 @@ public class MainWindow : Gtk.Window {
 	}
 
 	/**
+	 * Manages the reactions to the layer change.
+	 */
+	public void on_layer_change () {
+		this.update_statusbar_current_frame ();
+
+		// Don't react if the current map is map 0 (game_title)
+		if (this.controller.get_current_map_id () == 0) {
+			return;
+		}
+
+		// Get the current layer
+		var layer = (LayerType) this.get_current_layer ();
+
+		// Update the palette
+		this.drawingarea_palette.set_layer (layer);
+
+		// Update the maprender
+		this.drawingarea_maprender.set_layer (layer);
+	}
+
+	/**
 	 * Returns an int that represents the active scale.
 	 */
 	public Scale get_current_scale () {
@@ -639,6 +660,22 @@ public class MainWindow : Gtk.Window {
 	 */
 	public void set_current_scale (Scale scale) {
 		this.radio_scale.set_current_value (scale.to_int ());
+	}
+
+	/**
+	 * Manages the reactions to the scale change.
+	 */
+	public void on_scale_change () {
+		// Don't react if the current map is map 0 (game_title)
+		if (this.controller.get_current_map_id () == 0) {
+			return;
+		}
+
+		// Get the current scale
+		var scale = (Scale) this.get_current_scale ();
+
+		// Update the maprender
+		this.drawingarea_maprender.set_scale (scale);
 	}
 
 	/**
