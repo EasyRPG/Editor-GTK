@@ -464,62 +464,6 @@ public class MainController : Controller {
 	}
 
 	/**
-	 * Writes map data.
-	 */
-	public void save_map_data (int map_id) throws Error {
-		// Map 0 (game_title) has nothing to save
-		if (map_id == 0) {
-			return;
-		}
-
-		XmlNode root;
-		string map_file = this.base_path + "data/maps/map%d.xml".printf (map_id);
-		var writer = new XmlWriter ();
-
-		Map map = this.maps.get (map_id);
-		map.save_data (out root);
-
-		writer.set_root (root);
-		writer.generate ();
-		writer.write (map_file);
-
-		// Clear map's undo history
-		this.map_changes.set (map_id, new UndoManager.Stack (this.maps.get (map_id)));
-		this.updateUndoRedoButtons ();
-	}
-
-	/**
-	 * Writes all maps data.
-	 */
-	public void save_all_maps_data () {
-		/*
-		 * TODO: This is a thing we should think (and talk) about.
-		 *
-		 * A try/catch containing the foreach means that if a single map fails,
-		 * the process stops and the remaining maps aren't saved.
-		 *
-		 * A try/catch containing the save_map_data () call implies that even if a
-		 * single map fails, it will continue. For each map save fail there will be
-		 * a dialog.
-		 */
-		try {
-			foreach (int map_id in this.maps.get_keys ()) {
-				this.save_map_data (map_id);
-			}
-		} catch (Error e) {
-			// Show an error dialog
-			var error_dialog = new Gtk.MessageDialog (
-				this.main_view,
-				Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT,
-				Gtk.MessageType.ERROR, Gtk.ButtonsType.OK,
-				e.message
-			);
-			error_dialog.run ();
-			error_dialog.destroy ();
-		}
-	}
-
-	/**
 	 * Builds an updated maptree file.
 	 */
 	public void save_maptree_data () throws Error {
@@ -581,29 +525,6 @@ public class MainController : Controller {
 	}
 
 	/**
-	 * Saves the current changes.
-	 */
-	public void save_changes () {
-		try {
-			// Write current map data
-			this.save_map_data (this.current_map_id);
-
-			// Build and updated maptree
-			this.save_maptree_data ();
-		} catch (Error e) {
-			// Show an error dialog
-			var error_dialog = new Gtk.MessageDialog (
-				this.main_view,
-				Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT,
-				Gtk.MessageType.ERROR, Gtk.ButtonsType.OK,
-				e.message
-			);
-			error_dialog.run ();
-			error_dialog.destroy ();
-		}
-	}
-
-	/**
 	 * Loads XML data from a map file.
 	 *
 	 * @param The id of the map to load.
@@ -638,6 +559,85 @@ public class MainController : Controller {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Writes map data.
+	 */
+	public void save_map_data (int map_id) throws Error {
+		// Map 0 (game_title) has nothing to save
+		if (map_id == 0) {
+			return;
+		}
+
+		XmlNode root;
+		string map_file = this.base_path + "data/maps/map%d.xml".printf (map_id);
+		var writer = new XmlWriter ();
+
+		Map map = this.maps.get (map_id);
+		map.save_data (out root);
+
+		writer.set_root (root);
+		writer.generate ();
+		writer.write (map_file);
+
+		// Clear map's undo history
+		this.map_changes.set (map_id, new UndoManager.Stack (this.maps.get (map_id)));
+		this.updateUndoRedoButtons ();
+	}
+
+	/**
+	 * Writes all maps data.
+	 */
+	public void save_all_maps_data () {
+		/*
+		 * TODO: This is a thing we should think (and talk) about.
+		 *
+		 * A try/catch containing the foreach means that if a single map fails,
+		 * the process stops and the remaining maps aren't saved.
+		 *
+		 * A try/catch containing the save_map_data () call implies that even if a
+		 * single map fails, it will continue. For each map save fail there will be
+		 * a dialog.
+		 */
+		try {
+			foreach (int map_id in this.maps.get_keys ()) {
+				this.save_map_data (map_id);
+			}
+		} catch (Error e) {
+			// Show an error dialog
+			var error_dialog = new Gtk.MessageDialog (
+				this.main_view,
+				Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT,
+				Gtk.MessageType.ERROR, Gtk.ButtonsType.OK,
+				e.message
+			);
+			error_dialog.run ();
+			error_dialog.destroy ();
+		}
+	}
+
+	/**
+	 * Saves the current changes.
+	 */
+	public void save_changes () {
+		try {
+			// Write current map data
+			this.save_map_data (this.current_map_id);
+
+			// Build and updated maptree
+			this.save_maptree_data ();
+		} catch (Error e) {
+			// Show an error dialog
+			var error_dialog = new Gtk.MessageDialog (
+				this.main_view,
+				Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT,
+				Gtk.MessageType.ERROR, Gtk.ButtonsType.OK,
+				e.message
+			);
+			error_dialog.run ();
+			error_dialog.destroy ();
+		}
 	}
 
 	/**
