@@ -65,14 +65,6 @@ public class MainController : Controller {
 		// Connect the map reorder signal from treeview_maptree
 		this.main_view.treeview_maptree.map_reordered.connect(this.on_map_reordered);
 
-		/* update zoom/layer when requested by drawingarea_map */
-		this.main_view.drawingarea_maprender.request_scale.connect ((s) => {
-			this.main_view.set_current_scale (s);
-		});
-		this.main_view.drawingarea_maprender.request_layer.connect ((l) => {
-			this.main_view.set_current_layer (l);
-		});
-
 		if(project_file != null)
 			open_project_from_file (project_file);
 	}

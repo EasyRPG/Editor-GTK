@@ -39,21 +39,6 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	private HashTable<DrawingTool,Tool> tools;
 
 	/**
-	 * Send if the map's zoom level should be changed
-	 *
-	 * @param scale the requested zoom level
-	 */
-	public signal void request_scale (Scale scale);
-
-	/**
-	 * Send if the Layer should be changed
-	 *
-	 * @param layer the layer being requested
-	 */
-	public signal void request_layer (LayerType layer);
-
-
-	/**
 	 * Builds the map DrawingArea.
 	 */
 	public MapDrawingArea (MainController controller, Gtk.ScrolledWindow scrolled_window, TilePaletteDrawingArea palette) {
@@ -76,16 +61,6 @@ public class MapDrawingArea : Gtk.DrawingArea {
 		this.tools[DrawingTool.RECTANGLE] = new RectangleTool (controller, palette);
 		this.tools[DrawingTool.ERASER_NORMAL] = new EraserTool (controller, palette);
 		this.tools[DrawingTool.ZOOM] = new ZoomTool (controller, palette);
-
-		foreach (DrawingTool tool in DrawingTool.all ()) {
-			if (this.tools[tool] != null) {
-				this.tools[tool].request_scale.connect ((s) => { request_scale (s); });
-				this.tools[tool].request_layer.connect((l) => { request_layer (l); });
-				this.tools[tool].request_selection.connect((sel) => {
-					warning ("selection not yet supported!");
-				});
-			}
-		}
 	}
 
 	/**
