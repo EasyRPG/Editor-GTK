@@ -102,7 +102,7 @@ public class MainController : Controller {
 
 			// Enable/disable some widgets
 			this.main_view.set_project_status ("open");
-			updateUndoRedoButtons ();
+			this.updateUndoRedoButtons ();
 			this.main_view.update_statusbar_current_frame();
 		} catch (Error e) {
 			/* Show Error Dialog */
@@ -199,30 +199,6 @@ public class MainController : Controller {
 	}
 
 	/**
-	 * Saves the project
-	 */
-	public void save_project () {
-		try {
-			/* Manages all the XML write stuff */
-			this.save_project_data ();
-			this.save_maptree_data ();
-
-			/* Clear Undo History */
-			maps.foreach((key, val) => {
-				this.map_changes.set (key, new UndoManager.Stack (val));
-			});
-			updateUndoRedoButtons ();
-		} catch (Error e) {
-			/* Show Error Dialog */
-			var edialog = new Gtk.MessageDialog (this.main_view,
-				Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT,
-				Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, e.message);
-			edialog.run ();
-			edialog.destroy ();
-		}
-	}
-
-	/**
 	 * Loads XML data from the .rproject and game.xml files.
 	 */
 	private void load_project_data () throws Error {
@@ -292,40 +268,53 @@ public class MainController : Controller {
 	}
 
 	/**
-	 * Saves XML data to the .rproject and game.xml files.
+	 * Writes project data to the .rproject file.
 	 */
-	private void save_project_data () throws Error {
+	private void save_rproject_data () throws Error {
 		XmlNode root, node;
-		string path_game = base_path + "data/game.xml";
-		string path_project = base_path + project_filename;
+		string rproject_file = this.base_path + this.project_filename;
 		var writer = new XmlWriter ();
 
-		/* update project file */
+		// Root element
 		root = new XmlNode ("project");
 
-		node = new XmlNode ("current_layer");
-		node.content = this.main_view.get_current_layer ().to_int ().to_string ();
-		root.add_child (node);
-
+		// Current map
 		node = new XmlNode ("current_map");
 		node.content = this.current_map_id.to_string ();
 		root.add_child (node);
 
+		// Current layer
+		node = new XmlNode ("current_layer");
+		node.content = this.main_view.get_current_layer ().to_int ().to_string ();
+		root.add_child (node);
+
+		// Current map
 		node = new XmlNode ("current_scale");
 		node.content = this.main_view.get_current_scale ().to_int ().to_string ();
 		root.add_child (node);
 
 		writer.set_root (root);
 		writer.generate ();
-		writer.write (path_project);
+		writer.write (rproject_file);
+	}
 
-		/* update game file */
+	/**
+	 * Writes game data to the game.xml file.
+	 */
+	private void save_game_data () throws Error {
+		XmlNode root, node;
+		string game_file = this.base_path + "data/game.xml";
+		var writer = new XmlWriter ();
+
+		// Root element
 		root = new XmlNode ("game");
 
+		// Game title
 		node = new XmlNode ("title");
 		node.content = this.game_title;
 		root.add_child (node);
 
+		// Vehicles
 		this.party.save_data(out node);
 		root.add_child (node);
 
@@ -340,7 +329,7 @@ public class MainController : Controller {
 
 		writer.set_root (root);
 		writer.generate ();
-		writer.write (path_game);
+		writer.write (game_file);
 	}
 
 	/**
@@ -474,57 +463,111 @@ public class MainController : Controller {
 		this.main_view.treeview_maptree.expand_to_path (new Gtk.TreePath.from_string ("0"));
 	}
 
+	/**
+	 * Writes map data.
+	 */
+	public void save_map_data (int map_id) throws Error {
+		// Map 0 (game_title) has nothing to save
+		if (map_id == 0) {
+			return;
+		}
+
+		XmlNode root;
+		string map_file = this.base_path + "data/maps/map%d.xml".printf (map_id);
+		var writer = new XmlWriter ();
+
+		Map map = this.maps.get (map_id);
+		map.save_data (out root);
+
+		writer.set_root (root);
+		writer.generate ();
+		writer.write (map_file);
+
+		// Clear map's undo history
+		this.map_changes.set (map_id, new UndoManager.Stack (this.maps.get (map_id)));
+		this.updateUndoRedoButtons ();
+	}
+
+	/**
+	 * Writes all maps data.
+	 */
+	public void save_all_maps_data () {
+		/*
+		 * TODO: This is a thing we should think (and talk) about.
+		 *
+		 * A try/catch containing the foreach means that if a single map fails,
+		 * the process stops and the remaining maps aren't saved.
+		 *
+		 * A try/catch containing the save_map_data () call implies that even if a
+		 * single map fails, it will continue. For each map save fail there will be
+		 * a dialog.
+		 */
+		try {
+			foreach (int map_id in this.maps.get_keys ()) {
+				this.save_map_data (map_id);
+			}
+		} catch (Error e) {
+			// Show an error dialog
+			var error_dialog = new Gtk.MessageDialog (
+				this.main_view,
+				Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT,
+				Gtk.MessageType.ERROR, Gtk.ButtonsType.OK,
+				e.message
+			);
+			error_dialog.run ();
+			error_dialog.destroy ();
+		}
+	}
+
+	/**
+	 * Builds an updated maptree file.
+	 */
 	public void save_maptree_data () throws Error {
-		var maptree = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
 		var root = new XmlNode ("maptree");
 		var parent = root;
 		var writer = new XmlWriter ();
-		Value maptree_val;
+		string maps_path = this.base_path + "data/maps/";
+		var maptree_model = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
 		Gtk.TreeIter tmp, iter;
 		bool exit = false;
-		string mapspath = base_path + "data/maps/";
+		Value maptree_val;
 
-		/* 1. remove all map*.xml files in data/maps/ */
-		var dir = Dir.open (mapspath, 0);
-		string file = dir.read_name();
-		while (file != null) {
-			if(FileUtils.remove(mapspath + file) != 0)
-				throw new FileError.FAILED("Couldn't remove old map files!");
-			file = dir.read_name();
-		}
-
-		/* 2. build maptree.xml */
-		maptree.get_iter_first (out iter);
-		if(maptree.iter_children (out iter, iter)) {
+		maptree_model.get_iter_first (out iter);
+		if(maptree_model.iter_children (out iter, iter)) {
 			while (!exit) {
-				/* create and add node */
+				// Create a node and add it
 				var node = new XmlNode ("map");
-				maptree.get_value (iter, 0, out maptree_val);
+
+				maptree_model.get_value (iter, 0, out maptree_val);
 				node.attributes["id"] = maptree_val.get_int ().to_string ();
-				maptree.get_value (iter, 2, out maptree_val);
+
+				maptree_model.get_value (iter, 2, out maptree_val);
 				node.attributes["name"] = maptree_val.get_string ();
+
 				parent.add_child(node);
 
-				/* process children */
-				if (maptree.iter_children (out tmp, iter)) {
+				// Process children
+				if (maptree_model.iter_children (out tmp, iter)) {
 					iter = tmp;
 					parent = node;
 					continue;
 				}
 
-				/* process siblings */
+				// Process siblings
 				tmp = iter;
-				if (maptree.iter_next (ref iter))
+				if (maptree_model.iter_next (ref iter)) {
 					continue;
+				}
+
 				iter = tmp;
 
-				/* process siblings of parent nodes we descendend into */
-				while (!(exit = !maptree.iter_parent (out tmp, iter))) {
+				// Process siblings of parent nodes we descended into
+				while (!(exit = !maptree_model.iter_parent (out tmp, iter))) {
 					iter = tmp;
 					parent = parent.parent;
 
 					tmp = iter;
-					if (maptree.iter_next (ref iter)) {
+					if (maptree_model.iter_next (ref iter)) {
 						break;
 					}
 					iter = tmp;
@@ -534,14 +577,29 @@ public class MainController : Controller {
 
 		writer.set_root (root);
 		writer.generate ();
-		writer.write (mapspath + "maptree.xml");
+		writer.write (maps_path + "maptree.xml");
+	}
 
-		/* 3. create map<mapid>.xml files */
-		foreach(int id in this.maps.get_keys ()) {
-			this.maps[id].save_data (out root);
-			writer.set_root (root);
-			writer.generate ();
-			writer.write (mapspath + "map%d.xml".printf(id));
+	/**
+	 * Saves the current changes.
+	 */
+	public void save_changes () {
+		try {
+			// Write current map data
+			this.save_map_data (this.current_map_id);
+
+			// Build and updated maptree
+			this.save_maptree_data ();
+		} catch (Error e) {
+			// Show an error dialog
+			var error_dialog = new Gtk.MessageDialog (
+				this.main_view,
+				Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT,
+				Gtk.MessageType.ERROR, Gtk.ButtonsType.OK,
+				e.message
+			);
+			error_dialog.run ();
+			error_dialog.destroy ();
 		}
 	}
 
@@ -571,8 +629,8 @@ public class MainController : Controller {
 			this.map_changes.set (map_id, new UndoManager.Stack (map));
 
 			/* bind undo/redo changed signal handlers */
-			this.map_changes.get (map_id).can_undo_changed.connect (updateUndoRedoButtons);
-			this.map_changes.get (map_id).can_redo_changed.connect (updateUndoRedoButtons);
+			this.map_changes.get (map_id).can_undo_changed.connect (this.updateUndoRedoButtons);
+			this.map_changes.get (map_id).can_redo_changed.connect (this.updateUndoRedoButtons);
 		} catch (Error e) {
 			warning ("map %d could not be loaded: %s", map_id, e.message);
 			/* TODO: show dialog? */
@@ -689,7 +747,7 @@ public class MainController : Controller {
 		// Update current_map id
 		this.current_map_id = map_id;
 
-		updateUndoRedoButtons ();
+		this.updateUndoRedoButtons ();
 	}
 
 	/**
@@ -747,7 +805,7 @@ public class MainController : Controller {
 			if (width != 0 || height != 0) {
 				/* Reset UndoManager (TODO: make map size changes undoable) */
 				this.map_changes.set (map_id, new UndoManager.Stack (map));
-				updateUndoRedoButtons ();
+				this.updateUndoRedoButtons ();
 			}
 
 			/* reload map (size or tileset may have changed) */
@@ -784,8 +842,8 @@ public class MainController : Controller {
 			this.map_changes.set (new_map_id, new UndoManager.Stack (map));
 
 			/* bind undo/redo changed signal handlers */
-			this.map_changes.get (new_map_id).can_undo_changed.connect (updateUndoRedoButtons);
-			this.map_changes.get (new_map_id).can_redo_changed.connect (updateUndoRedoButtons);
+			this.map_changes.get (new_map_id).can_undo_changed.connect (this.updateUndoRedoButtons);
+			this.map_changes.get (new_map_id).can_redo_changed.connect (this.updateUndoRedoButtons);
 
 			/* get maptree model */
 			var maptree_model = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
@@ -865,7 +923,7 @@ public class MainController : Controller {
 
 			/* Reset UndoManager (TODO: make map shift undoable) */
 			this.map_changes.set (map_id, new UndoManager.Stack (map));
-			updateUndoRedoButtons ();
+			this.updateUndoRedoButtons ();
 
 			/* rerender map */
 			// FIXME: Re-render != open map again
