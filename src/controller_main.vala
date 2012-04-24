@@ -38,19 +38,26 @@ public class MainController : Controller {
 	private XmlNode project_data;
 	private XmlNode game_data;
 	private string[] tilesets;
-	private GLib.HashTable<int, Map> maps;
-	private GLib.HashTable<int, UndoManager.Stack> map_changes;
-	private GLib.HashTable<int, Gtk.TreeRowReference> map_references;
+
+	// Maps
 	private int current_map;
+	private GLib.HashTable<int, Map> maps;
+	private GLib.HashTable<int, Gtk.TreeRowReference> map_references;
+	private GLib.HashTable<int, UndoManager.Stack> map_changes;
 
 	/**
+	 * MainController Constructor.
+	 *
 	 * Instantiantes the MainWindow view.
 	 */
 	public MainController (string? project_file = null) {
 		Gtk.IconTheme.get_default().append_search_path ("../data/icons");
 		Gtk.IconTheme.get_default().append_search_path ("data/icons");
 
+		// Instance the view
 		this.main_view = new MainWindow (this);
+
+		// Create the map hashtables that will store map instances, references and changes
 		this.maps = new GLib.HashTable<int, Map> (null, null);
 		this.map_references = new GLib.HashTable<int, Gtk.TreeRowReference> (null, null);
 		this.map_changes = new GLib.HashTable<int, UndoManager.Stack> (null, null);
@@ -180,6 +187,7 @@ public class MainController : Controller {
 		this.project_data = parser.get_root ();
 
 //		int current_map = int.parse (this.project_data.get_node_by_name ("current_map").content);
+		this.current_map = 0;
 
 		// If the scale value found in the .rproject file is valid, set it.
 		int current_scale = int.parse (this.project_data.get_node_by_name ("current_scale").content);
@@ -193,13 +201,14 @@ public class MainController : Controller {
 			this.main_view.set_current_layer ((LayerType) current_layer);
 		}
 
-		// Load data from game.xml and instantiate the party and vehicles
+		// Load data from game.xml
 		parser.parse_file (this.base_path + "data/game.xml");
 		this.game_data = parser.get_root ();
 
 		XmlNode title_node = this.game_data.get_node_by_name ("title");
 		this.game_title = title_node.content;
 
+		// Instantiate the party and vehicles
 		this.party = new Party ();
 		XmlNode party_node = this.game_data.get_node_by_name ("party");
 		this.party.load_data (party_node);
@@ -216,6 +225,10 @@ public class MainController : Controller {
 		XmlNode airship_node = this.game_data.get_node_by_name ("airship");
 		this.airship.load_data (airship_node);
 
+		/*
+		 * Load tilesets from "graphics/tilesets"
+		 * TODO: This should be changed when the database load process is completed
+		 */
 		try {
 			var dir = Dir.open(this.base_path + "graphics/tilesets", 0);
 			string entry;
@@ -230,8 +243,6 @@ public class MainController : Controller {
 		}
 
 		/* TODO: sort tilesets alphabetically */
-
-		this.current_map = 0;
 	}
 
 	/**
