@@ -37,6 +37,11 @@ public class MaptreeTreeView : Gtk.TreeView {
 	public signal void map_shift (int map_id);
 
 	/**
+	 * This signal is emitted when a map has been reordered.
+	 */
+	public signal void map_reordered (int map_id, Gtk.TreeRowReference map_new_reference);
+
+	/**
 	 * Builds the maptree TreeView.
 	 */
 	public MaptreeTreeView () {
@@ -68,6 +73,7 @@ public class MaptreeTreeView : Gtk.TreeView {
 		// Get the TreeStore ready
 		this.maptree_model = new MaptreeTreeStore (this);
 		this.set_model (maptree_model);
+		this.maptree_model.map_path_changed.connect(this.on_map_path_changed);
 
 		menu_root = new MapTreeMenu.root();
 		menu_map = new MapTreeMenu();
@@ -173,5 +179,16 @@ public class MaptreeTreeView : Gtk.TreeView {
 		}
 		
 		return true;
+	}
+
+	/**
+	 * Manages the reactions to the map path changes.
+	 */
+	public void on_map_path_changed (int map_id, Gtk.TreePath map_iter) {
+		// Instance a new TreeRowReference
+		var map_new_reference = new Gtk.TreeRowReference(this.maptree_model, map_iter);
+
+		// Emit the map_reordered signal
+		this.map_reordered (map_id, map_new_reference);
 	}
 }

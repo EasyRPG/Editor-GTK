@@ -33,9 +33,11 @@ public class MaptreeTreeStore : Gtk.TreeStore, Gtk.TreeDragSource, Gtk.TreeDragD
 	private string dragged_row_path;
 
 	/**
-	 * Send for Drag & Drop events
+	 * This signal is emitted when a map path has changed.
+	 *
+	 * I.e: when a map has been moved through drag and drop.
 	 */
-	public signal void map_path_updated (int map_id, Gtk.TreePath iter);
+	public signal void map_path_changed (int map_id, Gtk.TreePath iter);
 
 	/**
 	 * Instantiates the Maptree TreeStore.
@@ -134,7 +136,9 @@ public class MaptreeTreeStore : Gtk.TreeStore, Gtk.TreeDragSource, Gtk.TreeDragD
 				this.map_position_update(child);
 
 		this.get_value (iter, 0, out map_id);
-		map_path_updated (map_id.get_int (), this.get_path (iter));
+
+		// Emit the map_path_changed signal
+		map_path_changed (map_id.get_int (), this.get_path (iter));
 	}
 
 	/**

@@ -62,11 +62,8 @@ public class MainController : Controller {
 		this.map_references = new GLib.HashTable<int, Gtk.TreeRowReference> (null, null);
 		this.map_changes = new GLib.HashTable<int, UndoManager.Stack> (null, null);
 
-		/* update map references for drag and drop */
-		var maptree_model = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
-		maptree_model.map_path_updated.connect ( (id, path) => {
-			map_references[id] = new Gtk.TreeRowReference(maptree_model, path);
-		});
+		// Connect the map reorder signal from treeview_maptree
+		this.main_view.treeview_maptree.map_reordered.connect(this.on_map_reordered);
 
 		/* update zoom/layer when requested by drawingarea_map */
 		this.main_view.drawingarea_maprender.request_scale.connect ((s) => {
@@ -926,6 +923,14 @@ public class MainController : Controller {
 	public void reload_map () {
 		if (current_map != 0)
 			load_map (current_map);
+	}
+
+	/**
+	 * Manages the reactions to the map reordering.
+	 */
+	public void on_map_reordered(int map_id, Gtk.TreeRowReference map_new_reference) {
+		// Insert (or update) the TreeRowReference for the corresponding map
+		this.map_references.set(map_id, map_new_reference);
 	}
 }
 
