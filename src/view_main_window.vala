@@ -519,7 +519,7 @@ public class MainWindow : Gtk.Window {
 		 * Connect signals
 		 */
 		// Open/Close project
-		action_open.activate.connect (this.controller.open_project);
+		action_open.activate.connect (this.controller.open_project_from_dialog);
 		action_save.activate.connect (this.controller.save_project);
 		action_revert.activate.connect (this.controller.reload_project);
 		action_close.activate.connect (this.controller.close_project);

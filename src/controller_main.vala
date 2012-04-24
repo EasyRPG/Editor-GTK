@@ -65,8 +65,10 @@ public class MainController : Controller {
 		// Connect the map reorder signal from treeview_maptree
 		this.main_view.treeview_maptree.map_reordered.connect(this.on_map_reordered);
 
-		if(project_file != null)
-			open_project_from_file (project_file);
+		// If a project_file was specified, open a project
+		if(project_file != null) {
+			this.open_project (project_file);
+		}
 	}
 
 	/**
@@ -77,16 +79,17 @@ public class MainController : Controller {
 	}
 
 	/**
-	 * Opens a project from file, loads its data and change the status of some widgets.
+	 * Opens a project, loads its data and change the status of some widgets.
 	 */
-	public void open_project_from_file (string project_file) {
+	public void open_project (string project_file) {
 		File file = File.new_for_path (project_file);
 
 		try {
+			// Get the project filename and base path
 			this.project_filename = file.get_basename ();
 			this.base_path = file.get_parent ().get_path () + "/";
 
-			// Manages all the XML read stuff
+			// Load all the required XML data
 			this.load_project_data ();
 			this.load_maptree_data ();
 
@@ -96,21 +99,51 @@ public class MainController : Controller {
 			this.main_view.update_statusbar_current_frame();
 		} catch (Error e) {
 			/* Show Error Dialog */
-			var edialog = new Gtk.MessageDialog (this.main_view,
+			var error_dialog = new Gtk.MessageDialog (this.main_view,
 				Gtk.DialogFlags.MODAL|Gtk.DialogFlags.DESTROY_WITH_PARENT,
 				Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, e.message);
-			edialog.run ();
-			edialog.destroy ();
+			error_dialog.run ();
+			error_dialog.destroy ();
 		}
 	}
 
 	/**
-	 * Reloads the project
+	 * Opens a project from dialog, loads its data and change the status of some widgets.
+	 */
+	public void open_project_from_dialog () {
+		var open_project_dialog = new Gtk.FileChooserDialog ("Open Project", this.main_view,
+		                                                     Gtk.FileChooserAction.OPEN,
+		                                                     Gtk.Stock.CANCEL, Gtk.ResponseType.CANCEL,
+		                                                     Gtk.Stock.OPEN, Gtk.ResponseType.ACCEPT);
+		/*
+		 * FIXME
+		 * FileFilter.set_filter_name is not implemented yet but will work soon.
+		 * More info: https://bugzilla.gnome.org/show_bug.cgi?id=647122
+		 *
+		 * Using proposed workaround "gtk_file_filter_set_name".
+		 */
+		var file_filter = new Gtk.FileFilter();
+		//file_filter.set_name ("EasyRPG Project (*.rproject)");
+		//file_filter.set_filter_name ("EasyRPG Project (*.rproject)");
+		gtk_file_filter_set_name (file_filter, "EasyRPG Project (*.rproject)");
+		file_filter.add_pattern ("*.rproject"); // for case-insensitive patterns -> add_custom()
+		open_project_dialog.add_filter (file_filter);
+
+		if (open_project_dialog.run () == Gtk.ResponseType.ACCEPT) {
+			this.open_project (open_project_dialog.get_filename ());
+		}
+
+		open_project_dialog.destroy ();
+	}
+
+	/**
+	 * Reloads the project.
 	 */
 	public void reload_project () {
-		var file = base_path + project_filename;
-		close_project ();
-		open_project_from_file (file);
+		this.close_project ();
+
+		var file = this.base_path + this.project_filename;
+		this.open_project (file);
 	}
 
 	/**
@@ -135,34 +168,6 @@ public class MainController : Controller {
 			edialog.run ();
 			edialog.destroy ();
 		}
-	}
-
-	/**
-	 * Opens a project from dialog, loads its data and change the status of some widgets.
-	 */
-	public void open_project () {
-		var open_project_dialog = new Gtk.FileChooserDialog ("Open Project", this.main_view,
-		                                                     Gtk.FileChooserAction.OPEN,
-		                                                     Gtk.Stock.CANCEL, Gtk.ResponseType.CANCEL,
-		                                                     Gtk.Stock.OPEN, Gtk.ResponseType.ACCEPT);
-		/*
-		 * FIXME
-		 * FileFilter.set_filter_name is not implemented yet but will work soon.
-		 * More info: https://bugzilla.gnome.org/show_bug.cgi?id=647122
-		 *
-		 * Using proposed workaround "gtk_file_filter_set_name".
-		 */
-		var file_filter = new Gtk.FileFilter();
-		//file_filter.set_name ("EasyRPG Project (*.rproject)");
-		//file_filter.set_filter_name ("EasyRPG Project (*.rproject)");
-		gtk_file_filter_set_name (file_filter, "EasyRPG Project (*.rproject)");
-		file_filter.add_pattern ("*.rproject"); // for case-insensitive patterns -> add_custom()
-		open_project_dialog.add_filter (file_filter);
-
-		if (open_project_dialog.run () == Gtk.ResponseType.ACCEPT)
-			open_project_from_file (open_project_dialog.get_filename ());
-
-		open_project_dialog.destroy ();
 	}
 
 	/**
@@ -613,7 +618,7 @@ public class MainController : Controller {
 					#endif
 
 					/* Load the new project */
-					open_project_from_file (rproject_path.get_path ());
+					this.open_project (rproject_path.get_path ());
 
 					/* Project created */
 					exit = true;
