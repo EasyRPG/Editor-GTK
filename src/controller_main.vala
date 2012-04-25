@@ -102,7 +102,7 @@ public class MainController : Controller {
 
 			// Enable/disable some widgets
 			this.main_view.set_project_status ("open");
-			this.updateUndoRedoButtons ();
+			this.update_undo_redo_buttons ();
 			this.main_view.update_statusbar_current_frame();
 		} catch (Error e) {
 			/* Show Error Dialog */
@@ -270,7 +270,7 @@ public class MainController : Controller {
 	/**
 	 * Writes project data to the .rproject file.
 	 */
-	private void save_rproject_data () throws Error {
+	private void save_project_data () throws Error {
 		XmlNode root, node;
 		string rproject_file = this.base_path + this.project_filename;
 		var writer = new XmlWriter ();
@@ -550,8 +550,8 @@ public class MainController : Controller {
 			this.map_changes.set (map_id, new UndoManager.Stack (map));
 
 			/* bind undo/redo changed signal handlers */
-			this.map_changes.get (map_id).can_undo_changed.connect (this.updateUndoRedoButtons);
-			this.map_changes.get (map_id).can_redo_changed.connect (this.updateUndoRedoButtons);
+			this.map_changes.get (map_id).can_undo_changed.connect (this.update_undo_redo_buttons);
+			this.map_changes.get (map_id).can_redo_changed.connect (this.update_undo_redo_buttons);
 		} catch (Error e) {
 			warning ("map %d could not be loaded: %s", map_id, e.message);
 			/* TODO: show dialog? */
@@ -583,7 +583,7 @@ public class MainController : Controller {
 
 		// Clear map's undo history
 		this.map_changes.set (map_id, new UndoManager.Stack (this.maps.get (map_id)));
-		this.updateUndoRedoButtons ();
+		this.update_undo_redo_buttons ();
 	}
 
 	/**
@@ -747,7 +747,7 @@ public class MainController : Controller {
 		// Update current_map id
 		this.current_map_id = map_id;
 
-		this.updateUndoRedoButtons ();
+		this.update_undo_redo_buttons ();
 	}
 
 	/**
@@ -805,7 +805,7 @@ public class MainController : Controller {
 			if (width != 0 || height != 0) {
 				/* Reset UndoManager (TODO: make map size changes undoable) */
 				this.map_changes.set (map_id, new UndoManager.Stack (map));
-				this.updateUndoRedoButtons ();
+				this.update_undo_redo_buttons ();
 			}
 
 			/* reload map (size or tileset may have changed) */
@@ -842,8 +842,8 @@ public class MainController : Controller {
 			this.map_changes.set (new_map_id, new UndoManager.Stack (map));
 
 			/* bind undo/redo changed signal handlers */
-			this.map_changes.get (new_map_id).can_undo_changed.connect (this.updateUndoRedoButtons);
-			this.map_changes.get (new_map_id).can_redo_changed.connect (this.updateUndoRedoButtons);
+			this.map_changes.get (new_map_id).can_undo_changed.connect (this.update_undo_redo_buttons);
+			this.map_changes.get (new_map_id).can_redo_changed.connect (this.update_undo_redo_buttons);
 
 			/* get maptree model */
 			var maptree_model = this.main_view.treeview_maptree.get_model () as MaptreeTreeStore;
@@ -923,7 +923,7 @@ public class MainController : Controller {
 
 			/* Reset UndoManager (TODO: make map shift undoable) */
 			this.map_changes.set (map_id, new UndoManager.Stack (map));
-			this.updateUndoRedoButtons ();
+			this.update_undo_redo_buttons ();
 
 			/* rerender map */
 			// FIXME: Re-render != open map again
@@ -963,19 +963,27 @@ public class MainController : Controller {
 		about_dialog.destroy ();
 	}
 
-	public string[] getTilesets () {
+	/**
+	 * Manages the reactions to the map reordering.
+	 */
+	public void on_map_reordered(int map_id, Gtk.TreeRowReference map_new_reference) {
+		// Insert (or update) the TreeRowReference for the corresponding map
+		this.map_references.set(map_id, map_new_reference);
+	}
+
+	public string[] get_tilesets () {
 		return this.tilesets;
 	}
 
-	public unowned Map getMap () {
+	public unowned Map get_map () {
 		return this.maps.get (this.current_map_id);
 	}
 
-	public unowned UndoManager.Stack getMapChanges () {
+	public unowned UndoManager.Stack get_map_changes () {
 		return this.map_changes.get (this.current_map_id);
 	}
 
-	private void updateUndoRedoButtons () {
+	private void update_undo_redo_buttons () {
 		bool can_undo = false, can_redo = false;
 
 		if (this.current_map_id != 0) {
@@ -986,14 +994,6 @@ public class MainController : Controller {
 		this.main_view.set_undo_available (can_undo);
 
 		this.main_view.set_redo_available (can_redo);
-	}
-
-	/**
-	 * Manages the reactions to the map reordering.
-	 */
-	public void on_map_reordered(int map_id, Gtk.TreeRowReference map_new_reference) {
-		// Insert (or update) the TreeRowReference for the corresponding map
-		this.map_references.set(map_id, map_new_reference);
 	}
 }
 

@@ -52,7 +52,7 @@ public class MapPropertiesDialog : Gtk.Dialog {
 
 			var frame_tileset = new Gtk.Frame ("Tileset");
 			input_tileset = new Gtk.ComboBoxText ();
-			foreach (var tileset in controller.getTilesets ())
+			foreach (var tileset in controller.get_tilesets ())
 				input_tileset.append (tileset, tileset);
 			input_tileset.set_active_id (map.tileset);
 			frame_tileset.add (input_tileset);

@@ -118,7 +118,8 @@ public class MaptreeTreeView : Gtk.TreeView {
 
 			this.map_id = value.get_int ();
 			map_selected (map_id);
-		} else {
+		}
+		else {
 			this.map_id = -1;
 		}
 	}

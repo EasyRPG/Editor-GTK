@@ -543,7 +543,7 @@ public class MainWindow : Gtk.Window {
 		this.treeview_maptree.map_shift.connect (this.controller.on_map_shift);
 
 		toolitem_undo.clicked.connect (() => {
-			var stack = controller.getMapChanges ();
+			var stack = controller.get_map_changes ();
 			if (stack != null) {
 				stack.undo ();
 				controller.reload_map ();
@@ -551,7 +551,7 @@ public class MainWindow : Gtk.Window {
 		});
 
 		toolitem_redo.clicked.connect (() => {
-			var stack = controller.getMapChanges ();
+			var stack = controller.get_map_changes ();
 			if (stack != null) {
 				stack.redo ();
 				controller.reload_map ();
