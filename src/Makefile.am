@@ -50,9 +50,9 @@ easyrpg_editor_SOURCES = \
 	view_database_dialog.vala \
 	view_generic_widgets.vala \
 	view_main_window.vala \
-	view_map_dialog.vala \
-	view_map_shift.vala \
-	view_project_create.vala \
+	view_map_properties_dialog.vala \
+	view_map_shift_dialog.vala \
+	view_project_create_dialog.vala \
 	xml_node.vala \
 	xml_parser.vala \
 	xml_writer.vala

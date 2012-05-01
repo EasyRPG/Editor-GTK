@@ -20,7 +20,7 @@
 /**
  * The create project window view.
  */
-public class CreateProjectDialog : Gtk.Dialog {
+public class ProjectCreateDialog : Gtk.Dialog {
 	public bool project_compability {get; private set; default = false;}
 	public string project_name {get; private set; default = "EasyRPG Game";}
 	public string project_path  {get; private set;}
@@ -28,7 +28,7 @@ public class CreateProjectDialog : Gtk.Dialog {
 	/**
 	 * Builds the map shift window.
 	 */
-	public CreateProjectDialog  (string? name=null, bool compability=false, string? path=null) {
+	public ProjectCreateDialog  (string? name=null, bool compability=false, string? path=null) {
 		Gtk.Box content = this.get_content_area () as Gtk.Box;
 
 		/* Init dialog */

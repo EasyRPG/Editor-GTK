@@ -248,6 +248,7 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 	public void set_layer (LayerType layer) {
 		this.current_layer = layer;
 
+		// Update the DrawingArea size
 		switch (layer) {
 			case LayerType.LOWER:
 				this.set_size_request (
