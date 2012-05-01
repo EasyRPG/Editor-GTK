@@ -80,16 +80,21 @@ public class Party : Model {
 	 */
 	public override void save_data (out XmlNode data) {
 		XmlNode node;
+
+		// Root element
 		data = new XmlNode("party");
 
+		// Map id
 		node = new XmlNode("map");
 		node.content = this.map_id.to_string ();
 		data.add_child(node);
 
+		// X coordinate
 		node = new XmlNode("x_coordinate");
 		node.content = this.x.to_string ();
 		data.add_child(node);
 
+		// Y coordinate
 		node = new XmlNode("y_coordinate");
 		node.content = this.y.to_string ();
 		data.add_child(node);
