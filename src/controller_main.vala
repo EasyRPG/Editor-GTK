@@ -644,7 +644,7 @@ public class MainController : Controller {
 	 * Opens a dialog to create a new project and opens this project afterwards
 	 */
 	public void create_project () {
-		var dialog = new CreateProjectDialog ();
+		var dialog = new ProjectCreateDialog ();
 		bool exit = false;
 
 		while (!exit) {
@@ -971,14 +971,23 @@ public class MainController : Controller {
 		this.map_references.set(map_id, map_new_reference);
 	}
 
+	/**
+	 * Returns the tileset list.
+	 */
 	public string[] get_tilesets () {
 		return this.tilesets;
 	}
 
+	/**
+	 * Returns the current map.
+	 */
 	public unowned Map get_map () {
 		return this.maps.get (this.current_map_id);
 	}
 
+	/**
+	 * Returns the changes done to the current map.
+	 */
 	public unowned UndoManager.Stack get_map_changes () {
 		return this.map_changes.get (this.current_map_id);
 	}
@@ -992,7 +1001,6 @@ public class MainController : Controller {
 		}
 
 		this.main_view.set_undo_available (can_undo);
-
 		this.main_view.set_redo_available (can_redo);
 	}
 }
