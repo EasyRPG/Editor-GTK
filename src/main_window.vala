@@ -1,6 +1,6 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * view_main_window.vala
+ * main_window.vala
  * Copyright (C) EasyRPG Project 2011-2012
  *
  * EasyRPG is free software: you can redistribute it and/or modify it
@@ -21,47 +21,54 @@
  * The main window view.
  */
 public class MainWindow : Gtk.Window {
-	/*
-	 * Properties
-	 */
-	private weak MainController controller;
-	public TilePaletteDrawingArea drawingarea_palette;
-	public MapDrawingArea drawingarea_maprender;
+	// Weak reference to Editor
+	private weak Editor editor;
+
+	// Menubar, Toolbar and Statusbar
 	private Gtk.MenuBar menubar_main;
-	private Gtk.Paned paned_palette_maptree;
+	private Gtk.Toolbar toolbar_main;
+	private Gtk.Toolbar toolbar_sidebar;
 	private Gtk.Statusbar statusbar_tooltip;
 	private Gtk.Statusbar statusbar_current_frame;
 	private Gtk.Statusbar statusbar_current_position;
-	private Gtk.Toolbar toolbar_main;
-	private Gtk.Toolbar toolbar_sidebar;
-	public MaptreeTreeView treeview_maptree;
 
+	// Maptree, palette and maprender
+	public MaptreeTreeView treeview_maptree;
+	public TilePaletteDrawingArea drawingarea_palette;
+	public MapDrawingArea drawingarea_maprender;
+	private Gtk.Paned paned_palette_maptree;
+
+	// Tools
 	private Gtk.Menu menu_eraser;
 	private Gtk.ToolButton toolitem_eraser;
+	private Gtk.ToolButton toolitem_undo;
+	private Gtk.ToolButton toolitem_redo;
 
+	// RadioActions
 	private Gtk.RadioAction radio_layer;
 	private Gtk.RadioAction radio_scale;
 	private Gtk.RadioAction radio_drawing_tool;
 
+	// ToggleActions
 	private Gtk.ToggleAction toggle_fullscreen;
 	private Gtk.ToggleAction toggle_show_title;
 
+	// ActionGroups
 	private Gtk.ActionGroup actiongroup_project_open;
 	private Gtk.ActionGroup actiongroup_project_closed;
 
-	private Gtk.ToolButton toolitem_undo;
-	private Gtk.ToolButton toolitem_redo;
+
 
 	/**
 	 * Builds the main interface.
-	 * 
-	 * @param controller A reference to the controller that launched this view.
+	 *
+	 * @param editor A reference to the Editor class.
 	 */
-	public MainWindow (MainController controller) {
+	public MainWindow (Editor editor) {
 		/*
 		 * Initialize properties
 		 */
-		this.controller = controller;
+		this.editor = editor;
 		this.set_icon (Resources.load_icon_as_pixbuf ("easyrpg", 48));
 		this.set_default_size (500, 400);
 
@@ -403,7 +410,7 @@ public class MainWindow : Gtk.Window {
 		var scrolled_maptree = new Gtk.ScrolledWindow (null, null);
 
 		this.drawingarea_palette = new TilePaletteDrawingArea ();
-		this.drawingarea_maprender = new MapDrawingArea (controller, scrolled_maprender, this.drawingarea_palette);
+		this.drawingarea_maprender = new MapDrawingArea (editor, scrolled_maprender, this.drawingarea_palette);
 		this.paned_palette_maptree = new Gtk.Paned (Gtk.Orientation.VERTICAL);
 		this.statusbar_tooltip = new Gtk.Statusbar ();
 		this.statusbar_current_frame = new Gtk.Statusbar ();
@@ -519,42 +526,42 @@ public class MainWindow : Gtk.Window {
 		 * Connect signals
 		 */
 		// Open/Close project
-		action_open.activate.connect (this.controller.open_project_from_dialog);
-		action_save.activate.connect (this.controller.save_changes);
-		action_revert.activate.connect (this.controller.reload_project);
-		action_close.activate.connect (this.controller.close_project);
-		action_new.activate.connect (this.controller.create_project);
+		action_open.activate.connect (this.editor.open_project_from_dialog);
+		action_save.activate.connect (this.editor.save_changes);
+		action_revert.activate.connect (this.editor.reload_project);
+		action_close.activate.connect (this.editor.close_project);
+		action_new.activate.connect (this.editor.create_project);
 
 		// Show database dialog
-		action_database.activate.connect (this.controller.show_database);
+		action_database.activate.connect (this.editor.show_database);
 
 		// Show about dialog
-		action_about.activate.connect (this.controller.on_about);
+		action_about.activate.connect (this.editor.on_about);
 
 		// Change edition mode
 		this.radio_layer.changed.connect (this.on_layer_change);
 		this.radio_scale.changed.connect (this.on_scale_change);
 
 		// Map selected
-		this.treeview_maptree.map_selected.connect (this.controller.on_map_selected);
-		this.treeview_maptree.map_properties.connect (this.controller.on_map_properties);
-		this.treeview_maptree.map_new.connect (this.controller.on_map_new);
-		this.treeview_maptree.map_delete.connect (this.controller.on_map_delete);
-		this.treeview_maptree.map_shift.connect (this.controller.on_map_shift);
+		this.treeview_maptree.map_selected.connect (this.editor.on_map_selected);
+		this.treeview_maptree.map_properties.connect (this.editor.on_map_properties);
+		this.treeview_maptree.map_new.connect (this.editor.on_map_new);
+		this.treeview_maptree.map_delete.connect (this.editor.on_map_delete);
+		this.treeview_maptree.map_shift.connect (this.editor.on_map_shift);
 
 		toolitem_undo.clicked.connect (() => {
-			var stack = controller.get_map_changes ();
+			var stack = editor.get_map_changes ();
 			if (stack != null) {
 				stack.undo ();
-				controller.reload_map ();
+				editor.reload_map ();
 			}
 		});
 
 		toolitem_redo.clicked.connect (() => {
-			var stack = controller.get_map_changes ();
+			var stack = editor.get_map_changes ();
 			if (stack != null) {
 				stack.redo ();
-				controller.reload_map ();
+				editor.reload_map ();
 			}
 		});
 
@@ -634,7 +641,7 @@ public class MainWindow : Gtk.Window {
 		this.update_statusbar_current_frame ();
 
 		// Don't react if the current map is map 0 (game_title)
-		if (this.controller.get_current_map_id () == 0) {
+		if (this.editor.get_current_map_id () == 0) {
 			return;
 		}
 
@@ -667,7 +674,7 @@ public class MainWindow : Gtk.Window {
 	 */
 	public void on_scale_change () {
 		// Don't react if the current map is map 0 (game_title)
-		if (this.controller.get_current_map_id () == 0) {
+		if (this.editor.get_current_map_id () == 0) {
 			return;
 		}
 
