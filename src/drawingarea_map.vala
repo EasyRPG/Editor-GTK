@@ -23,7 +23,7 @@
 public class MapDrawingArea : Gtk.DrawingArea {
 	private Editor editor;
 	private weak Gtk.ScrolledWindow scrolled_window;
-	private TilePaletteDrawingArea palette;
+	private Tileset tileset;
 	private int tile_width;
 	private int tile_height;
 	private int tile_size;
@@ -41,10 +41,9 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	/**
 	 * Builds the map DrawingArea.
 	 */
-	public MapDrawingArea (Editor editor, Gtk.ScrolledWindow scrolled_window, TilePaletteDrawingArea palette) {
+	public MapDrawingArea (Editor editor, Gtk.ScrolledWindow scrolled_window) {
 		this.editor = editor;
 		this.scrolled_window = scrolled_window;
-		this.palette = palette;
 		this.set_size_request (-1, -1);
 		this.set_halign (Gtk.Align.CENTER);
 		this.set_valign (Gtk.Align.CENTER);
@@ -57,10 +56,23 @@ public class MapDrawingArea : Gtk.DrawingArea {
 
 		this.tools = new HashTable<DrawingTool,Tool> (null, null);
 
+		this.tools[DrawingTool.PEN] = new PenTool (editor, null);
+		this.tools[DrawingTool.RECTANGLE] = new RectangleTool (editor, null);
+		this.tools[DrawingTool.ERASER_NORMAL] = new EraserTool (editor, null);
+		this.tools[DrawingTool.ZOOM] = new ZoomTool (editor, null);
+/*
 		this.tools[DrawingTool.PEN] = new PenTool (editor, palette);
 		this.tools[DrawingTool.RECTANGLE] = new RectangleTool (editor, palette);
 		this.tools[DrawingTool.ERASER_NORMAL] = new EraserTool (editor, palette);
 		this.tools[DrawingTool.ZOOM] = new ZoomTool (editor, palette);
+*/
+	}
+
+	/**
+	 * Sets a tileset.
+	 */
+	public void set_tileset (Tileset tileset) {
+		this.tileset = tileset;
 	}
 
 	/**
@@ -493,7 +505,7 @@ public class MapDrawingArea : Gtk.DrawingArea {
 
 				// Get and draw the lower layer tile, if any
 				if (lower_tile_id != 0) {
-					var surface_tile = this.palette.get_tile (lower_tile_id, LayerType.LOWER);
+					var surface_tile = this.tileset.get_tile (lower_tile_id, LayerType.LOWER);
 					// The standard 16x16 tile size is used because of the use of scale ()
 					this.draw_tile (surface_tile, this.surface_lower_layer, (dest_x + col) * 16, (dest_y + row) * 16);
 				} else {
@@ -502,7 +514,7 @@ public class MapDrawingArea : Gtk.DrawingArea {
 
 				// Get and draw the upper layer tile, if any
 				if (upper_tile_id != 0) {
-					var surface_tile = this.palette.get_tile (upper_tile_id, LayerType.UPPER);
+					var surface_tile = this.tileset.get_tile (upper_tile_id, LayerType.UPPER);
 					// The standard 16x16 tile size is used because of the use of scale ()
 					this.draw_tile (surface_tile, this.surface_upper_layer, (dest_x + col) * 16, (dest_y + row) * 16);
 				} else {
@@ -721,7 +733,7 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	public bool draw_preview (Cairo.Context ctx) {
 		MainWindow window = (MainWindow) this.get_toplevel ();
 		DrawingTool action = (DrawingTool) window.get_current_drawing_tool ();
-		Rect selected = this.palette.getSelectedArea (tile_size);
+		Rect selected_rect = this.tileset.get_selected_area (tile_size);
 
 		switch (action) {
 			case DrawingTool.PEN:
@@ -730,13 +742,25 @@ public class MapDrawingArea : Gtk.DrawingArea {
 			case DrawingTool.FILL:
 				ctx.set_source_rgb (1.0,1.0,1.0);
 				ctx.set_line_width (2.0);
-				ctx.rectangle (cursor.x * tile_size, cursor.y * tile_size, selected.width, selected.height);
+				ctx.rectangle (
+					cursor.x * tile_size,
+					cursor.y * tile_size,
+					selected_rect.width,
+					selected_rect.height
+				);
+
 				ctx.stroke ();
 				return true;
 			case DrawingTool.ERASER_NORMAL:
 				ctx.set_source_rgb (1.0,1.0,1.0);
 				ctx.set_line_width (2.0);
-				ctx.rectangle (cursor.x * tile_size, cursor.y * tile_size, tile_size, tile_size);
+				ctx.rectangle (
+					cursor.x * tile_size,
+					cursor.y * tile_size,
+					tile_size,
+					tile_size
+				);
+
 				ctx.stroke ();
 				return true;
 			default:

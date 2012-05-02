@@ -21,45 +21,11 @@
  * The tile palette DrawingArea.
  */
 public class TilePaletteDrawingArea : Gtk.DrawingArea {
-	private Cairo.ImageSurface surface_lower_tiles;
-	private Cairo.ImageSurface surface_upper_tiles;
-	private GLib.HashTable<int, Cairo.ImageSurface> autotiles;
+////private Cairo.ImageSurface surface_lower_tiles;
+////private Cairo.ImageSurface surface_upper_tiles;
+////private GLib.HashTable<int, Cairo.ImageSurface> autotiles;
 	private LayerType current_layer;
-
-	private Rect selected = Rect(0,0,0,0);
-
-	/**
-	 * Returns the rectangle of selected tiles
-	 */
-	public Rect getSelected() {
-		return selected;
-	}
-
-	/**
-	 * Returns the rectangle of selected tiles prepared
-	 * for Drawing to Surfaces.
-	 */
-	public Rect getSelectedArea (int tile_size) {
-		int x = selected.x * tile_size;
-		int y = selected.y * tile_size;
-		int w = selected.width * tile_size;
-		int h = selected.height * tile_size;
-
-		if(w < 0) {
-			w = -w;
-			x -= w;
-		}
-
-		if(h < 0) {
-			h *= -1;
-			y -= h;
-		}
-
-		w+=tile_size;
-		h+=tile_size;
-
-		return Rect(x, y, w, h);
-	}
+	private Tileset tileset;
 
 	/**
 	 * Builds the tile palette DrawingArea.
@@ -69,175 +35,15 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 			Gdk.EventMask.BUTTON_PRESS_MASK |
 			Gdk.EventMask.BUTTON1_MOTION_MASK
 		);
+
 		this.set_size_request (192, -1);
-		this.autotiles = new GLib.HashTable<int, Cairo.ImageSurface> (null, null);
 	}
 
 	/**
-	 * Loads the tileset.
-	 * 
-	 * The tileset is split in two surfaces, one for the lower tiles and another
-	 * for the upper tiles. The autotiles are stored as independent surfaces in
-	 * a hashtable.
+	 * Sets a tileset.
 	 */
-	public void load_tileset (string tileset) {
-		var surface_tileset = new Cairo.ImageSurface.from_png (tileset);
-
-		// Lower layer palette has 6x27 tiles, the first 6x3 tiles contain autotiles
-		this.surface_lower_tiles = new Cairo.ImageSurface (Cairo.Format.ARGB32, 96, 432);
-
-		// Upper layer palette has 6x24 tiles
-		this.surface_upper_tiles = new Cairo.ImageSurface (Cairo.Format.ARGB32, 96, 384);
-
-		// Load process
-		this.load_autotiles (surface_tileset);
-		this.load_lower_tiles (surface_tileset);
-		this.load_upper_tiles (surface_tileset);
-
-		this.draw.connect (on_draw);
-
-		this.button_press_event.connect (on_button_press);
-		this.motion_notify_event.connect (on_button_motion);
-	}
-
-	/**
-	 * Splits the autotiles in blocks that are stored in independent surfaces.
-	 */
-	private void load_autotiles (Cairo.ImageSurface surface_tileset) {
-		Cairo.Context ctx;
-		Cairo.ImageSurface surface_block;
-
-		// Each tileset contains 5 columns with a size of 6x16 tiles (96x256 pixels) 
-		int tileset_col = 0;
-
-		// Each tileset column contains 4 blocks with a size of 3x4 tiles (48x64 pixels)
-		int block_col = 0;
-		int block_row = 0;
-
-		int tile_id = 1;
-		
-		while (tileset_col < 2) {
-			surface_block = new Cairo.ImageSurface (Cairo.Format.ARGB32, 48, 64);
-			ctx = new Cairo.Context (surface_block);
-			ctx.set_operator (Cairo.Operator.SOURCE);
-
-			int dest_x = 0;
-			int dest_y = 0;
-			int orig_x = (2 * tileset_col + block_col) * 48;
-			int orig_y = block_row * 64;
-
-			// Select the destination area, pos (0,0) size (48,64)
-			ctx.rectangle (0, 0, 48, 64);
-
-			// Adapt the block coordinates to the destination area and fill it
-			ctx.set_source_surface (surface_tileset, dest_x - orig_x, dest_y - orig_y);
-			ctx.fill ();
-
-			// Store the surface in the autotiles hashtable
-			this.autotiles.set (tile_id, surface_block);
-
-			tile_id++;
-			block_col++;
-
-			// Go to the next block
-			if (block_col > 1) {
-				block_col = 0;
-				block_row++;
-			}
-
-			// Go to the next column
-			if (block_row > 3) {
-				block_row = 0;
-				tileset_col++;
-			}
-		}
-	}
-
-	/**
-	 * Builds the lower tiles surface (used when designing the lower layer).
-	 */
-	private void load_lower_tiles (Cairo.ImageSurface surface_tileset) {
-		var ctx = new Cairo.Context (this.surface_lower_tiles);
-		ctx.set_operator (Cairo.Operator.SOURCE);
-
-		Cairo.ImageSurface surface_autotile;
-
-		int dest_x = 0;
-		int dest_y = 0;
-		int orig_x = 0;
-		int orig_y = 0;
-
-		// For each autotile block, copy its representative tile to the palette
-		for (int tile_id = 1; tile_id < 17; tile_id++) {
-			surface_autotile = this.autotiles.get (tile_id);
-
-			// First three animated autotile blocks
-			if (tile_id < 4) {
-				dest_x = (tile_id - 1) * 16;
-				ctx.rectangle (dest_x, dest_y, 16, 16);
-				ctx.set_source_surface (surface_autotile, dest_x, dest_y);
-			}
-			// The fourth animated autotile block works in a different way
-			else if (tile_id == 4) {
-				dest_x = (tile_id - 1) * 16;
-				ctx.rectangle (dest_x, dest_y, 48, 16);
-				ctx.set_source_surface (surface_autotile, dest_x, dest_y);
-			}
-			// The remaining autotiles
-			else {
-				dest_x = ((tile_id + 1) % 6) * 16;
-				dest_y = ((tile_id + 1) / 6) * 16;
-				ctx.rectangle (dest_x, dest_y, 16, 16);
-			}
-
-			ctx.set_source_surface (surface_autotile, dest_x, dest_y);
-			ctx.fill ();
-		}
-
-		// First part of the lower tiles (third tileset column, 96x256)
-		dest_x = 0;
-		dest_y = 48;
-		orig_x = 192;
-		orig_y = 0;
-
-		ctx.rectangle (dest_x, dest_y, 96, 256);
-		ctx.set_source_surface (surface_tileset, dest_x - orig_x, dest_y - orig_y);
-		ctx.fill ();
-
-		// Second part of the lower tiles (fourth tileset column, 96x128)
-		dest_y = 304; // 48 + 256
-		orig_x = 288;
-
-		ctx.rectangle (dest_x, dest_y, 96, 128);
-		ctx.set_source_surface (surface_tileset, dest_x - orig_x, dest_y - orig_y);
-		ctx.fill ();		
-	}
-
-	/**
-	 * Builds the upper tiles surface (used when designing the upper layer).
-	 */
-	private void load_upper_tiles (Cairo.ImageSurface surface_tileset) {
-		var ctx = new Cairo.Context (this.surface_upper_tiles);
-		ctx.set_operator (Cairo.Operator.SOURCE);
-
-		// First part of the upper tiles (fourth tileset column, 96x128)
-		int dest_x = 0;
-		int dest_y = 0;
-		int orig_x = 288;
-		int orig_y = 128;
-
-		ctx.rectangle (dest_x, dest_y, 96, 128);
-		ctx.set_source_surface (surface_tileset, dest_x - orig_x, dest_y - orig_y);
-		ctx.fill ();
-
-		// Second part of the upper tiles (fifth tileset column, 96x256)
-		dest_y = 128;
-		orig_x = 384;
-		orig_y = 0;
-
-		ctx.rectangle (dest_x, dest_y, 96, 256);
-		ctx.set_source_surface (surface_tileset, dest_x - orig_x, dest_y - orig_y);
-		ctx.fill ();
+	public void set_tileset (Tileset tileset) {
+		this.tileset = tileset;
 	}
 
 	/**
@@ -252,15 +58,15 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 		switch (layer) {
 			case LayerType.LOWER:
 				this.set_size_request (
-					this.surface_lower_tiles.get_width () * 2,
-					this.surface_lower_tiles.get_height () * 2
+					this.tileset.get_lower_tiles ().get_width () * 2,
+					this.tileset.get_lower_tiles ().get_height () * 2
 				);
 				break;
 			case LayerType.UPPER:
 			case LayerType.EVENT:
 				this.set_size_request (
-					this.surface_upper_tiles.get_width () * 2,
-					this.surface_upper_tiles.get_height () * 2
+					this.tileset.get_upper_tiles ().get_width () * 2,
+					this.tileset.get_upper_tiles ().get_height () * 2
 				);
 				break;
 			default:
@@ -271,43 +77,23 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 		this.queue_draw ();
 	}
 
-	/**
-	 * Returns a 16x16 surface with the desired tile.
-	 */
-	public Cairo.ImageSurface get_tile (int tile_id, LayerType layer) {
-		var surface_tile = new Cairo.ImageSurface (Cairo.Format.ARGB32, 16, 16);
+	public void load_tileset (string tileset_file) {
+		// Instance a new Tileset
+		this.tileset = new Tileset (tileset_file);
 
-		// Find the tile coordinates
-		int orig_x = ((tile_id - 1) % 6) * 16;
-		int orig_y = ((tile_id - 1) / 6) * 16;
-
-		var ctx = new Cairo.Context (surface_tile);
-		ctx.rectangle (0, 0, 16, 16);
-
-		if (layer == LayerType.LOWER) {
-			ctx.set_source_surface (this.surface_lower_tiles, -orig_x, -orig_y);
-		}
-		else {
-			ctx.set_source_surface (this.surface_upper_tiles, -orig_x, -orig_y);
-		}
-
-		// Paint the tile in the 16x16 surface
-		ctx.set_operator (Cairo.Operator.SOURCE);
-		ctx.fill ();
-
-		return surface_tile;
+		// Signal connection
+		this.draw.connect (on_draw);
+		this.button_press_event.connect (on_button_press);
+		this.motion_notify_event.connect (on_button_motion);
 	}
 
 	/**
 	 * Clears the DrawingArea.
 	 */
 	public void clear () {
-		// Clear the surfaces
-		this.surface_lower_tiles = null;
-		this.surface_upper_tiles = null;
-
-		// Empty the hashtable
-		this.autotiles.remove_all ();
+		// Clear the tileset
+		this.tileset.clear ();
+		this.tileset = null;
 
 		// Make sure it keeps the correct size
 		this.set_size_request (192, -1);
@@ -316,24 +102,33 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 		this.queue_draw ();
 		this.draw.disconnect (on_draw);
 
-		// do not react anymore to the mouse signals
+		// Do not react anymore to the mouse signals
 		this.button_press_event.disconnect (on_button_press);
 		this.motion_notify_event.disconnect (on_button_motion);
 	}
 
 	public bool on_button_press (Gdk.EventButton event) {
-		selected.set_values(((int) event.x)/32, ((int) event.y)/32, 0, 0);
+		Rect selected_rect = this.tileset.get_selected_rect ();
+
+		selected_rect.set_values(
+			((int) event.x) / 32,
+			((int) event.y) / 32,
+			0, 0
+		);
+
 		this.queue_draw();
 		return true;
 	}
 
 	public bool on_button_motion (Gdk.EventMotion event) {
-		int width  = ((int) event.x)/32 - selected.x;
-		int height = ((int) event.y)/32 - selected.y;
+		Rect selected_rect = this.tileset.get_selected_rect ();
 
-		if(selected.width != width || selected.height != height) {
-			selected.width = width;
-			selected.height = height;
+		int width  = ((int) event.x) / 32 - selected_rect.x;
+		int height = ((int) event.y) / 32 - selected_rect.y;
+
+		if(selected_rect.width != width || selected_rect.height != height) {
+			selected_rect.width = width;
+			selected_rect.height = height;
 			this.queue_draw();
 		}
 
@@ -351,11 +146,11 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 
 		switch (this.current_layer) {
 			case LayerType.LOWER:
-				ctx.set_source_surface (this.surface_lower_tiles, 0, 0);
+				ctx.set_source_surface (this.tileset.get_lower_tiles (), 0, 0);
 				break;
 			case LayerType.UPPER:
 			case LayerType.EVENT:
-				ctx.set_source_surface (this.surface_upper_tiles, 0, 0);
+				ctx.set_source_surface (this.tileset.get_upper_tiles (), 0, 0);
 				break;
 			default:
 				return false;
@@ -368,7 +163,7 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 		// Mark selected tiles
 		ctx.set_source_rgb (1.0,1.0,1.0);
 		ctx.set_line_width (1.0);
-		Rect s = getSelectedArea (16);
+		Rect s = this.tileset.get_selected_area (16);
 		ctx.rectangle ((double) s.x, (double) s.y, (double) s.width, (double) s.height);
 		ctx.stroke ();
 
@@ -380,5 +175,20 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 	 */
 	public static int position_to_id (int x, int y) {
 		return y * 6 + x + 1;
+	}
+
+	/**
+	 * Returns the rectangle of selected tiles.
+	 */
+	public Rect get_selected_rect () {
+		return this.tileset.get_selected_rect ();
+	}
+
+	/**
+	 * Returns the rectangle of selected tiles prepared
+	 * for Drawing to Surfaces.
+	 */
+	public Rect get_selected_area (int tile_size) {
+		return this.tileset.get_selected_area (tile_size);
 	}
 }

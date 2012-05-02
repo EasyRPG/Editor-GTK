@@ -28,7 +28,7 @@ public class PenTool : EditTool {
 	}
 
 	private bool pen (Point cursor) {
-		Rect selected = this.palette.getSelected ().normalize ();
+		Rect selected = this.palette.get_selected_rect ().normalize ();
 
 		if (drawing_layer.length[1] <= cursor.x + selected.width)
 			selected.width = drawing_layer.length[1] - cursor.x - 1;
@@ -66,5 +66,4 @@ public class PenTool : EditTool {
 	public override bool on_key_pressed (Point cursor, uint key, Gdk.ModifierType modifier, int[,] layer) {
 		return false;
 	}
-
 }

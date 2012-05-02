@@ -34,13 +34,13 @@ public class RectangleTool : EditTool {
 		this.start = cursor;
 		this.old   = cursor;
 
-		drawing_layer[cursor.y, cursor.x] = this.palette.position_to_id(this.palette.getSelected ().x, this.palette.getSelected ().y);
+		drawing_layer[cursor.y, cursor.x] = this.palette.position_to_id(this.palette.get_selected_rect ().x, this.palette.get_selected_rect ().y);
 
 		return true;
 	}
 
 	public override bool on_button1_motion (Point cursor) {
-		Rect selected = this.palette.getSelected ().normalize ();
+		Rect selected = this.palette.get_selected_rect ().normalize ();
 
 		/* old area */
 		Rect area_old = Rect (start.x, start.y, old.x-start.x, old.y-start.y).normalize ();

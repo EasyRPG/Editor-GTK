@@ -38,6 +38,7 @@ easyrpg_editor_SOURCES = \
 	model_vehicle.vala \
 	resources.vala \
 	structs.vala \
+	tileset.vala \
 	tool.vala \
 	tools/eraser.vala \
 	tools/pen.vala \
