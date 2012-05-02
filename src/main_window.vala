@@ -542,28 +542,16 @@ public class MainWindow : Gtk.Window {
 		this.radio_layer.changed.connect (this.on_layer_change);
 		this.radio_scale.changed.connect (this.on_scale_change);
 
-		// Map selected
+		// Map
 		this.treeview_maptree.map_selected.connect (this.editor.on_map_selected);
 		this.treeview_maptree.map_properties.connect (this.editor.on_map_properties);
 		this.treeview_maptree.map_new.connect (this.editor.on_map_new);
 		this.treeview_maptree.map_delete.connect (this.editor.on_map_delete);
 		this.treeview_maptree.map_shift.connect (this.editor.on_map_shift);
 
-		toolitem_undo.clicked.connect (() => {
-			var stack = editor.get_map_changes ();
-			if (stack != null) {
-				stack.undo ();
-				editor.reload_map ();
-			}
-		});
-
-		toolitem_redo.clicked.connect (() => {
-			var stack = editor.get_map_changes ();
-			if (stack != null) {
-				stack.redo ();
-				editor.reload_map ();
-			}
-		});
+		// Undo and redo
+		toolitem_undo.clicked.connect (this.editor.on_undo);
+		toolitem_redo.clicked.connect (this.editor.on_redo);
 
 		// Eraser menu callbacks
 		toolitem_menu_eraser.clicked.connect (menu_eraser_popup);

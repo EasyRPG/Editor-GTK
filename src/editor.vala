@@ -1008,6 +1008,30 @@ public class Editor {
 	}
 
 	/**
+	 * Manages the reactions to the undo button.
+	 */
+	public void on_undo () {
+		var stack = this.get_map_changes () as UndoManager.Stack;
+
+		if (stack != null) {
+			stack.undo ();
+			this.reload_map ();
+		}
+	}
+
+	/**
+	 * Manages the reactions to the redo button.
+	 */
+	public void on_redo () {
+		var stack = this.get_map_changes () as UndoManager.Stack;
+
+		if (stack != null) {
+			stack.redo ();
+			this.reaload_map ();
+		}
+	}
+
+	/**
 	 * Instantiates and shows the database dialog.
 	 */
 	public void show_database () {
