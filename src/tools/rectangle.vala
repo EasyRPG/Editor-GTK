@@ -24,8 +24,8 @@ public class RectangleTool : EditTool {
 	Point start;
 	Point old;
 
-	public RectangleTool (MainController controller, TilePaletteDrawingArea palette) {
-		this.controller = controller;
+	public RectangleTool (Editor editor, TilePaletteDrawingArea palette) {
+		this.editor = editor;
 		this.palette = palette;
 	}
 

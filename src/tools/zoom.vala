@@ -21,8 +21,8 @@
  * The ZoomTool used by the Editor
  */
 public class ZoomTool : Tool {
-	public ZoomTool (MainController controller, TilePaletteDrawingArea palette) {
-		this.controller = controller;
+	public ZoomTool (Editor editor, TilePaletteDrawingArea palette) {
+		this.editor = editor;
 		this.palette = palette;
 	}
 

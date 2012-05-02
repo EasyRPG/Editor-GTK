@@ -22,8 +22,8 @@
  */
 public class EraserTool : EditTool {
 
-	public EraserTool (MainController controller, TilePaletteDrawingArea palette) {
-		this.controller = controller;
+	public EraserTool (Editor editor, TilePaletteDrawingArea palette) {
+		this.editor = editor;
 		this.palette = palette;
 	}
 

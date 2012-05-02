@@ -70,10 +70,10 @@ public abstract class EditTool : Tool {
 
 		switch (current_layer) {
 			case LayerType.LOWER:
-				map_layer = controller.get_map ().lower_layer;
+				map_layer = editor.get_map ().lower_layer;
 				break;
 			case LayerType.UPPER:
-				map_layer = controller.get_map ().upper_layer;
+				map_layer = editor.get_map ().upper_layer;
 				break;
 			default:
 				warning ("unsupported Layer!");
@@ -106,7 +106,7 @@ public abstract class EditTool : Tool {
 			return true;
 
 		var action = new UndoManager.MapEditAction (current_layer, drawing_layer, changes);
-		controller.get_map_changes ().push (action);
+		editor.get_map_changes ().push (action);
 
 		/* clean drawing layer */
 		drawing_layer = null;

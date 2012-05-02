@@ -21,7 +21,7 @@
  * The map DrawingArea.
  */
 public class MapDrawingArea : Gtk.DrawingArea {
-	private MainController controller;
+	private Editor editor;
 	private weak Gtk.ScrolledWindow scrolled_window;
 	private TilePaletteDrawingArea palette;
 	private int tile_width;
@@ -41,8 +41,8 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	/**
 	 * Builds the map DrawingArea.
 	 */
-	public MapDrawingArea (MainController controller, Gtk.ScrolledWindow scrolled_window, TilePaletteDrawingArea palette) {
-		this.controller = controller;
+	public MapDrawingArea (Editor editor, Gtk.ScrolledWindow scrolled_window, TilePaletteDrawingArea palette) {
+		this.editor = editor;
 		this.scrolled_window = scrolled_window;
 		this.palette = palette;
 		this.set_size_request (-1, -1);
@@ -57,10 +57,10 @@ public class MapDrawingArea : Gtk.DrawingArea {
 
 		this.tools = new HashTable<DrawingTool,Tool> (null, null);
 
-		this.tools[DrawingTool.PEN] = new PenTool (controller, palette);
-		this.tools[DrawingTool.RECTANGLE] = new RectangleTool (controller, palette);
-		this.tools[DrawingTool.ERASER_NORMAL] = new EraserTool (controller, palette);
-		this.tools[DrawingTool.ZOOM] = new ZoomTool (controller, palette);
+		this.tools[DrawingTool.PEN] = new PenTool (editor, palette);
+		this.tools[DrawingTool.RECTANGLE] = new RectangleTool (editor, palette);
+		this.tools[DrawingTool.ERASER_NORMAL] = new EraserTool (editor, palette);
+		this.tools[DrawingTool.ZOOM] = new ZoomTool (editor, palette);
 	}
 
 	/**

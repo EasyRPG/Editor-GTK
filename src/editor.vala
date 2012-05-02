@@ -31,7 +31,7 @@ public class Editor {
 	private XmlNode project_data;
 	private XmlNode game_data;
 	private string[] tilesets;
-	private int current_map;
+	private int current_map_id;
 
 	// Map related structures
 	private GLib.HashTable<int, Map> maps;
@@ -1027,7 +1027,7 @@ public class Editor {
 
 		if (stack != null) {
 			stack.redo ();
-			this.reaload_map ();
+			this.reload_map ();
 		}
 	}
 

@@ -22,8 +22,8 @@
  */
 public class PenTool : EditTool {
 
-	public PenTool (MainController controller, TilePaletteDrawingArea palette) {
-		this.controller = controller;
+	public PenTool (Editor editor, TilePaletteDrawingArea palette) {
+		this.editor = editor;
 		this.palette = palette;
 	}
 

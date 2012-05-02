@@ -21,7 +21,7 @@
  * The parent class for any Tools used by the Editor (e.g. Pen, Eraser or Zoom).
  */
 public abstract class Tool {
-	protected MainController controller;
+	protected Editor editor;
 	protected TilePaletteDrawingArea palette;
 	protected LayerType current_layer;
 	protected Scale current_scale;
