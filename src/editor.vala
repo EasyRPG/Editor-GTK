@@ -21,7 +21,7 @@
  * Editor is the application class, the starting point for the app.
  */
 public class Editor {
-	// MainWindow instance 
+	// MainWindow instance
 	private MainWindow main_window;
 
 	// Project main info
@@ -694,10 +694,11 @@ public class Editor {
 		// Load the tileset into the palette and the maprender
 		var tileset = new Tileset (this.base_path + "graphics/tilesets/" + map.tileset);
 
+		// Sets the tileset and the layer, and enables the drawing events
 		var palette = this.main_window.drawingarea_palette;
 		palette.set_tileset (tileset);
-
 		palette.set_layer (this.main_window.get_current_layer ());
+		palette.enable_draw ();
 
 		// Load the map scheme into the map render
 		var maprender = this.main_window.drawingarea_maprender;
@@ -838,7 +839,6 @@ public class Editor {
 			return;
 		}
 
-		this.close_map ();
 		this.open_map (map_id);
 	}
 

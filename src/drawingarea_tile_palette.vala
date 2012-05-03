@@ -21,9 +21,6 @@
  * The tile palette DrawingArea.
  */
 public class TilePaletteDrawingArea : Gtk.DrawingArea {
-////private Cairo.ImageSurface surface_lower_tiles;
-////private Cairo.ImageSurface surface_upper_tiles;
-////private GLib.HashTable<int, Cairo.ImageSurface> autotiles;
 	private LayerType current_layer;
 	private Tileset tileset;
 
@@ -48,7 +45,7 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 
 	/**
 	 * Manages the reactions to the layer change.
-	 * 
+	 *
 	 * Displays the correct palette for the selected layer.
 	 */
 	public void set_layer (LayerType layer) {
@@ -77,32 +74,53 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 		this.queue_draw ();
 	}
 
-	public void load_tileset (string tileset_file) {
-		// Instance a new Tileset
-		this.tileset = new Tileset (tileset_file);
+	/**
+	 * Clears the DrawingArea.
+	 */
+	public void clear () {
+		// Clear the tileset if it was defined
+		if (this.tileset != null) {
+			this.tileset.clear ();
+			this.tileset = null;
+		}
 
-		// Signal connection
+		// Make sure it keeps the correct size
+		this.set_size_request (192, -1);
+
+		// Redraw the DrawingArea to clean the canvas
+		this.queue_draw ();
+
+		// Disable the draw and tile selection events
+		this.disable_draw ();
+		this.disable_tile_selection ();
+	}
+
+	/**
+	 * Connects the draw signal and redraws the DrawingArea.
+	 */
+	public void enable_draw () {
 		this.draw.connect (on_draw);
+	}
+
+	/**
+	 * Disconnects the draw signal.
+	 */
+	public void disable_draw () {
+		this.draw.disconnect (on_draw);
+	}
+
+	/**
+	 * Connects the tile selection events.
+	 */
+	public void enable_tile_selection () {
 		this.button_press_event.connect (on_button_press);
 		this.motion_notify_event.connect (on_button_motion);
 	}
 
 	/**
-	 * Clears the DrawingArea.
+	 * Disconnects the tile selection events.
 	 */
-	public void clear () {
-		// Clear the tileset
-		this.tileset.clear ();
-		this.tileset = null;
-
-		// Make sure it keeps the correct size
-		this.set_size_request (192, -1);
-
-		// Redraw the DrawingArea and don't react anymore to the draw signal	
-		this.queue_draw ();
-		this.draw.disconnect (on_draw);
-
-		// Do not react anymore to the mouse signals
+	public void disable_tile_selection () {
 		this.button_press_event.disconnect (on_button_press);
 		this.motion_notify_event.disconnect (on_button_motion);
 	}
@@ -137,11 +155,11 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 
 	/**
 	 * Manages the reactions to the draw signal.
-	 * 
+	 *
 	 * Draws the palette according to the active layer.
 	 */
 	public bool on_draw (Cairo.Context ctx) {
-		// The palette must be scaled to 2x (32x32 tile size) 
+		// The palette must be scaled to 2x (32x32 tile size)
 		ctx.scale (2, 2);
 
 		switch (this.current_layer) {
