@@ -194,18 +194,7 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 		ctx.set_line_width (1.0);
 
 		Rect selected_rect = this.tileset.get_selected_rect ();
-
-		// If the width is negative, make it positive and recalculate x
-		if (selected_rect.width < 0) {
-			selected_rect.width = selected_rect.width.abs ();
-			selected_rect.x = selected_rect.x - selected_rect.width + 1;
-		}
-
-		// If the height is negative, make it positive and recalculate y
-		if (selected_rect.height < 0) {
-			selected_rect.height = selected_rect.height.abs ();
-			selected_rect.y = selected_rect.y - selected_rect.height + 1;
-		}
+		selected_rect.normalize ();
 
 		ctx.rectangle (
 			(double) selected_rect.x * 16,

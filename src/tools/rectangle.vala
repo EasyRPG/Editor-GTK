@@ -40,15 +40,15 @@ public class RectangleTool : EditTool {
 	}
 
 	public override bool on_button1_motion (Point cursor) {
-		Rect selected = this.palette.get_selected_rect ().normalize ();
+		Rect selected = this.palette.get_selected_rect ().ex_normalize ();
 
 		/* old area */
-		Rect area_old = Rect (start.x, start.y, old.x-start.x, old.y-start.y).normalize ();
+		Rect area_old = Rect (start.x, start.y, old.x-start.x, old.y-start.y).ex_normalize ();
 		area_old.width++;
 		area_old.height++;
 
 		/* new area */
-		Rect area_new = Rect (start.x, start.y, cursor.x-start.x, cursor.y-start.y).normalize ();
+		Rect area_new = Rect (start.x, start.y, cursor.x-start.x, cursor.y-start.y).ex_normalize ();
 		area_new.width++;
 		area_new.height++;
 

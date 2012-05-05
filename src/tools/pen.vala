@@ -28,7 +28,7 @@ public class PenTool : EditTool {
 	}
 
 	private bool pen (Point cursor) {
-		Rect selected = this.palette.get_selected_rect ().normalize ();
+		Rect selected = this.palette.get_selected_rect ().ex_normalize ();
 
 		if (drawing_layer.length[1] <= cursor.x + selected.width)
 			selected.width = drawing_layer.length[1] - cursor.x - 1;
