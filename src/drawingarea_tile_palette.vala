@@ -99,40 +99,40 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 	 * Connects the draw signal and redraws the DrawingArea.
 	 */
 	public void enable_draw () {
-		this.draw.connect (on_draw);
+		this.draw.connect (this.on_draw);
 	}
 
 	/**
 	 * Disconnects the draw signal.
 	 */
 	public void disable_draw () {
-		this.draw.disconnect (on_draw);
+		this.draw.disconnect (this.on_draw);
 	}
 
 	/**
 	 * Connects the tile selection events.
 	 */
 	public void enable_tile_selection () {
-		this.button_press_event.connect (on_button_press);
-		this.motion_notify_event.connect (on_button_motion);
+		this.button_press_event.connect (this.on_button_press);
+		this.motion_notify_event.connect (this.on_button_motion);
 	}
 
 	/**
 	 * Disconnects the tile selection events.
 	 */
 	public void disable_tile_selection () {
-		this.button_press_event.disconnect (on_button_press);
-		this.motion_notify_event.disconnect (on_button_motion);
+		this.button_press_event.disconnect (this.on_button_press);
+		this.motion_notify_event.disconnect (this.on_button_motion);
 	}
 
 	public bool on_button_press (Gdk.EventButton event) {
-		Rect selected_rect = this.tileset.get_selected_rect ();
-
-		selected_rect.set_values(
+		Rect selected_rect = Rect (
 			((int) event.x) / 32,
 			((int) event.y) / 32,
-			0, 0
+			1, 1
 		);
+
+		this.tileset.set_selected_rect (selected_rect);
 
 		this.queue_draw();
 		return true;
@@ -140,14 +140,25 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 
 	public bool on_button_motion (Gdk.EventMotion event) {
 		Rect selected_rect = this.tileset.get_selected_rect ();
+		Rect new_rect = selected_rect;
 
-		int width  = ((int) event.x) / 32 - selected_rect.x;
-		int height = ((int) event.y) / 32 - selected_rect.y;
+		int dest_x = ((int) event.x) / 32;
+		int dest_y = ((int) event.y) / 32;
 
-		if(selected_rect.width != width || selected_rect.height != height) {
-			selected_rect.width = width;
-			selected_rect.height = height;
-			this.queue_draw();
+		new_rect.width = (dest_x - selected_rect.x).abs () + 1;
+		new_rect.height = (dest_y - selected_rect.y).abs () + 1;
+
+		if (dest_x < selected_rect.x) {
+			new_rect.width = -new_rect.width;
+		}
+
+		if (dest_y < selected_rect.y) {
+			new_rect.height = -new_rect.height;
+		}
+
+		if (new_rect != selected_rect) {
+			this.tileset.set_selected_rect (new_rect);
+			this.queue_draw ();
 		}
 
 		return true;
@@ -178,11 +189,31 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 		ctx.get_source ().set_filter (Cairo.Filter.FAST);
 		ctx.paint ();
 
-		// Mark selected tiles
+		// Selector properties
 		ctx.set_source_rgb (1.0,1.0,1.0);
 		ctx.set_line_width (1.0);
-		Rect s = this.tileset.get_selected_area (16);
-		ctx.rectangle ((double) s.x, (double) s.y, (double) s.width, (double) s.height);
+
+		Rect selected_rect = this.tileset.get_selected_rect ();
+
+		// If the width is negative, make it positive and recalculate x
+		if (selected_rect.width < 0) {
+			selected_rect.width = selected_rect.width.abs ();
+			selected_rect.x = selected_rect.x - selected_rect.width + 1;
+		}
+
+		// If the height is negative, make it positive and recalculate y
+		if (selected_rect.height < 0) {
+			selected_rect.height = selected_rect.height.abs ();
+			selected_rect.y = selected_rect.y - selected_rect.height + 1;
+		}
+
+		ctx.rectangle (
+			(double) selected_rect.x * 16,
+			(double) selected_rect.y * 16,
+			(double) selected_rect.width * 16,
+			(double) selected_rect.height * 16
+		);
+
 		ctx.stroke ();
 
 		return true;

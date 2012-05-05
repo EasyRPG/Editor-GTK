@@ -694,17 +694,17 @@ public class Editor {
 		// Load the tileset into the palette and the maprender
 		var tileset = new Tileset (this.base_path + "graphics/tilesets/" + map.tileset);
 
-		// Sets the tileset and the layer, and enables the drawing events
+		// Get the palette ready
 		var palette = this.main_window.drawingarea_palette;
 		palette.set_tileset (tileset);
 		palette.set_layer (this.main_window.get_current_layer ());
 		palette.enable_draw ();
+		palette.enable_tile_selection ();
 
-		// Load the map scheme into the map render
+		// Get the maprender ready
 		var maprender = this.main_window.drawingarea_maprender;
 		maprender.set_tileset (tileset);
 		maprender.load_map_scheme (map.lower_layer, map.upper_layer);
-
 		maprender.set_layer (this.main_window.get_current_layer ());
 		maprender.set_scale (this.main_window.get_current_scale ());
 

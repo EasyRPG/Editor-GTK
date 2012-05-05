@@ -22,7 +22,7 @@ public class Tileset {
 	private Cairo.ImageSurface surface_lower_tiles;
 	private Cairo.ImageSurface surface_upper_tiles;
 
-	private Rect selected_rect = Rect (0, 0, 0, 0);
+	private Rect selected_rect = Rect (0, 0, 1, 1);
 
 	/**
 	 * MapTileset constructor.
@@ -64,8 +64,15 @@ public class Tileset {
 	/**
 	 * Returns the rectangle of selected tiles.
 	 */
-	public Rect get_selected_rect() {
+	public Rect get_selected_rect () {
 		return this.selected_rect;
+	}
+
+	/**
+	 * Sets the rectangle of selected tiles.
+	 */
+	public void set_selected_rect (Rect selected_rect) {
+		this.selected_rect = selected_rect;
 	}
 
 	/**
