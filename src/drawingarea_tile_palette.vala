@@ -21,15 +21,19 @@
  * The tile palette DrawingArea.
  */
 public class TilePaletteDrawingArea : Gtk.DrawingArea {
-	private LayerType current_layer;
+	// References
 	private Tileset tileset;
+
+	// Status values
+	private LayerType current_layer;
 
 	/**
 	 * Builds the tile palette DrawingArea.
 	 */
 	public TilePaletteDrawingArea () {
+		// Set the event mask
 		this.add_events(
-			Gdk.EventMask.BUTTON_PRESS_MASK |
+			Gdk.EventMask.BUTTON_PRESS_MASK|
 			Gdk.EventMask.BUTTON1_MOTION_MASK
 		);
 
@@ -44,9 +48,9 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 	}
 
 	/**
-	 * Manages the reactions to the layer change.
+	 * Sets a layer.
 	 *
-	 * Displays the correct palette for the selected layer.
+	 * The palette will change the displayed tiles according to the current layer.
 	 */
 	public void set_layer (LayerType layer) {
 		this.current_layer = layer;
