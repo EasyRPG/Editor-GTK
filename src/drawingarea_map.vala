@@ -21,45 +21,60 @@
  * The map DrawingArea.
  */
 public class MapDrawingArea : Gtk.DrawingArea {
-	private Editor editor;
+	// References
 	private weak Gtk.ScrolledWindow scrolled_window;
 	private Tileset tileset;
-	private int tile_width;
-	private int tile_height;
-	private int tile_size;
+
+	// Status values
+	private LayerType current_layer;
+	private Scale current_scale;
+
+	// Map scheme
 	private int[,] lower_layer;
 	private int[,] upper_layer;
+	private int tile_size;
+
+	// Map size (in tiles)
+	private int width_in_tiles;
+	private int height_in_tiles;
+
+	// Layers
 	private bool[,] draw_status;
 	private Cairo.ImageSurface surface_lower_layer;
 	private Cairo.ImageSurface surface_upper_layer;
-	private LayerType current_layer;
-	private Scale current_scale;
 	private Rect drawn_rect;
+
+	// Tile selector
+	private Rect drawn_selector_rect;
+
+	// Others
 	private Point cursor;
 	private HashTable<DrawingTool,Tool> tools;
 
 	/**
 	 * Builds the map DrawingArea.
 	 */
-	public MapDrawingArea (Editor editor, Gtk.ScrolledWindow scrolled_window) {
-		this.editor = editor;
+	public MapDrawingArea (Gtk.ScrolledWindow scrolled_window) {
 		this.scrolled_window = scrolled_window;
 		this.set_size_request (-1, -1);
 		this.set_halign (Gtk.Align.CENTER);
 		this.set_valign (Gtk.Align.CENTER);
 
-		/* enable events needed to for drawing */
-		this.add_events(Gdk.EventMask.POINTER_MOTION_MASK);
-		this.add_events(Gdk.EventMask.BUTTON1_MOTION_MASK);
-		this.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
-		this.add_events(Gdk.EventMask.BUTTON_RELEASE_MASK);
+		// Set the event mask
+		this.add_events (
+			Gdk.EventMask.LEAVE_NOTIFY_MASK|
+			Gdk.EventMask.POINTER_MOTION_MASK|
+			Gdk.EventMask.BUTTON1_MOTION_MASK|
+			Gdk.EventMask.BUTTON_PRESS_MASK|
+			Gdk.EventMask.BUTTON_RELEASE_MASK
+		);
 
 		this.tools = new HashTable<DrawingTool,Tool> (null, null);
 
-		this.tools[DrawingTool.PEN] = new PenTool (editor, null);
-		this.tools[DrawingTool.RECTANGLE] = new RectangleTool (editor, null);
-		this.tools[DrawingTool.ERASER_NORMAL] = new EraserTool (editor, null);
-		this.tools[DrawingTool.ZOOM] = new ZoomTool (editor, null);
+		this.tools[DrawingTool.PEN] = new PenTool (null, null);
+		this.tools[DrawingTool.RECTANGLE] = new RectangleTool (null, null);
+		this.tools[DrawingTool.ERASER_NORMAL] = new EraserTool (null, null);
+		this.tools[DrawingTool.ZOOM] = new ZoomTool (null, null);
 /*
 		this.tools[DrawingTool.PEN] = new PenTool (editor, palette);
 		this.tools[DrawingTool.RECTANGLE] = new RectangleTool (editor, palette);
@@ -76,48 +91,28 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	}
 
 	/**
-	 * Loads the map.
-	 * 
-	 * Gets the layer schemes and reads them to draw the tiles in each layer surface.
-	 */
-	public void load_map_scheme (int[,] lower_layer, int[,] upper_layer) {
-		this.lower_layer = lower_layer;
-		this.upper_layer = upper_layer;
-
-		// Map width and height (in tiles) 
-		this.tile_width = this.lower_layer.length[1];
-		this.tile_height = this.lower_layer.length[0];
-
-		// Update size information of tools
-		foreach (DrawingTool tool in DrawingTool.all ())
-			if (this.tools[tool] != null)
-				this.tools[tool].set_size(this.tile_width, this.tile_height);
-
-		this.draw.connect (on_draw);
-		this.motion_notify_event.connect (on_motion);
-		this.button_release_event.connect (on_button_released);
-		this.button_press_event.connect (on_button_pressed);
-	}
-
-	/**
-	 * Manages the reactions to the layer change.
+	 * Sets a layer.
+	 *
+	 * The maprender will change the displayed content according to the current layer.
 	 */
 	public void set_layer (LayerType layer) {
 		this.current_layer = layer;
 
 		// Update current layer of tools
-		foreach (DrawingTool index in DrawingTool.all ())
-			if (tools[index] != null)
+		foreach (DrawingTool index in DrawingTool.all ()) {
+			if (tools[index] != null) {
 				tools[index].set_layer (layer);
+			}
+		}
 
 		// Redraw the DrawingArea
 		this.queue_draw ();
 	}
 
 	/**
-	 * Manages the reactions to the scale change.
+	 * Sets a scale.
 	 *
-	 * Updates the DrawingArea size based in the selected scale.
+	 * The maprender will change the size of the displayed tiles according to the current scale.
 	 */
 	public void set_scale (Scale scale) {
 		this.current_scale = scale;
@@ -126,6 +121,7 @@ public class MapDrawingArea : Gtk.DrawingArea {
 		this.surface_lower_layer = null;
 		this.surface_upper_layer = null;
 
+		// Change the tile size
 		switch (scale) {
 			case Scale.1_1:
 				this.tile_size = 32;
@@ -153,29 +149,58 @@ public class MapDrawingArea : Gtk.DrawingArea {
 		this.surface_upper_layer = new Cairo.ImageSurface (Cairo.Format.ARGB32, surface_width, surface_height);
 
 		// Reset the draw status scheme
-		this.draw_status = new bool[this.tile_height, this.tile_width];
+		this.draw_status = new bool[this.height_in_tiles, this.width_in_tiles];
 
 		// Reset the drawn rect
 		this.drawn_rect = Rect (0, 0, 0, 0);
 
 		// Set a new size for the DrawingArea
-		int drawing_width = this.tile_width * this.tile_size;
-		int drawing_height = this.tile_height * this.tile_size;
+		int drawing_width = this.width_in_tiles * this.tile_size;
+		int drawing_height = this.height_in_tiles * this.tile_size;
 		this.set_size_request (drawing_width, drawing_height);
 
 		// Update current scale of tools
-		foreach (DrawingTool index in DrawingTool.all ())
-			if (tools[index] != null)
+		foreach (DrawingTool index in DrawingTool.all ()) {
+			if (tools[index] != null) {
 				tools[index].set_scale (scale);
+			}
+		}
 
 		// Redraw the DrawingArea
 		this.queue_draw ();
 	}
 
 	/**
+	 * Loads the map.
+	 *
+	 * Gets the layer schemes and reads them to draw the tiles in each layer surface.
+	 */
+	public void load_map_scheme (int[,] lower_layer, int[,] upper_layer) {
+		this.lower_layer = lower_layer;
+		this.upper_layer = upper_layer;
+
+		// Map width and height (in tiles)
+		this.width_in_tiles = this.lower_layer.length[1];
+		this.height_in_tiles = this.lower_layer.length[0];
+
+		// Update size information of tools
+		foreach (DrawingTool tool in DrawingTool.all ()) {
+			if (this.tools[tool] != null) {
+				this.tools[tool].set_size(this.width_in_tiles, this.height_in_tiles);
+			}
+		}
+	}
+
+	/**
 	 * Clears the DrawingArea.
 	 */
 	public void clear () {
+		// Clear the tileset if it was defined
+		if (this.tileset != null) {
+			this.tileset.clear ();
+			this.tileset = null;
+		}
+
 		// Clear the surfaces
 		this.surface_lower_layer = null;
 		this.surface_upper_layer = null;
@@ -188,12 +213,12 @@ public class MapDrawingArea : Gtk.DrawingArea {
 		// Change the size to fluid
 		this.set_size_request (-1, -1);
 
-		// Redraw the DrawingArea and don't react anymore to the draw signal
+		// Redraw the DrawingArea to clean the canvas
 		this.queue_draw ();
-		this.draw.disconnect (on_draw);
-		this.motion_notify_event.disconnect (on_motion);
-		this.button_release_event.disconnect (on_button_released);
-		this.button_press_event.disconnect (on_button_pressed);
+
+		// Disable the draw and tile selection events
+		this.disable_draw ();
+		this.disable_tile_selection ();
 	}
 
 	/**
@@ -203,7 +228,7 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	 * should be drawn on the DrawingArea.
 	 */
 	private Rect get_visible_rect () {
-		var visible_rect = Rect (0, 0, this.tile_width, this.tile_height);
+		var visible_rect = Rect (0, 0, this.width_in_tiles, this.height_in_tiles);
 
 		// Get the adjustment values
 		var hadjustment = this.scrolled_window.get_hadjustment ();
@@ -228,12 +253,12 @@ public class MapDrawingArea : Gtk.DrawingArea {
 			int last_x = (int) ((h_value + h_page_size) / this.tile_size);
 			int last_y = (int) ((v_value + v_page_size) / this.tile_size);
 
-			if (last_x > this.tile_width - 1) {
-				last_x = this.tile_width - 1;
+			if (last_x > this.width_in_tiles - 1) {
+				last_x = this.width_in_tiles - 1;
 			}
 
-			if (last_y > this.tile_height - 1) {
-				last_y = this.tile_height - 1;
+			if (last_y > this.height_in_tiles - 1) {
+				last_y = this.height_in_tiles - 1;
 			}
 
 			int width = (last_x - first_x) + 1;
@@ -497,18 +522,22 @@ public class MapDrawingArea : Gtk.DrawingArea {
 				int drawing_tile_id = 0;
 
 				// give tools the possibility to overwrite tile of the selected layer
-				if (tool != null && tool.on_draw (Point (rect.x + col, rect.y + row), out drawing_tile_id))
-					if (current_layer == LayerType.LOWER)
+				if (tool != null && tool.on_draw (Point (rect.x + col, rect.y + row), out drawing_tile_id)) {
+					if (current_layer == LayerType.LOWER) {
 						lower_tile_id = drawing_tile_id;
-					else if (current_layer == LayerType.UPPER)
+					}
+					else if (current_layer == LayerType.UPPER) {
 						upper_tile_id = drawing_tile_id;
+					}
+				}
 
 				// Get and draw the lower layer tile, if any
 				if (lower_tile_id != 0) {
 					var surface_tile = this.tileset.get_tile (lower_tile_id, LayerType.LOWER);
 					// The standard 16x16 tile size is used because of the use of scale ()
 					this.draw_tile (surface_tile, this.surface_lower_layer, (dest_x + col) * 16, (dest_y + row) * 16);
-				} else {
+				}
+				else {
 					this.clear_tile (this.surface_lower_layer, (dest_x + col) * 16, (dest_y + row) * 16);
 				}
 
@@ -517,7 +546,8 @@ public class MapDrawingArea : Gtk.DrawingArea {
 					var surface_tile = this.tileset.get_tile (upper_tile_id, LayerType.UPPER);
 					// The standard 16x16 tile size is used because of the use of scale ()
 					this.draw_tile (surface_tile, this.surface_upper_layer, (dest_x + col) * 16, (dest_y + row) * 16);
-				} else {
+				}
+				else {
 					this.clear_tile (this.surface_upper_layer, (dest_x + col) * 16, (dest_y + row) * 16);
 				}
 
@@ -596,16 +626,54 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	}
 
 	/**
+	 * Connects the draw signal and redraws the DrawingArea.
+	 */
+	public void enable_draw () {
+		this.draw.connect (this.on_draw);
+	}
+
+	/**
+	 * Disconnects the draw signal.
+	 */
+	public void disable_draw () {
+		this.draw.disconnect (this.on_draw);
+	}
+
+	/**
+	 * Connects the tile selection events.
+	 */
+	public void enable_tile_selection () {
+		this.leave_notify_event.connect (this.on_leave);
+		this.motion_notify_event.connect (this.on_motion);
+		this.button_release_event.connect (this.on_button_released);
+		this.button_press_event.connect (this.on_button_pressed);
+	}
+
+	/**
+	 * Disconnects the tile selection events.
+	 */
+	public void disable_tile_selection () {
+		this.leave_notify_event.disconnect (this.on_leave);
+		this.motion_notify_event.disconnect (this.on_motion);
+		this.button_release_event.disconnect (this.on_button_released);
+		this.button_press_event.disconnect (this.on_button_pressed);
+	}
+
+	/**
 	 * Manages the reactions to the draw signal.
-	 * 
+	 *
 	 * Draws the map according to the active layer and scale.
 	 */
 	public bool on_draw (Cairo.Context ctx) {
+//print ("Draw!\n");
 		// Get the visible rect
 		var visible_rect = this.get_visible_rect ();
 
 		// If the visible rect is different from the already drawn rect
 		if (visible_rect != this.drawn_rect) {
+print ("Drawn rect: (%i, %i) %i x %i\n", this.drawn_rect.x, this.drawn_rect.y, this.drawn_rect.width, this.drawn_rect.height);
+print ("Visible rect: (%i, %i) %i x %i\n\n", visible_rect.x, visible_rect.y, visible_rect.width, visible_rect.height);
+//print ("Update!\n");
 			// Update the surfaces and do selective cleaning and drawing
 			this.update_surfaces (visible_rect);
 			this.clean_surfaces (visible_rect);
@@ -733,7 +801,10 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	public bool draw_preview (Cairo.Context ctx) {
 		MainWindow window = (MainWindow) this.get_toplevel ();
 		DrawingTool action = (DrawingTool) window.get_current_drawing_tool ();
-		Rect selected_rect = this.tileset.get_selected_area (tile_size);
+
+		if (this.drawn_selector_rect == Rect (0, 0, 0, 0)) {
+			return false;
+		}
 
 		switch (action) {
 			case DrawingTool.PEN:
@@ -743,10 +814,10 @@ public class MapDrawingArea : Gtk.DrawingArea {
 				ctx.set_source_rgb (1.0,1.0,1.0);
 				ctx.set_line_width (2.0);
 				ctx.rectangle (
-					cursor.x * tile_size,
-					cursor.y * tile_size,
-					selected_rect.width,
-					selected_rect.height
+					this.drawn_selector_rect.x * tile_size,
+					this.drawn_selector_rect.y * tile_size,
+					this.drawn_selector_rect.width * tile_size,
+					this.drawn_selector_rect.height * tile_size
 				);
 
 				ctx.stroke ();
@@ -755,8 +826,8 @@ public class MapDrawingArea : Gtk.DrawingArea {
 				ctx.set_source_rgb (1.0,1.0,1.0);
 				ctx.set_line_width (2.0);
 				ctx.rectangle (
-					cursor.x * tile_size,
-					cursor.y * tile_size,
+					this.drawn_selector_rect.x * tile_size,
+					this.drawn_selector_rect.y * tile_size,
 					tile_size,
 					tile_size
 				);
@@ -787,7 +858,7 @@ public class MapDrawingArea : Gtk.DrawingArea {
 				status = tool.on_button2_pressed (Point(x, y));
 
 			if (status) {
-				this.draw_status = new bool[this.tile_height, this.tile_width];
+				this.draw_status = new bool[this.height_in_tiles, this.width_in_tiles];
 				this.drawn_rect = Rect (0, 0, 0, 0);
 				this.queue_draw ();
 			}
@@ -831,7 +902,20 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	}
 
 	/**
-	 * Manages the reactions to the pointer motion signal.
+	 * Manages the reactions to the leave notify event.
+	 */
+	public bool on_leave (Gdk.EventCrossing event) {
+		// Clear the drawn selector rect
+		this.drawn_selector_rect = Rect (0, 0, 0, 0);
+
+		// Redraw the DrawingArea
+		this.queue_draw ();
+
+		return true;
+	}
+
+	/**
+	 * Manages the reactions to the motion event.
 	 */
 	public bool on_motion (Gdk.EventMotion event) {
 		MainWindow window = (MainWindow) this.get_toplevel ();
@@ -840,26 +924,26 @@ public class MapDrawingArea : Gtk.DrawingArea {
 
 		int x = ((int) event.x) / this.tile_size;
 		int y = ((int) event.y) / this.tile_size;
-		bool status = true;
 
-		/* bounding check */
-		if (x >= this.tile_width || y >= this.tile_height || x < 0 || y < 0)
+		// Get the selection width and height
+		Rect tileset_selected_rect = this.tileset.get_selected_rect ();
+		int width = tileset_selected_rect.width;
+		int height = tileset_selected_rect.height;
+
+		if (x < 0 || x >= this.width_in_tiles || y < 0 || y >= this.height_in_tiles) {
 			return false;
-
-		if (x != cursor.x || y != cursor.y) {
-			cursor.x = x;
-			cursor.y = y;
-
-			if ((event.state & Gdk.ModifierType.BUTTON1_MASK) == Gdk.ModifierType.BUTTON1_MASK && tool != null)
-				status = tool.on_button1_motion (Point(x, y));
-
-			if (status) {
-				this.draw_status = new bool[this.tile_height, this.tile_width];
-				this.drawn_rect = Rect (0, 0, 0, 0);
-				this.queue_draw ();
-			}
 		}
 
-		return status;
+		Rect visible_selector_rect = Rect (x, y, width, height);
+
+		if (visible_selector_rect != this.drawn_selector_rect) {
+			// Update the drawn selector rect
+			this.drawn_selector_rect = visible_selector_rect;
+
+			this.queue_draw ();
+		}
+
+		return true;
 	}
+
 }

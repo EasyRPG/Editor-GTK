@@ -707,6 +707,8 @@ public class Editor {
 		maprender.load_map_scheme (map.lower_layer, map.upper_layer);
 		maprender.set_layer (this.main_window.get_current_layer ());
 		maprender.set_scale (this.main_window.get_current_scale ());
+		maprender.enable_draw ();
+		maprender.enable_tile_selection ();
 
 		// Update current_map id
 		this.current_map_id = map_id;
