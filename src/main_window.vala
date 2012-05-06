@@ -21,8 +21,8 @@
  * The main window view.
  */
 public class MainWindow : Gtk.Window {
-	// Weak reference to Editor
-	private weak Editor editor;
+	// Reference to Editor
+	private Editor editor;
 
 	// Menubar, Toolbar and Statusbar
 	private Gtk.MenuBar menubar_main;
@@ -39,7 +39,6 @@ public class MainWindow : Gtk.Window {
 	private Gtk.Paned paned_palette_maptree;
 
 	// Tools
-	private Gtk.Menu menu_eraser;
 	private Gtk.ToolButton toolitem_eraser;
 	private Gtk.ToolButton toolitem_undo;
 	private Gtk.ToolButton toolitem_redo;
@@ -121,27 +120,20 @@ public class MainWindow : Gtk.Window {
 		action_about.set_icon_name (Gtk.Stock.ABOUT);
 		var action_undo = new Gtk.Action ("ActionUndo", "_Undo", "Undo last change", Gtk.Stock.UNDO);
 		var action_redo = new Gtk.Action ("ActionRedo", "_Redo", "Redo last change", Gtk.Stock.REDO);
-		var action_select = new Gtk.RadioAction ("ActionSelect", "_Select", "Select a part of the map", null, DrawingTool.SELECT);
-		action_select.set_icon_name (Resources.ICON_SELECT);
-		var action_zoom = new Gtk.RadioAction ("ActionZoom", "_Zoom", "Increase or decrease map zoom", null, DrawingTool.ZOOM);
-		action_zoom.set_icon_name (Resources.ICON_ZOOM);
-		var action_pen = new Gtk.RadioAction ("ActionPen", "_Pen", "Draw using a Pen tool (Normal)", null, DrawingTool.PEN);
-		action_pen.set_icon_name (Resources.ICON_PEN);
-		var action_eraser = new Gtk.RadioAction ("ActionEraserNormal", "_Eraser (Normal)", "Delete tiles with a Pen tool (Normal)", null, DrawingTool.ERASER_NORMAL);
-		action_eraser.set_icon_name (Resources.ICON_ERASER);
-		var action_menu_eraser = new Gtk.ToggleAction ("ActionMenuEraser", "Eraser", "Select the eraser shape", null);
-		var action_eraser_rectangle = new Gtk.RadioAction ("ActionEraserRectangle", "Eraser R_ectangle", "Delete tiles with a Rectangle tool", null, DrawingTool.ERASER_RECTANGLE);
-		action_eraser_rectangle.set_icon_name (Resources.ICON_ERASER_RECTANGLE);
-		var action_eraser_circle = new Gtk.RadioAction ("ActionEraserCircle", "Eraser C_ircle", "Delete tiles with a Circle tool", null, DrawingTool.ERASER_CIRCLE);
-		action_eraser_circle.set_icon_name (Resources.ICON_ERASER_CIRCLE);
-		var action_eraser_fill = new Gtk.RadioAction ("ActionEraserFill", "Eraser Fi_ll", "Delete tiles with a Fill tool", null, DrawingTool.ERASER_FILL);
-		action_eraser_fill.set_icon_name (Resources.ICON_ERASER_FILL);
-		var action_rectangle = new Gtk.RadioAction ("ActionRectangle", "_Rectangle", "Draw using a Rectangle tool", null, DrawingTool.RECTANGLE);
-		action_rectangle.set_icon_name (Resources.ICON_RECTANGLE);
-		var action_circle = new Gtk.RadioAction ("ActionCircle", "_Circle", "Draw using a Circle tool", null, DrawingTool.CIRCLE);
-		action_circle.set_icon_name (Resources.ICON_CIRCLE);
-		var action_fill = new Gtk.RadioAction ("ActionFill", "_Fill", "Fill a selected area", null, DrawingTool.FILL);
-		action_fill.set_icon_name (Resources.ICON_FILL);
+		var action_select_tool = new Gtk.RadioAction ("ActionSelect", "_Select", "Select a part of the map", null, DrawingTool.SELECT);
+		action_select_tool.set_icon_name (Resources.ICON_SELECT);
+		var action_zoom_tool = new Gtk.RadioAction ("ActionZoom", "_Zoom", "Increase or decrease map zoom", null, DrawingTool.ZOOM);
+		action_zoom_tool.set_icon_name (Resources.ICON_ZOOM);
+		var action_pen_tool = new Gtk.RadioAction ("ActionPen", "_Pen", "Draw using a Pen tool (Normal)", null, DrawingTool.PEN);
+		action_pen_tool.set_icon_name (Resources.ICON_PEN);
+		var action_eraser_tool = new Gtk.RadioAction ("ActionEraserNormal", "_Eraser (Normal)", "Delete tiles with a Pen tool (Normal)", null, DrawingTool.ERASER);
+		action_eraser_tool.set_icon_name (Resources.ICON_ERASER);
+		var action_rectangle_tool = new Gtk.RadioAction ("ActionRectangle", "_Rectangle", "Draw using a Rectangle tool", null, DrawingTool.RECTANGLE);
+		action_rectangle_tool.set_icon_name (Resources.ICON_RECTANGLE);
+		var action_circle_tool = new Gtk.RadioAction ("ActionCircle", "_Circle", "Draw using a Circle tool", null, DrawingTool.CIRCLE);
+		action_circle_tool.set_icon_name (Resources.ICON_CIRCLE);
+		var action_fill_tool = new Gtk.RadioAction ("ActionFill", "_Fill", "Fill a selected area", null, DrawingTool.FILL);
+		action_fill_tool.set_icon_name (Resources.ICON_FILL);
 
 		/*
 		 * Create RadioActions Groups
@@ -156,18 +148,14 @@ public class MainWindow : Gtk.Window {
 		action_12_scale.join_group (action_11_scale);
 		action_14_scale.join_group (action_11_scale);
 		action_18_scale.join_group (action_11_scale);
-
 		var group_action_drawing_tools = new GLib.SList<Gtk.RadioAction> ();
-		action_select.set_group (group_action_drawing_tools);
-		action_zoom.join_group (action_select);
-		action_pen.join_group (action_select);
-		action_eraser.join_group (action_select);
-		action_eraser_rectangle.join_group (action_select);
-		action_eraser_circle.join_group (action_select);
-		action_eraser_fill.join_group (action_select);
-		action_rectangle.join_group (action_select);
-		action_circle.join_group (action_select);
-		action_fill.join_group (action_select);
+		action_select_tool.set_group (group_action_drawing_tools);
+		action_zoom_tool.join_group (action_select_tool);
+		action_pen_tool.join_group (action_select_tool);
+		action_eraser_tool.join_group (action_select_tool);
+		action_rectangle_tool.join_group (action_select_tool);
+		action_circle_tool.join_group (action_select_tool);
+		action_fill_tool.join_group (action_select_tool);
 
 		/*
 		 * Extra references to a Gtk.RadioAction for each group of RadioActions.
@@ -175,7 +163,7 @@ public class MainWindow : Gtk.Window {
 		 */
 		this.radio_layer = action_lower_layer;
 		this.radio_scale = action_11_scale;
-		this.radio_drawing_tool = action_select;
+		this.radio_drawing_tool = action_select_tool;
 
 		this.toggle_fullscreen = action_fullscreen;
 		this.toggle_show_title = action_show_title;
@@ -209,26 +197,13 @@ public class MainWindow : Gtk.Window {
 		 */
 		toolitem_undo = action_undo.create_tool_item () as Gtk.ToolButton;
 		toolitem_redo = action_redo.create_tool_item () as Gtk.ToolButton;
-		var toolitem_select = action_select.create_tool_item () as Gtk.ToolButton;
-		var toolitem_zoom = action_zoom.create_tool_item () as Gtk.ToolButton;
-		var toolitem_pen = action_pen.create_tool_item () as Gtk.ToolButton;
-		this.toolitem_eraser = action_eraser.create_tool_item () as Gtk.ToolButton;
-		var toolitem_menu_eraser = action_menu_eraser.create_tool_item () as Gtk.ToggleToolButton;
-		toolitem_menu_eraser.set_icon_widget(new Gtk.Arrow(Gtk.ArrowType.DOWN, Gtk.ShadowType.IN));
-		toolitem_menu_eraser.set_label ("Eraser");
-		toolitem_menu_eraser.set_size_request(15, -1);
-		this.menu_eraser = new Gtk.Menu ();
-		var menuitem_eraser_normal = new Gtk.ImageMenuItem ();
-		menuitem_eraser_normal.set_always_show_image(true);
-		var menuitem_eraser_rectangle = new Gtk.ImageMenuItem();
-		menuitem_eraser_rectangle.set_always_show_image(true);
-		var menuitem_eraser_circle = new Gtk.ImageMenuItem();
-		menuitem_eraser_circle.set_always_show_image(true);
-		var menuitem_eraser_fill = new Gtk.ImageMenuItem();
-		menuitem_eraser_fill.set_always_show_image(true);
-		var toolitem_rectangle = action_rectangle.create_tool_item () as Gtk.ToolButton;
-		var toolitem_circle = action_circle.create_tool_item () as Gtk.ToolButton;
-		var toolitem_fill = action_fill.create_tool_item () as Gtk.ToolButton;
+		var toolitem_select = action_select_tool.create_tool_item () as Gtk.ToolButton;
+		var toolitem_zoom = action_zoom_tool.create_tool_item () as Gtk.ToolButton;
+		var toolitem_pen = action_pen_tool.create_tool_item () as Gtk.ToolButton;
+		this.toolitem_eraser = action_eraser_tool.create_tool_item () as Gtk.ToolButton;
+		var toolitem_rectangle = action_rectangle_tool.create_tool_item () as Gtk.ToolButton;
+		var toolitem_circle = action_circle_tool.create_tool_item () as Gtk.ToolButton;
+		var toolitem_fill = action_fill_tool.create_tool_item () as Gtk.ToolButton;
 
 		/*
 		 * Initialize menu
@@ -393,11 +368,6 @@ public class MainWindow : Gtk.Window {
 		this.toolbar_sidebar.add (toolitem_zoom);
 		this.toolbar_sidebar.add (toolitem_pen);
 		this.toolbar_sidebar.add (this.toolitem_eraser);
-		this.toolbar_sidebar.add (toolitem_menu_eraser);
-		this.menu_eraser.add (menuitem_eraser_normal);
-		this.menu_eraser.add (menuitem_eraser_rectangle);
-		this.menu_eraser.add (menuitem_eraser_circle);
-		this.menu_eraser.add (menuitem_eraser_fill);
 		this.toolbar_sidebar.add (toolitem_rectangle);
 		this.toolbar_sidebar.add (toolitem_circle);
 		this.toolbar_sidebar.add (toolitem_fill);
@@ -465,19 +435,6 @@ public class MainWindow : Gtk.Window {
 		this.add (box_main);
 
 		/*
-		 * Connect actions and widgets
-		 * 
-		 * IMPORTANT: Connect toolbar radioitems before menu radioitems causes a Gtk crash
-		 */
-		this.toolitem_eraser.set_related_action (action_eraser);
-		toolitem_menu_eraser.set_related_action (action_menu_eraser);
-		menu_eraser.attach_to_widget(toolitem_menu_eraser, null);
-		menuitem_eraser_normal.set_related_action (action_eraser);
-		menuitem_eraser_rectangle.set_related_action (action_eraser_rectangle);
-		menuitem_eraser_circle.set_related_action (action_eraser_circle);
-		menuitem_eraser_fill.set_related_action (action_eraser_fill);
-
-		/*
 		 * Create ActionGroups
 		 */
 		this.actiongroup_project_open = new Gtk.ActionGroup("OpenGroup");
@@ -500,16 +457,13 @@ public class MainWindow : Gtk.Window {
 		this.actiongroup_project_open.add_action (action_show_title);
 		this.actiongroup_project_open.add_action (action_undo);
 		this.actiongroup_project_open.add_action (action_redo);
-		this.actiongroup_project_open.add_action (action_select);
-		this.actiongroup_project_open.add_action (action_zoom);
-		this.actiongroup_project_open.add_action (action_pen);
-		this.actiongroup_project_open.add_action (action_eraser);
-		this.actiongroup_project_open.add_action (action_eraser_rectangle);
-		this.actiongroup_project_open.add_action (action_eraser_circle);
-		this.actiongroup_project_open.add_action (action_eraser_fill); 
-		this.actiongroup_project_open.add_action (action_rectangle);
-		this.actiongroup_project_open.add_action (action_circle);
-		this.actiongroup_project_open.add_action (action_fill);
+		this.actiongroup_project_open.add_action (action_select_tool);
+		this.actiongroup_project_open.add_action (action_zoom_tool);
+		this.actiongroup_project_open.add_action (action_pen_tool);
+		this.actiongroup_project_open.add_action (action_eraser_tool);
+		this.actiongroup_project_open.add_action (action_rectangle_tool);
+		this.actiongroup_project_open.add_action (action_circle_tool);
+		this.actiongroup_project_open.add_action (action_fill_tool);
 
 		this.actiongroup_project_closed = new Gtk.ActionGroup ("ClosedGroup");
 		this.actiongroup_project_closed.add_action (action_new);
@@ -553,19 +507,9 @@ public class MainWindow : Gtk.Window {
 		toolitem_undo.clicked.connect (this.editor.on_undo);
 		toolitem_redo.clicked.connect (this.editor.on_redo);
 
-		// Eraser menu callbacks
-		toolitem_menu_eraser.clicked.connect (menu_eraser_popup);
-		menuitem_eraser_normal.activate.connect		(() => {set_current_drawing_tool(DrawingTool.ERASER_NORMAL);});
-		menuitem_eraser_rectangle.activate.connect  (() => {set_current_drawing_tool(DrawingTool.ERASER_RECTANGLE);});
-		menuitem_eraser_circle.activate.connect		(() => {set_current_drawing_tool(DrawingTool.ERASER_CIRCLE);});
-		menuitem_eraser_fill.activate.connect		(() => {set_current_drawing_tool(DrawingTool.ERASER_FILL);});
-		this.menu_eraser.deactivate.connect			(() => {toolitem_menu_eraser.set_active(false);
-															var icon = toolitem_menu_eraser.get_icon_widget() as Gtk.Arrow;
-															icon.set(Gtk.ArrowType.DOWN, Gtk.ShadowType.IN);});
-
 		/*
 		 * Connect menuitem labels to the statusbar
-		 * 
+		 *
 		 * Toolitem tooltips shouldn't be connected. They work in a different way.
 		 */
 		this.connect_menuitem_to_statusbar (menuitem_new);
@@ -590,10 +534,6 @@ public class MainWindow : Gtk.Window {
 		this.connect_menuitem_to_statusbar (menuitem_show_title);
 		this.connect_menuitem_to_statusbar (menuitem_about);
 		this.connect_menuitem_to_statusbar (menuitem_quit);
-		this.connect_menuitem_to_statusbar (menuitem_eraser_normal);
-		this.connect_menuitem_to_statusbar (menuitem_eraser_rectangle);
-		this.connect_menuitem_to_statusbar (menuitem_eraser_circle);
-		this.connect_menuitem_to_statusbar (menuitem_eraser_fill);
 
 		// Close application
 		action_quit.activate.connect (on_close);
@@ -676,35 +616,15 @@ public class MainWindow : Gtk.Window {
 	/**
 	 * Returns an int that represents the active drawing tool.
 	 */
-	public int get_current_drawing_tool () {
-		return this.radio_drawing_tool.get_current_value ();
+	public DrawingTool get_current_drawing_tool () {
+		return (DrawingTool) this.radio_drawing_tool.get_current_value ();
 	}
 
 	/**
 	 * Sets the active drawing tool
 	 */
-	public void set_current_drawing_tool (int value) {
-		switch (value){
-			case DrawingTool.ERASER_NORMAL:
-				Gtk.RadioAction action = actiongroup_project_open.get_action("ActionEraserNormal") as Gtk.RadioAction;
-				this.toolitem_eraser.set_related_action(action);
-				break;
-			case DrawingTool.ERASER_RECTANGLE:
-				Gtk.RadioAction action = actiongroup_project_open.get_action("ActionEraserRectangle") as Gtk.RadioAction;
-				this.toolitem_eraser.set_related_action(action);
-				break;
-			case DrawingTool.ERASER_CIRCLE:
-				Gtk.RadioAction action = actiongroup_project_open.get_action("ActionEraserCircle") as Gtk.RadioAction;
-				this.toolitem_eraser.set_related_action(action);
-				break;
-			case DrawingTool.ERASER_FILL:
-				Gtk.RadioAction action = actiongroup_project_open.get_action("ActionEraserFill") as Gtk.RadioAction;
-				this.toolitem_eraser.set_related_action(action);
-				break;
-			default:
-				break;
-			}
-		this.radio_drawing_tool.set_current_value (value);
+	public void set_current_drawing_tool (DrawingTool drawing_tool) {
+		this.radio_drawing_tool.set_current_value (drawing_tool.to_int ());
 	}
 
 	/**
@@ -814,38 +734,4 @@ public class MainWindow : Gtk.Window {
 			}
 		}
 	}
-
-	private void menu_eraser_popup(){
-//		this.menu_eraser.popup (null, null, position_func, 0, 0);
-	}
-
-/*	private void position_func (Gtk.Menu menu, out int x, out int y, out bool push_in){
-		var parent = menu.get_attach_widget() as Gtk.ToggleToolButton;
-		Gtk.Allocation parent_allocation;
-		Gtk.Allocation menu_allocation;
-		Gdk.Screen screen = Gdk.Screen.get_default();
-		Gdk.Device cursor = Gdk.Display.get_default().get_device_manager().get_client_pointer();
-
-		int current_x, current_y, parent_x, parent_y;
-
-		parent.get_allocation(out parent_allocation);
-		menu.get_allocation(out menu_allocation);
-		parent.get_pointer(out parent_x, out parent_y);
-		cursor.get_position(out screen, out current_x, out current_y);
-
-		x = current_x - parent_x;
-		y = current_y - parent_y;
-
-		if (y > (screen.height() - menu_allocation.height) - parent_allocation.height){
-			var icon = parent.get_icon_widget() as Gtk.Arrow;
-			icon.set(Gtk.ArrowType.UP, Gtk.ShadowType.IN);
-			y -= menu_allocation.height;
-		} else {
-			y += parent_allocation.height;
-		}
-		if (x > (screen.width() - menu_allocation.width) - parent_allocation.width){
-			x -= menu_allocation.width;
-			x += parent_allocation.width;
-		}
-	}*/
 }

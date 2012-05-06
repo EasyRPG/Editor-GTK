@@ -47,10 +47,6 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	// Tile selector
 	private Rect drawn_selector_rect;
 
-	// Others
-	private Point cursor;
-	private HashTable<DrawingTool,Tool> tools;
-
 	/**
 	 * Builds the map DrawingArea.
 	 */
@@ -68,19 +64,6 @@ public class MapDrawingArea : Gtk.DrawingArea {
 			Gdk.EventMask.BUTTON_PRESS_MASK|
 			Gdk.EventMask.BUTTON_RELEASE_MASK
 		);
-
-		this.tools = new HashTable<DrawingTool,Tool> (null, null);
-
-		this.tools[DrawingTool.PEN] = new PenTool (null, null);
-		this.tools[DrawingTool.RECTANGLE] = new RectangleTool (null, null);
-		this.tools[DrawingTool.ERASER_NORMAL] = new EraserTool (null, null);
-		this.tools[DrawingTool.ZOOM] = new ZoomTool (null, null);
-/*
-		this.tools[DrawingTool.PEN] = new PenTool (editor, palette);
-		this.tools[DrawingTool.RECTANGLE] = new RectangleTool (editor, palette);
-		this.tools[DrawingTool.ERASER_NORMAL] = new EraserTool (editor, palette);
-		this.tools[DrawingTool.ZOOM] = new ZoomTool (editor, palette);
-*/
 	}
 
 	/**
@@ -97,13 +80,6 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	 */
 	public void set_layer (LayerType layer) {
 		this.current_layer = layer;
-
-		// Update current layer of tools
-		foreach (DrawingTool index in DrawingTool.all ()) {
-			if (tools[index] != null) {
-				tools[index].set_layer (layer);
-			}
-		}
 
 		// Redraw the DrawingArea
 		this.queue_draw ();
@@ -159,13 +135,6 @@ public class MapDrawingArea : Gtk.DrawingArea {
 		int drawing_height = this.height_in_tiles * this.tile_size;
 		this.set_size_request (drawing_width, drawing_height);
 
-		// Update current scale of tools
-		foreach (DrawingTool index in DrawingTool.all ()) {
-			if (tools[index] != null) {
-				tools[index].set_scale (scale);
-			}
-		}
-
 		// Redraw the DrawingArea
 		this.queue_draw ();
 	}
@@ -182,13 +151,6 @@ public class MapDrawingArea : Gtk.DrawingArea {
 		// Map width and height (in tiles)
 		this.width_in_tiles = this.lower_layer.length[1];
 		this.height_in_tiles = this.lower_layer.length[0];
-
-		// Update size information of tools
-		foreach (DrawingTool tool in DrawingTool.all ()) {
-			if (this.tools[tool] != null) {
-				this.tools[tool].set_size(this.width_in_tiles, this.height_in_tiles);
-			}
-		}
 	}
 
 	/**
@@ -507,10 +469,6 @@ public class MapDrawingArea : Gtk.DrawingArea {
 		int col = 0;
 		int row = 0;
 
-		MainWindow window = (MainWindow) this.get_toplevel ();
-		DrawingTool toolid = (DrawingTool) window.get_current_drawing_tool ();
-		Tool tool = tools[toolid];
-
 		while (row < rect.height) {
 			bool is_drawn = this.draw_status[rect.y + row, rect.x + col];
 
@@ -519,17 +477,6 @@ public class MapDrawingArea : Gtk.DrawingArea {
 				// Get the tile ids
 				int lower_tile_id = this.lower_layer[rect.y + row, rect.x + col];
 				int upper_tile_id = this.upper_layer[rect.y + row, rect.x + col];
-				int drawing_tile_id = 0;
-
-				// give tools the possibility to overwrite tile of the selected layer
-				if (tool != null && tool.on_draw (Point (rect.x + col, rect.y + row), out drawing_tile_id)) {
-					if (current_layer == LayerType.LOWER) {
-						lower_tile_id = drawing_tile_id;
-					}
-					else if (current_layer == LayerType.UPPER) {
-						upper_tile_id = drawing_tile_id;
-					}
-				}
 
 				// Get and draw the lower layer tile, if any
 				if (lower_tile_id != 0) {
@@ -665,15 +612,11 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	 * Draws the map according to the active layer and scale.
 	 */
 	public bool on_draw (Cairo.Context ctx) {
-//print ("Draw!\n");
 		// Get the visible rect
 		var visible_rect = this.get_visible_rect ();
 
 		// If the visible rect is different from the already drawn rect
 		if (visible_rect != this.drawn_rect) {
-print ("Drawn rect: (%i, %i) %i x %i\n", this.drawn_rect.x, this.drawn_rect.y, this.drawn_rect.width, this.drawn_rect.height);
-print ("Visible rect: (%i, %i) %i x %i\n\n", visible_rect.x, visible_rect.y, visible_rect.width, visible_rect.height);
-//print ("Update!\n");
 			// Update the surfaces and do selective cleaning and drawing
 			this.update_surfaces (visible_rect);
 			this.clean_surfaces (visible_rect);
@@ -799,74 +742,28 @@ print ("Visible rect: (%i, %i) %i x %i\n\n", visible_rect.x, visible_rect.y, vis
 	 * in the tile palette.
 	 */
 	public bool draw_preview (Cairo.Context ctx) {
-		MainWindow window = (MainWindow) this.get_toplevel ();
-		DrawingTool action = (DrawingTool) window.get_current_drawing_tool ();
-
 		if (this.drawn_selector_rect == Rect (0, 0, 0, 0)) {
 			return false;
 		}
 
-		switch (action) {
-			case DrawingTool.PEN:
-			case DrawingTool.RECTANGLE:
-			case DrawingTool.CIRCLE:
-			case DrawingTool.FILL:
-				ctx.set_source_rgb (1.0,1.0,1.0);
-				ctx.set_line_width (2.0);
-				ctx.rectangle (
-					this.drawn_selector_rect.x * tile_size,
-					this.drawn_selector_rect.y * tile_size,
-					this.drawn_selector_rect.width * tile_size,
-					this.drawn_selector_rect.height * tile_size
-				);
+		ctx.set_source_rgb (1.0,1.0,1.0);
+		ctx.set_line_width (2.0);
+		ctx.rectangle (
+			this.drawn_selector_rect.x * tile_size,
+			this.drawn_selector_rect.y * tile_size,
+			this.drawn_selector_rect.width * tile_size,
+			this.drawn_selector_rect.height * tile_size
+		);
 
-				ctx.stroke ();
-				return true;
-			case DrawingTool.ERASER_NORMAL:
-				ctx.set_source_rgb (1.0,1.0,1.0);
-				ctx.set_line_width (2.0);
-				ctx.rectangle (
-					this.drawn_selector_rect.x * tile_size,
-					this.drawn_selector_rect.y * tile_size,
-					tile_size,
-					tile_size
-				);
+		ctx.stroke ();
 
-				ctx.stroke ();
-				return true;
-			default:
-				return false;
-		}
+		return true;
 	}
 
 	/**
 	 * Manages the reactions to button press signals.
 	 */
 	public bool on_button_pressed (Gdk.EventButton event) {
-		MainWindow window = (MainWindow) this.get_toplevel ();
-		DrawingTool toolid = (DrawingTool) window.get_current_drawing_tool ();
-		Tool tool = tools[toolid];
-
-		if (tool != null) {
-			int x = ((int) event.x) / this.tile_size;
-			int y = ((int) event.y) / this.tile_size;
-			bool status = false;
-
-			if (event.button == 1)
-				status = tool.on_button1_pressed (Point(x, y));
-			else
-				status = tool.on_button2_pressed (Point(x, y));
-
-			if (status) {
-				this.draw_status = new bool[this.height_in_tiles, this.width_in_tiles];
-				this.drawn_rect = Rect (0, 0, 0, 0);
-				this.queue_draw ();
-			}
-
-			return status;
-		}
-
-		/* no tool found */
 		return false;
 	}
 
@@ -874,30 +771,6 @@ print ("Visible rect: (%i, %i) %i x %i\n\n", visible_rect.x, visible_rect.y, vis
 	 * Manages the reactions to button release signals.
 	 */
 	public bool on_button_released (Gdk.EventButton event) {
-		MainWindow window = (MainWindow) this.get_toplevel ();
-		DrawingTool toolid = (DrawingTool) window.get_current_drawing_tool ();
-		Tool tool = tools[toolid];
-
-		if (tool != null) {
-			int x = ((int) event.x) / this.tile_size;
-			int y = ((int) event.y) / this.tile_size;
-			unowned int[,] layer;
-
-			switch (current_layer) {
-				case LayerType.LOWER:
-					layer = lower_layer;
-					break;
-				case LayerType.UPPER:
-					layer = upper_layer;
-					break;
-				default:
-					return false;
-			}
-
-			return tool.on_button1_released (Point(x, y), layer);
-		}
-
-		/* no tool found */
 		return false;
 	}
 
@@ -918,10 +791,6 @@ print ("Visible rect: (%i, %i) %i x %i\n\n", visible_rect.x, visible_rect.y, vis
 	 * Manages the reactions to the motion event.
 	 */
 	public bool on_motion (Gdk.EventMotion event) {
-		MainWindow window = (MainWindow) this.get_toplevel ();
-		DrawingTool toolid = (DrawingTool) window.get_current_drawing_tool ();
-		Tool tool = tools[toolid];
-
 		int x = ((int) event.x) / this.tile_size;
 		int y = ((int) event.y) / this.tile_size;
 
@@ -945,5 +814,4 @@ print ("Visible rect: (%i, %i) %i x %i\n\n", visible_rect.x, visible_rect.y, vis
 
 		return true;
 	}
-
 }
