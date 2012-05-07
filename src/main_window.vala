@@ -94,13 +94,13 @@ public class MainWindow : Gtk.Window {
 		action_upper_layer.set_icon_name (Resources.ICON_UPPER_LAYER);
 		var action_event_layer = new Gtk.RadioAction ("ActionEventLayer", "_Event Layer", "Edit map events", null, LayerType.EVENT);
 		action_event_layer.set_icon_name (Resources.ICON_EVENT_LAYER);
-		var action_11_scale = new Gtk.RadioAction ("Action11Scale", "Zoom 1/_1", "Map zoom 1/1 (Normal)", null, 0);
+		var action_11_scale = new Gtk.RadioAction ("Action11Scale", "Zoom 1/_1", "Map zoom 1/1 (Normal)", null, Scale.1_1);
 		action_11_scale.set_icon_name (Resources.ICON_11_SCALE);
-		var action_12_scale = new Gtk.RadioAction ("Action12Scale", "Zoom 1/_2", "Map zoom 1/2", null, 1);
+		var action_12_scale = new Gtk.RadioAction ("Action12Scale", "Zoom 1/_2", "Map zoom 1/2", null, Scale.1_2);
 		action_12_scale.set_icon_name (Resources.ICON_12_SCALE);
-		var action_14_scale = new Gtk.RadioAction ("Action14Scale", "Zoom 1/_4", "Map zoom 1/4", null, 2);
+		var action_14_scale = new Gtk.RadioAction ("Action14Scale", "Zoom 1/_4", "Map zoom 1/4", null, Scale.1_4);
 		action_14_scale.set_icon_name (Resources.ICON_14_SCALE);
-		var action_18_scale = new Gtk.RadioAction ("Action18Scale", "Zoom 1/_8", "Map zoom 1/8", null, 3);
+		var action_18_scale = new Gtk.RadioAction ("Action18Scale", "Zoom 1/_8", "Map zoom 1/8", null, Scale.1_8);
 		action_18_scale.set_icon_name (Resources.ICON_18_SCALE);
 		var action_database = new Gtk.Action ("ActionDatabase", "_Database", "Database", null);
 		action_database.set_icon_name (Resources.ICON_DATABASE);
