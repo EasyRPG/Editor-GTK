@@ -19,10 +19,10 @@
 
 public class Tileset {
 	private GLib.HashTable<int, Cairo.ImageSurface> autotiles;
-	private Cairo.ImageSurface surface_lower_tiles;
-	private Cairo.ImageSurface surface_upper_tiles;
+	private Cairo.ImageSurface surface_lower_layer_tiles;
+	private Cairo.ImageSurface surface_upper_layer_tiles;
 
-	private Rect selected_rect = Rect (0, 0, 1, 1);
+	private Rect selected_rect = Rect (0, 0, 0, 0);
 
 	/**
 	 * MapTileset constructor.
@@ -35,10 +35,10 @@ public class Tileset {
 		var surface_tileset = new Cairo.ImageSurface.from_png (tileset_file);
 
 		// Lower layer palette has 6x27 tiles, the first 6x3 tiles contain autotiles
-		this.surface_lower_tiles = new Cairo.ImageSurface (Cairo.Format.ARGB32, 96, 432);
+		this.surface_lower_layer_tiles = new Cairo.ImageSurface (Cairo.Format.ARGB32, 96, 432);
 
 		// Upper layer palette has 6x24 tiles
-		this.surface_upper_tiles = new Cairo.ImageSurface (Cairo.Format.ARGB32, 96, 384);
+		this.surface_upper_layer_tiles = new Cairo.ImageSurface (Cairo.Format.ARGB32, 96, 384);
 
 		// Load process
 		this.autotiles = new GLib.HashTable<int, Cairo.ImageSurface> (null, null);
@@ -50,15 +50,29 @@ public class Tileset {
 	/**
 	 * Returns a reference to the lower surface.
 	 */
-	public Cairo.ImageSurface get_lower_tiles () {
-		return this.surface_lower_tiles;
+	public Cairo.ImageSurface get_lower_layer_tiles () {
+		return this.surface_lower_layer_tiles;
 	}
 
 	/**
 	 * Returns a reference to the upper surface.
 	 */
-	public Cairo.ImageSurface get_upper_tiles () {
-		return this.surface_upper_tiles;
+	public Cairo.ImageSurface get_upper_layer_tiles () {
+		return this.surface_upper_layer_tiles;
+	}
+
+	/**
+	 * Returns a reference to the specified surface.
+	 */
+	public Cairo.ImageSurface get_layer_tiles (LayerType layer) {
+		switch (layer) {
+			case LayerType.LOWER:
+				return this.get_lower_layer_tiles ();
+			case LayerType.UPPER:
+				return this.get_upper_layer_tiles ();
+			default:
+				return null;
+		}
 	}
 
 	/**
@@ -158,7 +172,7 @@ public class Tileset {
 	 * Builds the lower tiles surface (used when designing the lower layer).
 	 */
 	private void load_lower_tiles (Cairo.ImageSurface surface_tileset) {
-		var ctx = new Cairo.Context (this.surface_lower_tiles);
+		var ctx = new Cairo.Context (this.surface_lower_layer_tiles);
 		ctx.set_operator (Cairo.Operator.SOURCE);
 
 		Cairo.ImageSurface surface_autotile;
@@ -218,7 +232,7 @@ public class Tileset {
 	 * Builds the upper tiles surface (used when designing the upper layer).
 	 */
 	private void load_upper_tiles (Cairo.ImageSurface surface_tileset) {
-		var ctx = new Cairo.Context (this.surface_upper_tiles);
+		var ctx = new Cairo.Context (this.surface_upper_layer_tiles);
 		ctx.set_operator (Cairo.Operator.SOURCE);
 
 		// First part of the upper tiles (fourth tileset column, 96x128)
@@ -246,13 +260,13 @@ public class Tileset {
 	 */
 	public void clear () {
 		// Clear the surfaces
-		this.surface_lower_tiles = null;
-		this.surface_upper_tiles = null;
+		this.surface_lower_layer_tiles = null;
+		this.surface_upper_layer_tiles = null;
 
 		// Empty the hashtable
 		this.autotiles.remove_all ();
 	}
-
+	
 	/**
 	 * Returns a 16x16 surface with the desired tile.
 	 */
@@ -267,10 +281,10 @@ public class Tileset {
 		ctx.rectangle (0, 0, 16, 16);
 
 		if (layer == LayerType.LOWER) {
-			ctx.set_source_surface (this.surface_lower_tiles, -orig_x, -orig_y);
+			ctx.set_source_surface (this.surface_lower_layer_tiles, -orig_x, -orig_y);
 		}
 		else {
-			ctx.set_source_surface (this.surface_upper_tiles, -orig_x, -orig_y);
+			ctx.set_source_surface (this.surface_upper_layer_tiles, -orig_x, -orig_y);
 		}
 
 		// Paint the tile in the 16x16 surface

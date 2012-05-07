@@ -59,15 +59,15 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 		switch (layer) {
 			case LayerType.LOWER:
 				this.set_size_request (
-					this.tileset.get_lower_tiles ().get_width () * 2,
-					this.tileset.get_lower_tiles ().get_height () * 2
+					this.tileset.get_lower_layer_tiles ().get_width () * 2,
+					this.tileset.get_lower_layer_tiles ().get_height () * 2
 				);
 				break;
 			case LayerType.UPPER:
 			case LayerType.EVENT:
 				this.set_size_request (
-					this.tileset.get_upper_tiles ().get_width () * 2,
-					this.tileset.get_upper_tiles ().get_height () * 2
+					this.tileset.get_upper_layer_tiles ().get_width () * 2,
+					this.tileset.get_upper_layer_tiles ().get_height () * 2
 				);
 				break;
 			default:
@@ -179,11 +179,11 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 
 		switch (this.current_layer) {
 			case LayerType.LOWER:
-				ctx.set_source_surface (this.tileset.get_lower_tiles (), 0, 0);
+				ctx.set_source_surface (this.tileset.get_lower_layer_tiles (), 0, 0);
 				break;
 			case LayerType.UPPER:
 			case LayerType.EVENT:
-				ctx.set_source_surface (this.tileset.get_upper_tiles (), 0, 0);
+				ctx.set_source_surface (this.tileset.get_upper_layer_tiles (), 0, 0);
 				break;
 			default:
 				return false;
