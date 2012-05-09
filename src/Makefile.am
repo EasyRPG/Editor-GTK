@@ -28,7 +28,6 @@ easyrpg_editor_SOURCES = \
 	drawingarea_map.vala \
 	drawingarea_tile_palette.vala \
 	editor.vala \
-	edittool.vala \
 	enum.vala \
 	main_window.vala \
 	menu_maptree.vala \
@@ -39,11 +38,6 @@ easyrpg_editor_SOURCES = \
 	resources.vala \
 	structs.vala \
 	tileset.vala \
-	tool.vala \
-	tools/eraser.vala \
-	tools/pen.vala \
-	tools/rectangle.vala \
-	tools/zoom.vala \
 	treestore_maptree.vala \
 	treeview_maptree.vala \
 	utils.vala \
