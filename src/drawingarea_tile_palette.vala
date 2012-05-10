@@ -48,11 +48,11 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 	}
 
 	/**
-	 * Sets a layer.
+	 * Sets the current layer.
 	 *
 	 * The palette will change the displayed tiles according to the current layer.
 	 */
-	public void set_layer (LayerType layer) {
+	public void set_current_layer (LayerType layer) {
 		this.current_layer = layer;
 
 		// Update the DrawingArea size

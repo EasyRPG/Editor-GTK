@@ -64,12 +64,14 @@ public class Tileset {
 	/**
 	 * Returns a reference to the specified surface.
 	 */
-	public Cairo.ImageSurface get_layer_tiles (LayerType layer) {
+	public Cairo.ImageSurface? get_layer_tiles (LayerType layer) {
 		switch (layer) {
 			case LayerType.LOWER:
 				return this.get_lower_layer_tiles ();
+
 			case LayerType.UPPER:
 				return this.get_upper_layer_tiles ();
+
 			default:
 				return null;
 		}

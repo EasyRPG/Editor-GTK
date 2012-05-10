@@ -74,11 +74,11 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	}
 
 	/**
-	 * Sets a layer.
+	 * Sets the current layer.
 	 *
 	 * The maprender will change the displayed content according to the current layer.
 	 */
-	public void set_layer (LayerType layer) {
+	public void set_current_layer (LayerType layer) {
 		this.current_layer = layer;
 
 		// Redraw the DrawingArea
@@ -86,11 +86,11 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	}
 
 	/**
-	 * Sets a scale.
+	 * Sets the current scale.
 	 *
 	 * The maprender will change the size of the displayed tiles according to the current scale.
 	 */
-	public void set_scale (Scale scale) {
+	public void set_current_scale (Scale scale) {
 		this.current_scale = scale;
 
 		// Clear the surfaces
@@ -140,11 +140,11 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	}
 
 	/**
-	 * Loads the map.
+	 * Loads the layer schemes.
 	 *
 	 * Gets the layer schemes and reads them to draw the tiles in each layer surface.
 	 */
-	public void load_map_scheme (int[,] lower_layer, int[,] upper_layer) {
+	public void load_layer_schemes (int[,] lower_layer, int[,] upper_layer) {
 		this.lower_layer = lower_layer;
 		this.upper_layer = upper_layer;
 
