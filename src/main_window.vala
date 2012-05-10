@@ -380,7 +380,8 @@ public class MainWindow : Gtk.Window {
 		var scrolled_maptree = new Gtk.ScrolledWindow (null, null);
 
 		this.drawingarea_palette = new TilePaletteDrawingArea ();
-		this.drawingarea_maprender = new MapDrawingArea (scrolled_maprender);
+		this.drawingarea_maprender = new MapDrawingArea (scrolled_maprender, this.drawingarea_palette);
+
 		this.paned_palette_maptree = new Gtk.Paned (Gtk.Orientation.VERTICAL);
 		this.statusbar_tooltip = new Gtk.Statusbar ();
 		this.statusbar_current_frame = new Gtk.Statusbar ();

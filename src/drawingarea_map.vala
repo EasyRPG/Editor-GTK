@@ -23,6 +23,7 @@
 public class MapDrawingArea : TiledMapDrawingArea {
 	// References
 	private weak Gtk.ScrolledWindow scrolled_window;
+	private TilePaletteDrawingArea palette;
 
 	// Selector
 	protected Rect drawn_selector;
@@ -30,8 +31,10 @@ public class MapDrawingArea : TiledMapDrawingArea {
 	/**
 	 * Builds the map DrawingArea.
 	 */
-	public MapDrawingArea (Gtk.ScrolledWindow scrolled_window) {
+	public MapDrawingArea (Gtk.ScrolledWindow scrolled_window, TilePaletteDrawingArea palette) {
 		this.scrolled_window = scrolled_window;
+		this.palette = palette;
+
 		this.set_size_request (-1, -1);
 		this.set_halign (Gtk.Align.CENTER);
 		this.set_valign (Gtk.Align.CENTER);
@@ -780,7 +783,7 @@ public class MapDrawingArea : TiledMapDrawingArea {
 		int y = ((int) event.y) / this.tile_size;
 
 		// Get the selection width and height
-		Rect tileset_selector = this.tileset.get_selected_rect ();
+		Rect tileset_selector = this.palette.tile_selector;
 		tileset_selector.normalize ();
 
 		int width = tileset_selector.width;
