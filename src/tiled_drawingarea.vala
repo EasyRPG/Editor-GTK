@@ -21,7 +21,7 @@
  * A tiled DrawingArea.
  */
 public abstract class TiledDrawingArea : Gtk.DrawingArea {
-	// References	
+	// References
 	protected Tileset tileset;
 
 	// Status values

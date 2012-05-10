@@ -24,8 +24,8 @@ public class MapDrawingArea : TiledMapDrawingArea {
 	// References
 	private weak Gtk.ScrolledWindow scrolled_window;
 
-	// Tile selector
-	private Rect drawn_selector_rect;
+	// Selector
+	protected Rect drawn_selector;
 
 	/**
 	 * Builds the map DrawingArea.
@@ -67,8 +67,7 @@ public class MapDrawingArea : TiledMapDrawingArea {
 		base.set_current_scale (scale);
 
 		// Clear the surfaces
-		this.surface_lower_layer = null;
-		this.surface_upper_layer = null;
+		this.clear_surfaces ();
 
 		// Change the tile size
 		switch (scale) {
@@ -118,19 +117,10 @@ public class MapDrawingArea : TiledMapDrawingArea {
 	public override void clear () {
 		base.clear ();
 
-		// Clear the surfaces
-		this.surface_lower_layer = null;
-		this.surface_upper_layer = null;
-
-		// Clear the schemes
-		this.lower_layer = {{},{}};
-		this.upper_layer = {{},{}};
-		this.draw_status = {{},{}};
-
 		// Change the size to fluid
 		this.set_size_request (-1, -1);
 
-		// Redraw the DrawingArea to clean the canvas
+		// Redraw the DrawingArea
 		this.queue_draw ();
 
 		// Disable the draw and tile selection events
@@ -523,7 +513,6 @@ public class MapDrawingArea : TiledMapDrawingArea {
 		ctx.rectangle (x, y, 16, 16);
 		ctx.get_source ().set_filter (Cairo.Filter.FAST);
 		ctx.set_operator (Cairo.Operator.CLEAR);
-
 		ctx.fill ();
 	}
 
@@ -533,8 +522,8 @@ public class MapDrawingArea : TiledMapDrawingArea {
 	public void enable_tile_selection () {
 		this.leave_notify_event.connect (this.on_leave);
 		this.motion_notify_event.connect (this.on_motion);
-		this.button_release_event.connect (this.on_button_released);
 		this.button_press_event.connect (this.on_button_pressed);
+		this.button_release_event.connect (this.on_button_released);
 	}
 
 	/**
@@ -607,10 +596,11 @@ public class MapDrawingArea : TiledMapDrawingArea {
 				ctx.paint ();
 
 				// Blend the upper layer with opacity 0.5
-				ctx.set_operator (Cairo.Operator.OVER);
 				ctx.set_source_surface (this.surface_upper_layer, x, y);
+				ctx.set_operator (Cairo.Operator.OVER);
 				ctx.paint_with_alpha (0.5);
 				break;
+
 			case LayerType.UPPER:
 				// Paint the lower layer
 				ctx.set_source_surface (this.surface_lower_layer, x, y);
@@ -627,6 +617,7 @@ public class MapDrawingArea : TiledMapDrawingArea {
 				ctx.set_operator (Cairo.Operator.OVER);
 				ctx.paint ();
 				break;
+
 			case LayerType.EVENT:
 				// Paint the lower layer
 				ctx.set_source_surface (this.surface_lower_layer, x, y);
@@ -669,31 +660,32 @@ public class MapDrawingArea : TiledMapDrawingArea {
 				ctx.set_line_width (1);
 				ctx.stroke ();
 				break;
+
 			default:
 				return false;
 		}
 
-		draw_preview(ctx);
+		this.draw_selector (ctx);
 
 		return true;
 	}
 
 	/**
-	 * Renders a preview of map changes based on the selected action and tiles
-	 * in the tile palette.
+	 * Draws the tile selector.
 	 */
-	public bool draw_preview (Cairo.Context ctx) {
-		if (this.drawn_selector_rect == Rect (0, 0, 0, 0)) {
+	public bool draw_selector (Cairo.Context ctx) {
+		// If the selection is empty, stop the process
+		if (this.drawn_selector == Rect (0, 0, 0, 0)) {
 			return false;
 		}
 
 		ctx.set_source_rgb (1.0,1.0,1.0);
 		ctx.set_line_width (2.0);
 		ctx.rectangle (
-			this.drawn_selector_rect.x * tile_size,
-			this.drawn_selector_rect.y * tile_size,
-			this.drawn_selector_rect.width * tile_size,
-			this.drawn_selector_rect.height * tile_size
+			this.drawn_selector.x * tile_size,
+			this.drawn_selector.y * tile_size,
+			this.drawn_selector.width * tile_size,
+			this.drawn_selector.height * tile_size
 		);
 
 		ctx.stroke ();
@@ -705,6 +697,40 @@ public class MapDrawingArea : TiledMapDrawingArea {
 	 * Manages the reactions to button press signals.
 	 */
 	public bool on_button_pressed (Gdk.EventButton event) {
+		switch (event.button) {
+			case 1:
+				return this.on_left_click (event);
+
+			case 3:
+				return this.on_right_click (event);
+
+			default:
+				return false;
+		}
+	}
+
+	/**
+	 * Manages the reactions to a "left click" event.
+	 */
+	public bool on_left_click (Gdk.EventButton event) {
+		// If the selection is empty, stop the process
+		if (this.drawn_selector == Rect (0, 0, 0, 0)) {
+			return false;
+		}
+
+		// Disable the left click on event layer
+		// TODO: The event layer behaves differently
+		if (this.get_current_layer () == LayerType.EVENT) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Manages the reactions to a "right click" event.
+	 */
+	public bool on_right_click (Gdk.EventButton event) {
 		return false;
 	}
 
@@ -712,7 +738,25 @@ public class MapDrawingArea : TiledMapDrawingArea {
 	 * Manages the reactions to button release signals.
 	 */
 	public bool on_button_released (Gdk.EventButton event) {
-		return false;
+		switch (event.button) {
+			case 1:
+				return this.on_left_click_released (event);
+
+			default:
+				return false;
+		}
+	}
+
+	/**
+	 * Manages the reactions to a "left click" release event.
+	 */
+	public bool on_left_click_released (Gdk.EventButton event) {
+		// If the selection is empty, stop the process
+		if (this.drawn_selector == Rect (0, 0, 0, 0)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -720,7 +764,7 @@ public class MapDrawingArea : TiledMapDrawingArea {
 	 */
 	public bool on_leave (Gdk.EventCrossing event) {
 		// Clear the drawn selector rect
-		this.drawn_selector_rect = Rect (0, 0, 0, 0);
+		this.drawn_selector = Rect (0, 0, 0, 0);
 
 		// Redraw the DrawingArea
 		this.queue_draw ();
@@ -736,9 +780,11 @@ public class MapDrawingArea : TiledMapDrawingArea {
 		int y = ((int) event.y) / this.tile_size;
 
 		// Get the selection width and height
-		Rect tileset_selected_rect = this.tileset.get_selected_rect ();
-		int width = tileset_selected_rect.width;
-		int height = tileset_selected_rect.height;
+		Rect tileset_selector = this.tileset.get_selected_rect ();
+		tileset_selector.normalize ();
+
+		int width = tileset_selector.width;
+		int height = tileset_selector.height;
 
 		if (x < 0 || x >= this.width_in_tiles || y < 0 || y >= this.height_in_tiles) {
 			return false;
@@ -746,9 +792,9 @@ public class MapDrawingArea : TiledMapDrawingArea {
 
 		Rect visible_selector_rect = Rect (x, y, width, height);
 
-		if (visible_selector_rect != this.drawn_selector_rect) {
+		if (visible_selector_rect != this.drawn_selector) {
 			// Update the drawn selector rect
-			this.drawn_selector_rect = visible_selector_rect;
+			this.drawn_selector = visible_selector_rect;
 
 			this.queue_draw ();
 		}

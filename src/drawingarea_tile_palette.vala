@@ -67,7 +67,7 @@ public class TilePaletteDrawingArea : TiledDrawingArea {
 		// Make sure it keeps the correct size
 		this.set_size_request (192, -1);
 
-		// Redraw the DrawingArea to clean the canvas
+		// Redraw the DrawingArea
 		this.queue_draw ();
 
 		// Disable the draw and tile selection events
@@ -166,27 +166,5 @@ public class TilePaletteDrawingArea : TiledDrawingArea {
 		ctx.stroke ();
 
 		return true;
-	}
-
-	/**
-	 * Returns tile id for a position in the tileset
-	 */
-	public static int position_to_id (int x, int y) {
-		return y * 6 + x + 1;
-	}
-
-	/**
-	 * Returns the rectangle of selected tiles.
-	 */
-	public Rect get_selected_rect () {
-		return this.tileset.get_selected_rect ();
-	}
-
-	/**
-	 * Returns the rectangle of selected tiles prepared
-	 * for Drawing to Surfaces.
-	 */
-	public Rect get_selected_area (int tile_size) {
-		return this.tileset.get_selected_area (tile_size);
 	}
 }
