@@ -20,10 +20,9 @@
 /**
  * The map DrawingArea.
  */
-public class MapDrawingArea : Gtk.DrawingArea {
+public class MapDrawingArea : TiledDrawingArea {
 	// References
 	private weak Gtk.ScrolledWindow scrolled_window;
-	private Tileset tileset;
 
 	// Status values
 	private LayerType current_layer;
@@ -32,11 +31,6 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	// Map scheme
 	private int[,] lower_layer;
 	private int[,] upper_layer;
-	private int tile_size;
-
-	// Map size (in tiles)
-	private int width_in_tiles;
-	private int height_in_tiles;
 
 	// Layers
 	private bool[,] draw_status;
@@ -67,13 +61,6 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	}
 
 	/**
-	 * Sets a tileset.
-	 */
-	public void set_tileset (Tileset tileset) {
-		this.tileset = tileset;
-	}
-
-	/**
 	 * Sets the current layer.
 	 *
 	 * The maprender will change the displayed content according to the current layer.
@@ -90,8 +77,8 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	 *
 	 * The maprender will change the size of the displayed tiles according to the current scale.
 	 */
-	public void set_current_scale (Scale scale) {
-		this.current_scale = scale;
+	public override void set_current_scale (Scale scale) {
+		base.set_current_scale (scale);
 
 		// Clear the surfaces
 		this.surface_lower_layer = null;
@@ -156,12 +143,8 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	/**
 	 * Clears the DrawingArea.
 	 */
-	public void clear () {
-		// Clear the tileset if it was defined
-		if (this.tileset != null) {
-			this.tileset.clear ();
-			this.tileset = null;
-		}
+	public override void clear () {
+		base.clear ();
 
 		// Clear the surfaces
 		this.surface_lower_layer = null;
@@ -573,20 +556,6 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	}
 
 	/**
-	 * Connects the draw signal and redraws the DrawingArea.
-	 */
-	public void enable_draw () {
-		this.draw.connect (this.on_draw);
-	}
-
-	/**
-	 * Disconnects the draw signal.
-	 */
-	public void disable_draw () {
-		this.draw.disconnect (this.on_draw);
-	}
-
-	/**
 	 * Connects the tile selection events.
 	 */
 	public void enable_tile_selection () {
@@ -611,7 +580,7 @@ public class MapDrawingArea : Gtk.DrawingArea {
 	 *
 	 * Draws the map according to the active layer and scale.
 	 */
-	public bool on_draw (Cairo.Context ctx) {
+	public override bool on_draw (Cairo.Context ctx) {
 		// Get the visible rect
 		var visible_rect = this.get_visible_rect ();
 

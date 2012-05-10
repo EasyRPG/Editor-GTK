@@ -20,12 +20,9 @@
 /**
  * The tile palette DrawingArea.
  */
-public class TilePaletteDrawingArea : Gtk.DrawingArea {
-	// References
-	private Tileset tileset;
-
-	// Status values
-	private LayerType current_layer;
+public class TilePaletteDrawingArea : TiledDrawingArea {
+	// Surface
+	protected Cairo.ImageSurface surface_tiles;
 
 	/**
 	 * Builds the tile palette DrawingArea.
@@ -41,38 +38,21 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 	}
 
 	/**
-	 * Sets a tileset.
+	 * Displays a set of tiles.
 	 */
-	public void set_tileset (Tileset tileset) {
-		this.tileset = tileset;
-	}
+	public void load_tiles (LayerType layer) {
+		this.surface_tiles = this.tileset.get_layer_tiles (layer);
 
-	/**
-	 * Sets the current layer.
-	 *
-	 * The palette will change the displayed tiles according to the current layer.
-	 */
-	public void set_current_layer (LayerType layer) {
-		this.current_layer = layer;
-
-		// Update the DrawingArea size
-		switch (layer) {
-			case LayerType.LOWER:
-				this.set_size_request (
-					this.tileset.get_lower_layer_tiles ().get_width () * 2,
-					this.tileset.get_lower_layer_tiles ().get_height () * 2
-				);
-				break;
-			case LayerType.UPPER:
-			case LayerType.EVENT:
-				this.set_size_request (
-					this.tileset.get_upper_layer_tiles ().get_width () * 2,
-					this.tileset.get_upper_layer_tiles ().get_height () * 2
-				);
-				break;
-			default:
-				return;
+		// If the returned surface is null, stop the process
+		if (this.surface_tiles == null) {
+			return;
 		}
+
+		// Resize the DrawingArea to match the size of the surface
+		this.set_size_request (
+			this.surface_tiles.get_width () * 2,
+			this.surface_tiles.get_height () * 2
+		);
 
 		// Redraw the DrawingArea
 		this.queue_draw ();
@@ -81,12 +61,8 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 	/**
 	 * Clears the DrawingArea.
 	 */
-	public void clear () {
-		// Clear the tileset if it was defined
-		if (this.tileset != null) {
-			this.tileset.clear ();
-			this.tileset = null;
-		}
+	public override void clear () {
+		base.clear ();
 
 		// Make sure it keeps the correct size
 		this.set_size_request (192, -1);
@@ -97,20 +73,6 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 		// Disable the draw and tile selection events
 		this.disable_draw ();
 		this.disable_tile_selection ();
-	}
-
-	/**
-	 * Connects the draw signal and redraws the DrawingArea.
-	 */
-	public void enable_draw () {
-		this.draw.connect (this.on_draw);
-	}
-
-	/**
-	 * Disconnects the draw signal.
-	 */
-	public void disable_draw () {
-		this.draw.disconnect (this.on_draw);
 	}
 
 	/**
@@ -173,21 +135,15 @@ public class TilePaletteDrawingArea : Gtk.DrawingArea {
 	 *
 	 * Draws the palette according to the active layer.
 	 */
-	public bool on_draw (Cairo.Context ctx) {
+	public override bool on_draw (Cairo.Context ctx) {
+		// If the surface is null, stop the process
+		if (this.surface_tiles == null) {
+			return false;
+		}
+
 		// The palette must be scaled to 2x (32x32 tile size)
 		ctx.scale (2, 2);
-
-		switch (this.current_layer) {
-			case LayerType.LOWER:
-				ctx.set_source_surface (this.tileset.get_lower_layer_tiles (), 0, 0);
-				break;
-			case LayerType.UPPER:
-			case LayerType.EVENT:
-				ctx.set_source_surface (this.tileset.get_upper_layer_tiles (), 0, 0);
-				break;
-			default:
-				return false;
-		}
+		ctx.set_source_surface (this.surface_tiles, 0, 0);
 
 		// Fast interpolation, similar to nearest-neighbor
 		ctx.get_source ().set_filter (Cairo.Filter.FAST);

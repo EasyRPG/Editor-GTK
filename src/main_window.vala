@@ -577,7 +577,7 @@ public class MainWindow : Gtk.Window {
 		var layer = (LayerType) this.get_current_layer ();
 
 		// Update the palette
-		this.drawingarea_palette.set_current_layer (layer);
+		this.drawingarea_palette.load_tiles (layer);
 
 		// Update the maprender
 		this.drawingarea_maprender.set_current_layer (layer);

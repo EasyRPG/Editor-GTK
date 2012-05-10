@@ -697,7 +697,7 @@ public class Editor {
 		// Get the palette ready
 		var palette = this.main_window.drawingarea_palette;
 		palette.set_tileset (tileset);
-		palette.set_current_layer (this.main_window.get_current_layer ());
+		palette.load_tiles (this.main_window.get_current_layer ());
 		palette.enable_draw ();
 		palette.enable_tile_selection ();
 

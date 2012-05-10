@@ -38,6 +38,7 @@ easyrpg_editor_SOURCES = \
 	resources.vala \
 	structs.vala \
 	tileset.vala \
+	tiled_drawingarea.vala \
 	treestore_maptree.vala \
 	treeview_maptree.vala \
 	utils.vala \
