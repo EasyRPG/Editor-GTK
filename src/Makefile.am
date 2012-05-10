@@ -29,6 +29,7 @@ easyrpg_editor_SOURCES = \
 	drawingarea_tile_palette.vala \
 	editor.vala \
 	enum.vala \
+	i_selectable_tiles.vala \
 	main_window.vala \
 	menu_maptree.vala \
 	model_map.vala \
