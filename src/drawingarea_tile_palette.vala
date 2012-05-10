@@ -20,9 +20,12 @@
 /**
  * The tile palette DrawingArea.
  */
-public class TilePaletteDrawingArea : TiledDrawingArea {
+public class TilePaletteDrawingArea : TiledDrawingArea, ISelectableTiles {
 	// Surface
 	protected Cairo.ImageSurface surface_tiles;
+
+	// Tile selector
+	protected Rect tile_selector {get; set; default = Rect (0, 0, 0, 0);}
 
 	/**
 	 * Builds the tile palette DrawingArea.
@@ -91,39 +94,58 @@ public class TilePaletteDrawingArea : TiledDrawingArea {
 		this.motion_notify_event.disconnect (this.on_button_motion);
 	}
 
+	/**
+	 * Manages the reactions to button press signals.
+	 */
 	public bool on_button_press (Gdk.EventButton event) {
-		Rect selected_rect = Rect (
+		switch (event.button) {
+			case 1:
+				return this.on_left_click (event);
+
+			default:
+				return false;
+		}
+	}
+
+	/**
+	 * Manages the reactions to a "left click" event.
+	 */
+	public bool on_left_click (Gdk.EventButton event) {
+		// Update the selector
+		this.tile_selector = Rect (
 			((int) event.x) / 32,
 			((int) event.y) / 32,
 			1, 1
 		);
 
-		this.tileset.set_selected_rect (selected_rect);
-
+		// Redraw the DrawingArea
 		this.queue_draw();
+
 		return true;
 	}
 
 	public bool on_button_motion (Gdk.EventMotion event) {
-		Rect selected_rect = this.tileset.get_selected_rect ();
-		Rect new_rect = selected_rect;
+		Rect new_tile_selector = this.tile_selector;
 
 		int dest_x = ((int) event.x) / 32;
 		int dest_y = ((int) event.y) / 32;
 
-		new_rect.width = (dest_x - selected_rect.x).abs () + 1;
-		new_rect.height = (dest_y - selected_rect.y).abs () + 1;
+		new_tile_selector.width = (dest_x - this.tile_selector.x).abs () + 1;
+		new_tile_selector.height = (dest_y - this.tile_selector.y).abs () + 1;
 
-		if (dest_x < selected_rect.x) {
-			new_rect.width = -new_rect.width;
+		if (dest_x < this.tile_selector.x) {
+			new_tile_selector.width = -new_tile_selector.width;
 		}
 
-		if (dest_y < selected_rect.y) {
-			new_rect.height = -new_rect.height;
+		if (dest_y < this.tile_selector.y) {
+			new_tile_selector.height = -new_tile_selector.height;
 		}
 
-		if (new_rect != selected_rect) {
-			this.tileset.set_selected_rect (new_rect);
+		// If the tile selector changed, update it
+		if (new_tile_selector != this.tile_selector) {
+			this.tile_selector = new_tile_selector;
+
+			// Redraw the DrawingArea
 			this.queue_draw ();
 		}
 
@@ -149,21 +171,8 @@ public class TilePaletteDrawingArea : TiledDrawingArea {
 		ctx.get_source ().set_filter (Cairo.Filter.FAST);
 		ctx.paint ();
 
-		// Selector properties
-		ctx.set_source_rgb (1.0,1.0,1.0);
-		ctx.set_line_width (1.0);
-
-		Rect selected_rect = this.tileset.get_selected_rect ();
-		selected_rect.normalize ();
-
-		ctx.rectangle (
-			(double) selected_rect.x * 16,
-			(double) selected_rect.y * 16,
-			(double) selected_rect.width * 16,
-			(double) selected_rect.height * 16
-		);
-
-		ctx.stroke ();
+		// Draw the tile selector
+		this.draw_selector (ctx, 16);
 
 		return true;
 	}
