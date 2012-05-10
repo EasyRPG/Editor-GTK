@@ -20,23 +20,9 @@
 /**
  * The map DrawingArea.
  */
-public class MapDrawingArea : TiledDrawingArea {
+public class MapDrawingArea : TiledMapDrawingArea {
 	// References
 	private weak Gtk.ScrolledWindow scrolled_window;
-
-	// Status values
-	private LayerType current_layer;
-	private Scale current_scale;
-
-	// Map scheme
-	private int[,] lower_layer;
-	private int[,] upper_layer;
-
-	// Layers
-	private bool[,] draw_status;
-	private Cairo.ImageSurface surface_lower_layer;
-	private Cairo.ImageSurface surface_upper_layer;
-	private Rect drawn_rect;
 
 	// Tile selector
 	private Rect drawn_selector_rect;
@@ -65,8 +51,8 @@ public class MapDrawingArea : TiledDrawingArea {
 	 *
 	 * The maprender will change the displayed content according to the current layer.
 	 */
-	public void set_current_layer (LayerType layer) {
-		this.current_layer = layer;
+	public override void set_current_layer (LayerType layer) {
+		base.set_current_layer (layer);
 
 		// Redraw the DrawingArea
 		this.queue_draw ();
@@ -115,7 +101,7 @@ public class MapDrawingArea : TiledDrawingArea {
 		this.draw_status = new bool[this.height_in_tiles, this.width_in_tiles];
 
 		// Reset the drawn rect
-		this.drawn_rect = Rect (0, 0, 0, 0);
+		this.drawn_tiles = Rect (0, 0, 0, 0);
 
 		// Set a new size for the DrawingArea
 		int drawing_width = this.width_in_tiles * this.tile_size;
@@ -124,20 +110,6 @@ public class MapDrawingArea : TiledDrawingArea {
 
 		// Redraw the DrawingArea
 		this.queue_draw ();
-	}
-
-	/**
-	 * Loads the layer schemes.
-	 *
-	 * Gets the layer schemes and reads them to draw the tiles in each layer surface.
-	 */
-	public void load_layer_schemes (int[,] lower_layer, int[,] upper_layer) {
-		this.lower_layer = lower_layer;
-		this.upper_layer = upper_layer;
-
-		// Map width and height (in tiles)
-		this.width_in_tiles = this.lower_layer.length[1];
-		this.height_in_tiles = this.lower_layer.length[0];
 	}
 
 	/**
@@ -235,8 +207,8 @@ public class MapDrawingArea : TiledDrawingArea {
 		this.surface_upper_layer = new Cairo.ImageSurface (Cairo.Format.ARGB32, surface_width, surface_height);
 
 		// Find how many tiles should be shifted to the right and bottom 
-		int offset_x = (this.drawn_rect.x - visible_rect.x) * this.tile_size;
-		int offset_y = (this.drawn_rect.y - visible_rect.y) * this.tile_size;
+		int offset_x = (this.drawn_tiles.x - visible_rect.x) * this.tile_size;
+		int offset_y = (this.drawn_tiles.y - visible_rect.y) * this.tile_size;
 
 		// Draw the tiles
 		var ctx = new Cairo.Context (this.surface_lower_layer);
@@ -253,7 +225,7 @@ public class MapDrawingArea : TiledDrawingArea {
 	 * in the DrawingArea, determined by the visible rect.
 	 */
 	private void clean_surfaces (Rect visible) {
-		var drawn = this.drawn_rect;
+		var drawn = this.drawn_tiles;
 
 		// If the drawn tiles rect is not defined, stop the process
 		if (drawn == Rect (0, 0, 0, 0)) {
@@ -357,7 +329,7 @@ public class MapDrawingArea : TiledDrawingArea {
 	 * by the visible rect.
 	 */
 	private void draw_surfaces (Rect visible) {
-		var drawn = this.drawn_rect;
+		var drawn = this.drawn_tiles;
 
 		/*
 		 * If the drawn tiles rect is not defined, or the visible rect does not
@@ -502,7 +474,7 @@ public class MapDrawingArea : TiledDrawingArea {
 		var ctx = new Cairo.Context (surface);
 
 		// Sets the correct scale factor
-		switch (this.current_scale) {
+		switch (this.get_current_scale ()) {
 			case Scale.1_1:
 				ctx.scale (2, 2);
 				break;
@@ -533,7 +505,7 @@ public class MapDrawingArea : TiledDrawingArea {
 		var ctx = new Cairo.Context (surface);
 
 		// Sets the correct scale factor
-		switch (this.current_scale) {
+		switch (this.get_current_scale ()) {
 			case Scale.1_1:
 				ctx.scale (2, 2);
 				break;
@@ -585,14 +557,14 @@ public class MapDrawingArea : TiledDrawingArea {
 		var visible_rect = this.get_visible_rect ();
 
 		// If the visible rect is different from the already drawn rect
-		if (visible_rect != this.drawn_rect) {
+		if (visible_rect != this.drawn_tiles) {
 			// Update the surfaces and do selective cleaning and drawing
 			this.update_surfaces (visible_rect);
 			this.clean_surfaces (visible_rect);
 			this.draw_surfaces (visible_rect);
 
 			// Update the drawn tiles rect
-			this.drawn_rect.set_values (
+			this.drawn_tiles.set_values (
 				visible_rect.x, visible_rect.y,
 				visible_rect.width, visible_rect.height
 			);
@@ -627,7 +599,7 @@ public class MapDrawingArea : TiledDrawingArea {
 		ctx.paint ();
 
 		// Set the draw order based in the active layer
-		switch (this.current_layer) {
+		switch (this.get_current_layer ()) {
 			case LayerType.LOWER:
 				// Paint the lower layer
 				ctx.set_source_surface (this.surface_lower_layer, x, y);
