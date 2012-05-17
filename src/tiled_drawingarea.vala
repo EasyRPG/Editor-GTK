@@ -54,6 +54,65 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 	}
 
 	/**
+	 * Draws a tile on a surface.
+	 */
+	protected void draw_tile (Cairo.ImageSurface tile, Cairo.ImageSurface surface, int x, int y) {
+		var ctx = new Cairo.Context (surface);
+
+		// Sets the correct scale factor
+		switch (this.get_current_scale ()) {
+			case Scale.1_1:
+				ctx.scale (2, 2);
+				break;
+			case Scale.1_2:
+				ctx.scale (1, 1);
+				break;
+			case Scale.1_4:
+				ctx.scale (0.5, 0.5);
+				break;
+			case Scale.1_8:
+				ctx.scale (0.25, 0.25);
+				break;
+		}
+
+		// Draws the tile on (x,y)
+		ctx.rectangle (x, y, 16, 16);
+		ctx.set_source_surface (tile, x, y);
+		ctx.get_source ().set_filter (Cairo.Filter.FAST);
+		ctx.set_operator (Cairo.Operator.SOURCE);
+
+		ctx.fill ();
+	}
+
+	/**
+	 * Clears a tile on a surface.
+	 */
+	protected void clear_tile (Cairo.ImageSurface surface, int x, int y) {
+		var ctx = new Cairo.Context (surface);
+
+		// Sets the correct scale factor
+		switch (this.get_current_scale ()) {
+			case Scale.1_1:
+				ctx.scale (2, 2);
+				break;
+			case Scale.1_2:
+				ctx.scale (1, 1);
+				break;
+			case Scale.1_4:
+				ctx.scale (0.5, 0.5);
+				break;
+			case Scale.1_8:
+				ctx.scale (0.25, 0.25);
+				break;
+		}
+
+		ctx.rectangle (x, y, 16, 16);
+		ctx.get_source ().set_filter (Cairo.Filter.FAST);
+		ctx.set_operator (Cairo.Operator.CLEAR);
+		ctx.fill ();
+	}
+
+	/**
 	 * Connects the draw signal and redraws the DrawingArea.
 	 */
 	public void enable_draw () {
