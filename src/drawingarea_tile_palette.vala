@@ -20,7 +20,7 @@
 /**
  * The tile palette DrawingArea.
  */
-public class TilePaletteDrawingArea : TiledDrawingArea, ISelectableTiles {
+public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 	// Surface
 	protected Cairo.ImageSurface surface_tiles;
 

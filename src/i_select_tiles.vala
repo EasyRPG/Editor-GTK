@@ -1,6 +1,6 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * i_selectable_tiles.vala
+ * i_select_tiles.vala
  * Copyright (C) EasyRPG Project 2012
  *
  * EasyRPG is free software: you can redistribute it and/or modify it
@@ -20,7 +20,7 @@
 /**
  * Adds the tile selector feature.
  */
-public interface ISelectableTiles {
+public interface ISelectTiles {
 	// The tile selector rect
 	public abstract Rect tile_selector {get; set; default = Rect (0, 0, 0, 0);}
 
