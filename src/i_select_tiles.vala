@@ -28,10 +28,6 @@ public interface ISelectTiles {
 	 * Draws the selector in a Cairo Context.
 	 */
 	protected void draw_selector (Cairo.Context ctx, int tile_size) {
-		// Selector properties
-		ctx.set_source_rgb (1.0,1.0,1.0);
-		ctx.set_line_width (1.0);
-
 		// Create a copy of the rect and normalize it
 		// The original tile_selector rect SHOULD NOT be normalized
 		Rect selector = this.tile_selector;
@@ -43,6 +39,11 @@ public interface ISelectTiles {
 			(double) selector.width * tile_size,
 			(double) selector.height * tile_size
 		);
+
+		// Selector properties
+		ctx.set_source_rgb (1.0, 1.0, 1.0);
+		ctx.set_line_width (2.0);
+		ctx.set_operator (Cairo.Operator.OVER);
 
 		ctx.stroke ();
 	}

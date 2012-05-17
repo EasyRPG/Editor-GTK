@@ -171,8 +171,11 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 		ctx.get_source ().set_filter (Cairo.Filter.FAST);
 		ctx.paint ();
 
+		// Restore the context to the initial state (default scale)
+		ctx.restore ();
+
 		// Draw the tile selector
-		this.draw_selector (ctx, 16);
+		this.draw_selector (ctx, 32);
 
 		return true;
 	}

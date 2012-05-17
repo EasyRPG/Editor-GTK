@@ -20,12 +20,12 @@
 /**
  * The map DrawingArea.
  */
-public class MapDrawingArea : TiledMapDrawingArea {
+public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles {
 	// References
 	private TilePaletteDrawingArea palette;
 
-	// Selector
-	protected Rect drawn_selector;
+	// Tile selector
+	protected Rect tile_selector {get; set; default = Rect (0, 0, 0, 0);}
 
 	/**
 	 * Builds the map DrawingArea.
@@ -211,6 +211,9 @@ public class MapDrawingArea : TiledMapDrawingArea {
 				ctx.set_source_surface (this.surface_upper_layer, x, y);
 				ctx.set_operator (Cairo.Operator.OVER);
 				ctx.paint_with_alpha (0.5);
+
+				// Draw the tile selector
+				this.draw_selector (ctx, this.tile_size);
 				break;
 
 			case LayerType.UPPER:
@@ -228,6 +231,9 @@ public class MapDrawingArea : TiledMapDrawingArea {
 				ctx.set_source_surface (this.surface_upper_layer, x, y);
 				ctx.set_operator (Cairo.Operator.OVER);
 				ctx.paint ();
+
+				// Draw the tile selector
+				this.draw_selector (ctx, this.tile_size);
 				break;
 
 			case LayerType.EVENT:
@@ -277,31 +283,6 @@ public class MapDrawingArea : TiledMapDrawingArea {
 				return false;
 		}
 
-		this.draw_selector (ctx);
-
-		return true;
-	}
-
-	/**
-	 * Draws the tile selector.
-	 */
-	public bool draw_selector (Cairo.Context ctx) {
-		// If the selection is empty, stop the process
-		if (this.drawn_selector == Rect (0, 0, 0, 0)) {
-			return false;
-		}
-
-		ctx.set_source_rgb (1.0,1.0,1.0);
-		ctx.set_line_width (2.0);
-		ctx.rectangle (
-			this.drawn_selector.x * tile_size,
-			this.drawn_selector.y * tile_size,
-			this.drawn_selector.width * tile_size,
-			this.drawn_selector.height * tile_size
-		);
-
-		ctx.stroke ();
-
 		return true;
 	}
 
@@ -326,7 +307,7 @@ public class MapDrawingArea : TiledMapDrawingArea {
 	 */
 	public bool on_left_click (Gdk.EventButton event) {
 		// If the selection is empty, stop the process
-		if (this.drawn_selector == Rect (0, 0, 0, 0)) {
+		if (this.tile_selector == Rect (0, 0, 0, 0)) {
 			return false;
 		}
 
@@ -364,7 +345,7 @@ public class MapDrawingArea : TiledMapDrawingArea {
 	 */
 	public bool on_left_click_released (Gdk.EventButton event) {
 		// If the selection is empty, stop the process
-		if (this.drawn_selector == Rect (0, 0, 0, 0)) {
+		if (this.tile_selector == Rect (0, 0, 0, 0)) {
 			return false;
 		}
 
@@ -376,7 +357,7 @@ public class MapDrawingArea : TiledMapDrawingArea {
 	 */
 	public bool on_leave (Gdk.EventCrossing event) {
 		// Clear the drawn selector rect
-		this.drawn_selector = Rect (0, 0, 0, 0);
+		this.tile_selector = Rect (0, 0, 0, 0);
 
 		// Redraw the DrawingArea
 		this.queue_draw ();
@@ -404,9 +385,9 @@ public class MapDrawingArea : TiledMapDrawingArea {
 
 		Rect visible_selector_rect = Rect (x, y, width, height);
 
-		if (visible_selector_rect != this.drawn_selector) {
+		if (visible_selector_rect != this.tile_selector) {
 			// Update the drawn selector rect
-			this.drawn_selector = visible_selector_rect;
+			this.tile_selector = visible_selector_rect;
 
 			this.queue_draw ();
 		}
