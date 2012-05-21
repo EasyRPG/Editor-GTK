@@ -62,6 +62,20 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	public virtual void set_current_layer (LayerType layer) {
 		this.current_layer = layer;
 	}
+
+	/**
+	 * Returns the current drawing tool.
+	 */
+	public DrawingTool get_current_drawing_tool () {
+		return this.current_drawing_tool;
+	}
+
+	/**
+	 * Sets the current drawing tool.
+	 */
+	public virtual void set_current_drawing_tool (DrawingTool drawing_tool) {
+		this.current_drawing_tool = drawing_tool;
+	}
 	
 	/**
 	 * Returns a copy of a layer scheme.
@@ -69,7 +83,7 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	 * This is a convenience method that simplifies the code required to get a
 	 * layer scheme, since it accepts get_current_layer () as a parameter.
 	 */
-	protected int[,]? get_layer_scheme (LayerType layer) {
+	public int[,]? get_layer_scheme (LayerType layer) {
 		switch (layer) {
 			case LayerType.LOWER:
 				return this.lower_layer;
@@ -88,7 +102,7 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	 * This is a convenience method that simplifies the code required to set a
 	 * layer scheme, since it accepts get_current_layer () as a parameter.
 	 */
-	protected void set_layer_scheme (LayerType layer, int[,] layer_scheme) {
+	public void set_layer_scheme (LayerType layer, int[,] layer_scheme) {
 		switch (layer) {
 			case LayerType.LOWER:
 				this.lower_layer = layer_scheme;
@@ -109,7 +123,7 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	 * This is a convenience method that simplifies the code required to get a
 	 * layer surface, since it accepts get_current_layer () as a parameter.
 	 */
-	protected Cairo.ImageSurface? get_layer_surface (LayerType layer) {
+	public Cairo.ImageSurface? get_layer_surface (LayerType layer) {
 		switch (layer) {
 			case LayerType.LOWER:
 				return this.surface_lower_layer;
@@ -140,7 +154,7 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	 * Uses the scrollbars position and page size to find which tiles
 	 * should be drawn on the DrawingArea.
 	 */
-	protected Rect get_visible_rect () {
+	public Rect get_visible_rect () {
 		var visible_rect = Rect (0, 0, this.width_in_tiles, this.height_in_tiles);
 
 		// Get the adjustment values
@@ -312,7 +326,7 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 
 			col++;
 
-			// Advance to the next row when cleaning is complete for this row
+			// Advance to the next row whecleaning is complete for this rowed
 			if (col == rect.x + rect.width) {
 				col = rect.x;
 				row++;

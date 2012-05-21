@@ -140,6 +140,13 @@ public struct Rect {
 	public RectIterator iterator () {
 		return new RectIterator (this);
 	}
+
+	/**
+	 * Prints the rect values.
+	 */
+	public void print_values (string name) {
+		print ("%s: (%i, %i) %i x %i\n", name, this.x, this.y, this.width, this.height);
+	}
 }
 
 /**

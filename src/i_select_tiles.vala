@@ -34,10 +34,10 @@ public interface ISelectTiles {
 		selector.normalize ();
 
 		ctx.rectangle (
-			(double) selector.x * tile_size,
-			(double) selector.y * tile_size,
-			(double) selector.width * tile_size,
-			(double) selector.height * tile_size
+			selector.x * tile_size,
+			selector.y * tile_size,
+			selector.width * tile_size,
+			selector.height * tile_size
 		);
 
 		// Selector properties
