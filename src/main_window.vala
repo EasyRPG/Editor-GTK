@@ -410,7 +410,14 @@ public class MainWindow : Gtk.Window {
 		scrolled_palette.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.ALWAYS);
 		scrolled_palette.set_min_content_width (192);
 		scrolled_palette.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
-		scrolled_maprender.add_with_viewport (this.drawingarea_maprender);
+
+		// This fix disables any background-color defined for Gtk.Viewport
+		var viewport_maprender = new Gtk.Viewport (null, null);
+		var viewport_bg_color = Gdk.RGBA ();
+		viewport_bg_color.parse ("rgba(0,0,0,0.0)");
+		viewport_maprender.override_background_color (Gtk.StateFlags.NORMAL, viewport_bg_color);
+		viewport_maprender.add (this.drawingarea_maprender);
+		scrolled_maprender.add (viewport_maprender);
 		scrolled_maprender.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
 		
 		this.paned_palette_maptree.pack1 (scrolled_palette, true, true);
