@@ -163,6 +163,9 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 			return false;
 		}
 
+		// Save the context initial state
+		ctx.save();
+
 		// The palette must be scaled to 2x (32x32 tile size)
 		ctx.scale (2, 2);
 		ctx.set_source_surface (this.surface_tiles, 0, 0);
@@ -171,7 +174,7 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 		ctx.get_source ().set_filter (Cairo.Filter.FAST);
 		ctx.paint ();
 
-		// Restore the context to the initial state (default scale)
+		// Restore the context state
 		ctx.restore ();
 
 		// Draw the tile selector
