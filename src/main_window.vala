@@ -496,6 +496,7 @@ public class MainWindow : Gtk.Window {
 		// Change edition mode
 		this.radio_layer.changed.connect (this.on_layer_change);
 		this.radio_scale.changed.connect (this.on_scale_change);
+		this.radio_drawing_tool.changed.connect (this.on_drawing_tool_change);
 
 		// Map
 		this.treeview_maptree.map_selected.connect (this.editor.on_map_selected);
@@ -575,7 +576,7 @@ public class MainWindow : Gtk.Window {
 		}
 
 		// Get the current layer
-		var layer = (LayerType) this.get_current_layer ();
+		var layer = this.get_current_layer ();
 
 		// Update the palette
 		this.drawingarea_palette.load_tiles (layer);
@@ -608,7 +609,7 @@ public class MainWindow : Gtk.Window {
 		}
 
 		// Get the current scale
-		var scale = (Scale) this.get_current_scale ();
+		var scale = this.get_current_scale ();
 
 		// Update the maprender
 		this.drawingarea_maprender.set_current_scale (scale);
@@ -626,6 +627,22 @@ public class MainWindow : Gtk.Window {
 	 */
 	public void set_current_drawing_tool (DrawingTool drawing_tool) {
 		this.radio_drawing_tool.set_current_value (drawing_tool.to_int ());
+	}
+
+	/**
+	 * Manages the reactions to the drawing tool change.
+	 */
+	public void on_drawing_tool_change () {
+		// Don't react if the current map is map 0 (game_title)
+		if (this.editor.get_current_map_id () == 0) {
+			return;
+		}
+
+		// Get the current drawing tool
+		var drawing_tool = this.get_current_drawing_tool ();
+
+		// Update the maprender
+		this.drawingarea_maprender.set_current_drawing_tool (drawing_tool);
 	}
 
 	/**

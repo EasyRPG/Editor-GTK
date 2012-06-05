@@ -20,9 +20,13 @@
 /**
  * The map DrawingArea.
  */
-public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles {
+public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 	// References
 	private TilePaletteDrawingArea palette;
+
+	// The painting layer and painted tiles
+	public Cairo.ImageSurface surface_painting_layer {get; set; default = null;}
+	public int[,] painted_tiles {get; set; default = null;}
 
 	// Tile selector
 	protected Rect tile_selector {get; set; default = Rect (0, 0, 0, 0);}
@@ -154,6 +158,8 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles {
 	 * Draws the map according to the active layer and scale.
 	 */
 	public override bool on_draw (Cairo.Context ctx) {
+		ctx.save();
+
 		// Get the visible rect
 		var visible_rect = this.get_visible_rect ();
 
@@ -207,6 +213,13 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles {
 				ctx.set_operator (Cairo.Operator.SOURCE);
 				ctx.paint ();
 
+				// Blend the drawing layer
+				this.draw_painting_layer (
+					ctx,
+					this.tile_selector.x * this.tile_size,
+					this.tile_selector.y * this.tile_size
+				);
+
 				// Blend the upper layer with opacity 0.5
 				ctx.set_source_surface (this.surface_upper_layer, x, y);
 				ctx.set_operator (Cairo.Operator.OVER);
@@ -227,8 +240,39 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles {
 				ctx.set_operator (Cairo.Operator.OVER);
 				ctx.paint_with_alpha (0.5);
 
+				// We need a new reference for the surface
+				// In some cases, a modified version of the upper layer will be used
+				Cairo.ImageSurface surface_upper_layer = this.surface_upper_layer;
+
+				// Paint the painting layer if it is defined
+				if (this.surface_painting_layer != null) {
+					/*
+					 * We need to display the upper layer and the tiles in the
+					 * drawing layer (a preview of the tiles that will be painted)
+					 * without changing anything in the upper layer.
+					 */
+					surface_upper_layer = new Cairo.ImageSurface (
+						Cairo.Format.ARGB32,
+						this.surface_upper_layer.get_width (),
+						this.surface_upper_layer.get_height ()
+					);
+
+					// Copy the current upper layer to this new surface
+					var temp_ctx = new Cairo.Context (surface_upper_layer);
+					temp_ctx.set_source_surface (this.surface_upper_layer, 0, 0);
+					temp_ctx.set_operator (Cairo.Operator.SOURCE);
+					temp_ctx.paint ();
+
+					// Blend the drawing layer
+					this.draw_painting_layer (
+						temp_ctx,
+						(this.tile_selector.x - visible_rect.x) * this.tile_size,
+						(this.tile_selector.y - visible_rect.y) * this.tile_size
+					);
+				}
+
 				// Blend the upper layer
-				ctx.set_source_surface (this.surface_upper_layer, x, y);
+				ctx.set_source_surface (surface_upper_layer, x, y);
 				ctx.set_operator (Cairo.Operator.OVER);
 				ctx.paint ();
 
@@ -317,6 +361,15 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles {
 			return false;
 		}
 
+		switch (this.get_current_drawing_tool ()) {
+			case DrawingTool.PEN:
+				this.paint_with_pencil (this.palette.tile_selector);
+				break;
+
+			default:
+				return false;
+		}
+
 		return true;
 	}
 
@@ -349,6 +402,8 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles {
 			return false;
 		}
 
+		this.apply_painted_tiles (this.get_current_layer ());
+
 		return true;
 	}
 
@@ -373,21 +428,21 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles {
 		int y = ((int) event.y) / this.tile_size;
 
 		// Get the selection width and height
-		Rect tileset_selector = this.palette.tile_selector;
-		tileset_selector.normalize ();
+		Rect palette_selector = this.palette.tile_selector;
+		palette_selector.normalize ();
 
-		int width = tileset_selector.width;
-		int height = tileset_selector.height;
+		int width = palette_selector.width;
+		int height = palette_selector.height;
 
 		if (x < 0 || x >= this.width_in_tiles || y < 0 || y >= this.height_in_tiles) {
 			return false;
 		}
 
-		Rect visible_selector_rect = Rect (x, y, width, height);
+		Rect new_tile_selector = Rect (x, y, width, height);
 
-		if (visible_selector_rect != this.tile_selector) {
-			// Update the drawn selector rect
-			this.tile_selector = visible_selector_rect;
+		if (new_tile_selector != this.tile_selector) {
+			// Update the tile selector
+			this.tile_selector = new_tile_selector;
 
 			this.queue_draw ();
 		}

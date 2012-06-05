@@ -22,22 +22,15 @@
  */
 public abstract class TiledDrawingArea : Gtk.DrawingArea {
 	// References
-	protected Tileset tileset;
+	public Tileset tileset {get; set; default = null;}
 
 	// Status values
 	private Scale current_scale;
 
 	// Size properties
-	protected int tile_size;
+	public int tile_size;
 	protected int width_in_tiles;
 	protected int height_in_tiles;
-
-	/**
-	 * Sets a tileset.
-	 */
-	public void set_tileset (Tileset tileset) {
-		this.tileset = tileset;
-	}
 
 	/**
 	 * Returns the current scale.
@@ -56,7 +49,7 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 	/**
 	 * Draws a tile on a surface.
 	 */
-	protected void draw_tile (Cairo.ImageSurface tile, Cairo.ImageSurface surface, int x, int y) {
+	protected virtual void draw_tile (Cairo.ImageSurface tile, Cairo.ImageSurface surface, int x, int y) {
 		var ctx = new Cairo.Context (surface);
 
 		// Sets the correct scale factor
@@ -87,7 +80,7 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 	/**
 	 * Clears a tile on a surface.
 	 */
-	protected void clear_tile (Cairo.ImageSurface surface, int x, int y) {
+	protected virtual void clear_tile (Cairo.ImageSurface surface, int x, int y) {
 		var ctx = new Cairo.Context (surface);
 
 		// Sets the correct scale factor
@@ -109,6 +102,7 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 		ctx.rectangle (x, y, 16, 16);
 		ctx.get_source ().set_filter (Cairo.Filter.FAST);
 		ctx.set_operator (Cairo.Operator.CLEAR);
+
 		ctx.fill ();
 	}
 

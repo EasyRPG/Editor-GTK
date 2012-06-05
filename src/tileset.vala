@@ -279,4 +279,44 @@ public class Tileset {
 
 		return surface_tile;
 	}
+
+	/*
+	 * Returns the id of the tile placed in the coordinates (x, y).
+	 */
+	public int get_tile_id (int x, int y) {
+		// (row * num_cols) + (col + 1)
+		int tile_id = (y * 6) + (x + 1);
+
+		return tile_id;
+	}
+
+	/**
+	 * Returns a matrix containing the ids of the tiles defined by tiles_rect.
+	 */
+	public int[,] get_tiles_ids (Rect tiles_rect) {
+		// Normalize the tiles rect
+		tiles_rect.normalize ();
+
+		var tile_ids = new int[tiles_rect.height, tiles_rect.width];
+
+		int col = tiles_rect.x;
+		int row = tiles_rect.y;
+		int tile_id = 0;
+
+		// For each tile, get and store its id
+		while (row < tiles_rect.y + tiles_rect.height) {
+			tile_id = this.get_tile_id (col, row);
+			tile_ids[row - tiles_rect.y, col - tiles_rect.x] = tile_id;
+
+			col++;
+
+			// Advance to the next row when the last col has been reached
+			if (col == tiles_rect.x + tiles_rect.width) {
+				col = tiles_rect.x;
+				row++;
+			}
+		}
+
+		return tile_ids;
+	}
 }

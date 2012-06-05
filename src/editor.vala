@@ -696,17 +696,18 @@ public class Editor {
 
 		// Get the palette ready
 		var palette = this.main_window.drawingarea_palette;
-		palette.set_tileset (tileset);
+		palette.tileset = tileset;
 		palette.load_tiles (this.main_window.get_current_layer ());
 		palette.enable_draw ();
 		palette.enable_tile_selection ();
 
 		// Get the maprender ready
 		var maprender = this.main_window.drawingarea_maprender;
-		maprender.set_tileset (tileset);
+		maprender.tileset = tileset;
 		maprender.load_layer_schemes (map.lower_layer, map.upper_layer);
 		maprender.set_current_layer (this.main_window.get_current_layer ());
 		maprender.set_current_scale (this.main_window.get_current_scale ());
+		maprender.set_current_drawing_tool (this.main_window.get_current_drawing_tool ());
 		maprender.enable_draw ();
 		maprender.enable_tile_selection ();
 
