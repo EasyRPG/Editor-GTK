@@ -72,10 +72,6 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 
 		// Redraw the DrawingArea
 		this.queue_draw ();
-
-		// Disable the draw and tile selection events
-		this.disable_draw ();
-		this.disable_tile_selection ();
 	}
 
 	/**
@@ -92,6 +88,7 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 	public void disable_tile_selection () {
 		this.button_press_event.disconnect (this.on_button_press);
 		this.motion_notify_event.disconnect (this.on_button_motion);
+		this.clear_selector ();
 	}
 
 	/**

@@ -588,6 +588,13 @@ public class MainWindow : Gtk.Window {
 		// Update the palette
 		this.drawingarea_palette.load_tiles (layer);
 
+		if (layer == LayerType.EVENT) {
+			this.drawingarea_palette.disable_tile_selection ();
+		}
+		else {
+			this.drawingarea_palette.enable_tile_selection ();
+		}
+
 		// Update the maprender
 		this.drawingarea_maprender.set_current_layer (layer);
 	}

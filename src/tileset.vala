@@ -68,6 +68,7 @@ public class Tileset {
 				return this.get_lower_layer_tiles ();
 
 			case LayerType.UPPER:
+			case LayerType.EVENT:
 				return this.get_upper_layer_tiles ();
 
 			default:

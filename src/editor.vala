@@ -699,7 +699,10 @@ public class Editor {
 		palette.tileset = tileset;
 		palette.load_tiles (this.main_window.get_current_layer ());
 		palette.enable_draw ();
-		palette.enable_tile_selection ();
+
+		if (this.main_window.get_current_layer () != LayerType.EVENT) {
+			palette.enable_tile_selection ();
+		}
 
 		// Get the maprender ready
 		var maprender = this.main_window.drawingarea_maprender;
@@ -709,7 +712,10 @@ public class Editor {
 		maprender.set_current_scale (this.main_window.get_current_scale ());
 		maprender.set_current_drawing_tool (this.main_window.get_current_drawing_tool ());
 		maprender.enable_draw ();
-		maprender.enable_tile_selection ();
+
+		if (this.main_window.get_current_layer () != LayerType.EVENT) {
+			maprender.enable_tile_selection ();
+		}
 
 		// Update current_map id
 		this.current_map_id = map_id;
@@ -724,10 +730,14 @@ public class Editor {
 		// Clear the palette
 		var palette = this.main_window.drawingarea_palette;
 		palette.clear ();
+		palette.disable_draw ();
+		palette.disable_tile_selection ();
 
 		// Clear the maprender
 		var maprender = this.main_window.drawingarea_maprender;
 		maprender.clear ();
+		palette.disable_draw ();
+		palette.disable_tile_selection ();
 
 		this.current_map_id = 0;
 	}

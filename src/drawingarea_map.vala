@@ -126,10 +126,6 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 
 		// Redraw the DrawingArea
 		this.queue_draw ();
-
-		// Disable the draw and tile selection events
-		this.disable_draw ();
-		this.disable_tile_selection ();
 	}
 
 	/**
