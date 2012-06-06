@@ -25,7 +25,14 @@ public interface ISelectTiles {
 	public abstract Rect tile_selector {get; set; default = Rect (0, 0, 0, 0);}
 
 	/**
-	 * Draws the selector in a Cairo Context.
+	 * Clears the tile selector.
+	 */
+	protected void clear_selector () {
+		this.tile_selector = Rect (0, 0, 0, 0);
+	}
+
+	/**
+	 * Draws the tile selector in a Cairo Context.
 	 */
 	protected void draw_selector (Cairo.Context ctx, int tile_size) {
 		// Create a copy of the rect and normalize it
