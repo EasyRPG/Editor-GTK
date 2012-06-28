@@ -24,13 +24,14 @@ easyrpg_editor_SOURCES = \
 	action_map_edit.vala \
 	action_stack.vala \
 	action.vala \
-	controller_main.vala \
 	controller.vala \
 	drawingarea_map.vala \
 	drawingarea_tile_palette.vala \
 	editor.vala \
-	edittool.vala \
 	enum.vala \
+	i_paint_tiles.vala \
+	i_select_tiles.vala \
+	main_window.vala \
 	menu_maptree.vala \
 	model_map.vala \
 	model_party.vala \
@@ -38,18 +39,15 @@ easyrpg_editor_SOURCES = \
 	model_vehicle.vala \
 	resources.vala \
 	structs.vala \
-	tool.vala \
-	tools/eraser.vala \
-	tools/pen.vala \
-	tools/rectangle.vala \
-	tools/zoom.vala \
+	tiled_drawingarea.vala \
+	tiled_map_drawingarea.vala \
+	tileset.vala \
 	treestore_maptree.vala \
 	treeview_maptree.vala \
 	utils.vala \
 	view_actor.vala \
 	view_database_dialog.vala \
 	view_generic_widgets.vala \
-	view_main_window.vala \
 	view_map_properties_dialog.vala \
 	view_map_shift_dialog.vala \
 	view_project_create_dialog.vala \

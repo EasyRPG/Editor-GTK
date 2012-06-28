@@ -24,20 +24,20 @@ public class DatabaseDialog : Gtk.Dialog {
 	/*
 	 * Properties
 	 */
-	private weak MainController controller;
+	private weak Editor editor;
 	private ActorFrame actor_frame;
 	private Gtk.Notebook notebook;
 
 	/**
 	 * Builds the database interface.
 	 * 
-	 * @param controller A reference to the controller that launched this view.
+	 * @param editor A reference to the Editor class.
 	 */
-	public DatabaseDialog (MainController controller) {
+	public DatabaseDialog (Editor editor) {
 		/*
 		 * Initialize properties
 		 */
-		this.controller = controller;
+		this.editor = editor;
 		this.set_title("Database");
 		this.add_button (Gtk.Stock.OK, 0);
 		this.add_button (Gtk.Stock.CANCEL, 1);
