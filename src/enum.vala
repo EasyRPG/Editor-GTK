@@ -61,10 +61,7 @@ public enum DrawingTool {
 	SELECT,
 	ZOOM,
 	PEN,
-	ERASER_NORMAL,
-	ERASER_RECTANGLE,
-	ERASER_CIRCLE,
-	ERASER_FILL,
+	ERASER,
 	RECTANGLE,
 	CIRCLE,
 	FILL;
@@ -77,46 +74,17 @@ public enum DrawingTool {
 				return 1;
 			case PEN:
 				return 2;
-			case ERASER_NORMAL:
+			case ERASER:
 				return 3;
-			case ERASER_RECTANGLE:
-				return 4;
-			case ERASER_CIRCLE:
-				return 5;
-			case ERASER_FILL:
-				return 6;
 			case RECTANGLE:
-				return 7;
+				return 4;
 			case CIRCLE:
-				return 8;
+				return 5;
 			case FILL:
-				return 9;
+				return 6;
 			default:
 				error("Unknown drawing tool: %d", this);
 		}
-	}
-
-	public bool needsDrawingLayer () {
-		if (this == SELECT || this == ZOOM)
-			return false;
-		else
-			return true;
-	}
-
-	public bool isEraser () {
-		switch (this) {
-			case ERASER_NORMAL:
-			case ERASER_RECTANGLE:
-			case ERASER_CIRCLE:
-			case ERASER_FILL:
-				return true;
-			default:
-				return false;
-		}
-	}
-
-	public static DrawingTool[] all () {
-		return { SELECT, ZOOM, PEN, ERASER_NORMAL, ERASER_RECTANGLE, ERASER_CIRCLE, ERASER_FILL, RECTANGLE, CIRCLE, FILL };
 	}
 }
 

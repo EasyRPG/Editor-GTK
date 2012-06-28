@@ -39,7 +39,7 @@ public class MapPropertiesDialog : Gtk.Dialog {
 		private OptionTable options;
 		private PanoramaTable panorama;
 
-		public BasicPage (MainController controller, Map map) {
+		public BasicPage (Editor editor, Map map) {
 			Object(orientation: Gtk.Orientation.HORIZONTAL, spacing:5, halign:Gtk.Align.START, valign:Gtk.Align.START);
 
 			var left_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 5);
@@ -52,7 +52,7 @@ public class MapPropertiesDialog : Gtk.Dialog {
 
 			var frame_tileset = new Gtk.Frame ("Tileset");
 			input_tileset = new Gtk.ComboBoxText ();
-			foreach (var tileset in controller.get_tilesets ())
+			foreach (var tileset in editor.get_tilesets ())
 				input_tileset.append (tileset, tileset);
 			input_tileset.set_active_id (map.tileset);
 			frame_tileset.add (input_tileset);
@@ -349,7 +349,7 @@ public class MapPropertiesDialog : Gtk.Dialog {
 	/**
 	 * Builds the map properties window.
 	 */
-	public MapPropertiesDialog (MainController controller, Map map) {
+	public MapPropertiesDialog (Editor editor, Map map) {
 		this.model = map;
 
 		/* Initialize Dialog */
@@ -360,7 +360,7 @@ public class MapPropertiesDialog : Gtk.Dialog {
 		/* Initialize Widgets */
 		this.notebook = new Gtk.Notebook ();
 		this.notebook.set_scrollable (true);
-		this.page1 = new BasicPage (controller, map);
+		this.page1 = new BasicPage (editor, map);
 
 		/* Dialog Layout */
 		Gtk.Box main_box = this.get_content_area () as Gtk.Box;		
