@@ -445,7 +445,8 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 
 				// Get and draw the lower layer tile, if any
 				if (lower_tile_id != 0) {
-					var surface_tile = this.tileset.get_tile (lower_tile_id, LayerType.LOWER);
+					int? binding_code = this.generate_binding_code(rect.y + row, rect.x + col);
+					var surface_tile = this.tileset.get_tile (lower_tile_id, LayerType.LOWER, binding_code);
 					// The standard 16x16 tile size is used because of the use of scale ()
 					this.draw_tile (surface_tile, this.surface_lower_layer, (dest_x + col) * 16, (dest_y + row) * 16);
 				}
@@ -502,5 +503,45 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 
 		this.clear_surfaces ();
 		this.clear_schemes ();
+	}
+
+	private int? generate_binding_code(int y, int x){
+		int tile_id = this.lower_layer[y,x];
+		//TODO: bind Water
+		if (tile_id < 7 || tile_id >18)
+			return null;
+		
+		/**
+		 * Generate binding_grid
+		 */
+		int u = 0;
+		int d = 0;
+		int l = 0;
+		int r = 0;
+		int ul = 0;
+		int ur = 0;
+		int dl = 0;
+		int dr = 0;
+		int h = this.height_in_tiles;
+		int w = this.width_in_tiles;
+
+		if (y > 0 && this.lower_layer[y-1,x] != tile_id)
+			u = 1;
+		if (y < h && this.lower_layer[y+1,x] != tile_id)
+			d = 2;
+		if (x > 0 && this.lower_layer[y,x-1] != tile_id)
+			l = 4;
+		if (x < w && this.lower_layer[y,x+1] != tile_id)
+			r = 8;
+		if (x > 0 && y > 0 && (u+l) == 0 && this.lower_layer[y-1,x-1] != tile_id)
+			ul = 16;
+		if (x < w && y > 0 && (u+r) == 0 && this.lower_layer[y-1,x+1] != tile_id)
+			ur = 32;
+		if (x > 0 && y < h && (d+l) == 0 && this.lower_layer[y+1,x-1] != tile_id)
+			dl = 64;
+		if (x < w && y < h && (d+r) == 0 && this.lower_layer[y+1,x+1] != tile_id)
+			dr = 128;
+
+		return u+r+l+d+ul+ur+dl+dr;
 	}
 }

@@ -135,8 +135,10 @@ public class Tileset {
 			ctx.set_source_surface (surface_tileset, dest_x - orig_x, dest_y - orig_y);
 			ctx.fill ();
 
-			// Store the surface in the autotiles hashtable
-			this.autotiles.set (tile_id, surface_block);
+			/**
+			 * Generate binded cache and store them on hash table
+			 */
+			this.generate_binded_tiles (tile_id, surface_block);
 
 			tile_id++;
 			block_col++;
@@ -155,6 +157,134 @@ public class Tileset {
 		}
 	}
 
+	private void generate_binded_tiles (int tile_id, Cairo.ImageSurface surface_block){
+		
+		/**
+		 * Simulate al posible combinations
+		 */
+
+		bool[2] is_binded = {true,false};
+
+		foreach (bool bu in is_binded)
+		foreach (bool bd in is_binded)
+		foreach (bool bl in is_binded)
+		foreach (bool br in is_binded)
+		foreach (bool bul in is_binded)
+		foreach (bool bur in is_binded)
+		foreach (bool bdl in is_binded)
+		foreach (bool bdr in is_binded){
+			
+			int u = 0;
+			int d = 0;
+			int l = 0;
+			int r = 0;
+			if (bu) u = 1;
+			if (bd) d = 2;
+			if (bl) l = 4;
+			if (br) r = 8;
+			int ul = 0;
+			int ur = 0;
+			int dl = 0;
+			int dr = 0;
+			if (u + l == 0 && bul)
+				ul = 16;
+			if (u + r == 0 && bur)
+				ur = 32;
+			if (d + l == 0 && bdl)
+				dl = 64;
+			if (d + r == 0 && bdr)
+				dr = 128;
+			
+
+			/*
+			 * Get base
+			 */
+			var surface_tile = new Cairo.ImageSurface (Cairo.Format.ARGB32, 16, 16);
+			var ctx = new Cairo.Context (surface_tile);
+			ctx.set_operator (Cairo.Operator.SOURCE);
+			ctx.rectangle (0, 0, 16, 16);
+			ctx.set_source_surface (surface_block, -16, -32);
+			ctx.fill ();
+
+			/*
+			 * Draw upper_left corner
+			 */
+			int dest_x = 0;
+			int dest_y = 0;
+			if ((u + l + ul) != 0){
+				ctx.rectangle (dest_x, dest_y, 8, 8);
+				if (u + l + ul == 1)
+					ctx.set_source_surface (surface_block, dest_x-16, dest_y-16);
+				if (u + l + ul == 4)
+					ctx.set_source_surface (surface_block, dest_x-0, dest_y-32);
+				if (u + l + ul == 5)
+					ctx.set_source_surface (surface_block, dest_x-0, dest_y-16);
+				if (u + l + ul == 16)
+					ctx.set_source_surface (surface_block, dest_x-32, dest_y-0);
+				ctx.fill();
+			}
+
+			/*
+			 * Draw upper_right corner
+			 */
+			dest_x = 8;
+			if (u + r + ur > 0){
+				ctx.rectangle (8, 0, 8, 8);
+				if (u + r + ur == 1)
+					ctx.set_source_surface (surface_block, dest_x-24, dest_y-16);
+				if (u + r + ur == 8)
+					ctx.set_source_surface (surface_block, dest_x-40, dest_y-32);
+				if (u + r + ur == 9)
+					ctx.set_source_surface (surface_block, dest_x-40, dest_y-16);
+				if (u + r + ur == 32)
+					ctx.set_source_surface (surface_block, dest_x-40, dest_y-0);
+				ctx.fill();
+			}
+			
+			/*
+			 * Draw down_left corner
+			 */
+			dest_x = 0;
+			dest_y = 8;
+			if (d + l + dl > 0){
+				ctx.rectangle (0, 8, 8, 8);
+				if (d + l + dl == 2)
+					ctx.set_source_surface (surface_block, dest_x-16, dest_y-56);
+				if (d + l + dl == 4)
+					ctx.set_source_surface (surface_block, dest_x-0, dest_y-40);
+				if (d + l + dl == 6)
+					ctx.set_source_surface (surface_block, dest_x-0, dest_y-56);
+				if (d + l + dl == 64)
+					ctx.set_source_surface (surface_block, dest_x-32, dest_y-8);
+				ctx.fill ();
+			}
+
+			/*
+			 * Draw down_right corner
+			 */
+			dest_x = 8;
+			if (d + r + dr > 0){
+			ctx.rectangle (8, 8, 8, 8);
+			if (d + r + dr == 2)
+				ctx.set_source_surface (surface_block, dest_x-24, dest_y-56);
+			if (d + r + dr == 8)
+				ctx.set_source_surface (surface_block, dest_x-40, dest_y-40);
+			if (d + r + dr == 10)
+				ctx.set_source_surface (surface_block, dest_x-40, dest_y-56);
+			if (d + r + dr == 128)
+				ctx.set_source_surface (surface_block, dest_x-40, dest_y-8);
+				ctx.fill ();
+			}
+			
+			/*
+			 * Register tile
+			 */
+			int binding_code = (tile_id + 2)*250+ul+u+ur+l+r+dl+d+dr;
+			this.autotiles.set (binding_code, surface_tile);
+		}
+	}
+		
+
 	/**
 	 * Builds the lower tiles surface (used when designing the lower layer).
 	 */
@@ -169,41 +299,40 @@ public class Tileset {
 		int orig_x = 0;
 		int orig_y = 0;
 
+
 		// For each autotile block, copy its representative tile to the palette
-		for (int tile_id = 1; tile_id < 17; tile_id++) {
-			surface_autotile = this.autotiles.get (tile_id);
-
-			// First three animated autotile blocks
-			if (tile_id < 4) {
-				dest_x = (tile_id - 1) * 16;
-				ctx.rectangle (dest_x, dest_y, 16, 16);
-				ctx.set_source_surface (surface_autotile, dest_x, dest_y);
-			}
-			// The fourth animated autotile block works in a different way
-			else if (tile_id == 4) {
-				dest_x = (tile_id - 1) * 16;
-				ctx.rectangle (dest_x, dest_y, 48, 16);
-				ctx.set_source_surface (surface_autotile, dest_x, dest_y);
-			}
-			// The remaining autotiles
-			else {
-				dest_x = ((tile_id + 1) % 6) * 16;
-				dest_y = ((tile_id + 1) / 6) * 16;
-				ctx.rectangle (dest_x, dest_y, 16, 16);
-			}
-
+		
+		ctx.rectangle (0, 0, 16, 16);
+		ctx.set_source_surface (surface_tileset, 0, 0);
+		ctx.fill();
+		ctx.rectangle (16, 0, 16, 16);
+		ctx.set_source_surface (surface_tileset, 16-48, 0);
+		ctx.fill();
+		ctx.rectangle (32, 0, 16, 16);
+		ctx.set_source_surface (surface_tileset, 32, -80);
+		ctx.fill();
+		// The fourth animated autotile block works in a different way
+		ctx.rectangle (48, 0, 48, 16);
+		ctx.set_source_surface (surface_tileset, 0, -64);
+		ctx.fill();
+		// The remaining autotiles
+		for (int tile_id = 5; tile_id < 17; tile_id++) {
+			surface_autotile = this.autotiles.get ((tile_id + 2) * 250+15);
+			dest_x = ((tile_id+1) % 6) * 16;
+			dest_y = ((tile_id+1) / 6) * 16;
+			ctx.rectangle (dest_x, dest_y, 16, 16);
 			ctx.set_source_surface (surface_autotile, dest_x, dest_y);
 			ctx.fill ();
 		}
-
+		
 		// First part of the lower tiles (third tileset column, 96x256)
 		dest_x = 0;
 		dest_y = 48;
 		orig_x = 192;
 		orig_y = 0;
-
+		
 		ctx.rectangle (dest_x, dest_y, 96, 256);
-		ctx.set_source_surface (surface_tileset, dest_x - orig_x, dest_y - orig_y);
+		ctx.set_source_surface (surface_tileset, -192, 48);
 		ctx.fill ();
 
 		// Second part of the lower tiles (fourth tileset column, 96x128)
@@ -257,9 +386,13 @@ public class Tileset {
 	/**
 	 * Returns a 16x16 surface with the desired tile.
 	 */
-	public Cairo.ImageSurface get_tile (int tile_id, LayerType layer) {
+	public Cairo.ImageSurface get_tile (int tile_id, LayerType layer, int? binding_code = null) {
 		var surface_tile = new Cairo.ImageSurface (Cairo.Format.ARGB32, 16, 16);
 
+		// Is an autotile?
+		if (binding_code != null)
+			return this.autotiles.get(tile_id * 250 + binding_code);
+		
 		// Find the tile coordinates
 		int orig_x = ((tile_id - 1) % 6) * 16;
 		int orig_y = ((tile_id - 1) / 6) * 16;
