@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<map>
+	<name>Water-Basis</name>
+	<width>20</width>
+	<height>16</height>
+	<tileset>basis.png</tileset>
+	<scroll_type>0</scroll_type>
+	<panorama>
+		<filename />
+		<horizontal_loop>false</horizontal_loop>
+		<horizontal_autoscroll>false</horizontal_autoscroll>
+		<horizontal_autoscroll_speed>0</horizontal_autoscroll_speed>
+		<vertical_loop>false</vertical_loop>
+		<vertical_autoscroll>false</vertical_autoscroll>
+		<vertical_autoscroll_speed>0</vertical_autoscroll_speed>
+	</panorama>
+	<bgm>
+		<type>1</type>
+		<filename />
+	</bgm>
+	<backdrop>
+		<type>1</type>
+		<filename />
+	</backdrop>
+	<teleport>
+		<type>1</type>
+		<allow>true</allow>
+	</teleport>
+	<escape>
+		<type>1</type>
+		<allow>true</allow>
+	</escape>
+	<save>
+		<type>1</type>
+		<allow>true</allow>
+	</save>
+	<layers>
+		<lower>7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 1 1 1 1 1 1 1 7 7 3 1 1 1 1 1 3 7 7 7 1 3 1 1 1 1 1 3 1 3 3 1 1 1 1 1 1 3 7 7 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 7 7 1 1 1 1 3 1 1 1 1 1 1 1 1 1 1 1 1 1 7 7 1 1 1 1 1 3 1 1 1 3 1 1 1 1 1 1 1 1 7 7 3 1 1 1 1 1 1 1 3 1 3 1 1 1 1 1 1 3 7 7 3 1 1 1 1 1 1 1 1 3 1 1 3 3 3 1 1 3 7 16 2 2 2 2 2 2 2 2 2 2 2 2 3 2 3 2 2 2 16 16 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 2 2 2 16 16 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 16 16 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 16 16 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 16 16 2 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 2 16 16 16 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 16 16 16 16 16 16 16 16 16 16 16 16 16 16 16 16 16 16 16 16 16 16</lower>
+		<upper>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</upper>
+	</layers>
+	<enemy_encounter_steps>25</enemy_encounter_steps>
+	<save_time>0</save_time>
+</map>

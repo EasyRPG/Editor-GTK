@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <map>
-	<name>Map1</name>
+	<name>DBlocks-Debug</name>
 	<width>20</width>
 	<height>16</height>
 	<tileset>debug.png</tileset>

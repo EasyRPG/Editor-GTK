@@ -109,14 +109,19 @@ public class Tileset {
 		Cairo.Context ctx;
 		Cairo.ImageSurface surface_block;
 
+		// Since water binds in a diferent way and merges with deep water,
+		// we need a diferent way to bind it
+		this.generate_binded_water(surface_tileset);
+		
 		// Each tileset contains 5 columns with a size of 6x16 tiles (96x256 pixels) 
 		int tileset_col = 0;
 
 		// Each tileset column contains 4 blocks with a size of 3x4 tiles (48x64 pixels)
-		int block_col = 0;
-		int block_row = 0;
+		// Anyway we should skip water colums because they are already stored
+		int block_col = 1;
+		int block_row = 1;
 
-		int tile_id = 1;
+		int tile_id = 4;
 		
 		while (tileset_col < 2) {
 			surface_block = new Cairo.ImageSurface (Cairo.Format.ARGB32, 48, 64);
@@ -157,10 +162,241 @@ public class Tileset {
 		}
 	}
 
+	/**
+	 * Used for water binding code generation
+	 * 1- WaterA
+	 * 2- WaterB
+	 * 3- DeepWater
+	 * 4- Ground
+	 **/
+	private bool is_water(int tile_id){
+		if (tile_id < 4)
+			return true;
+		return false;
+	}
+
+	/**
+	 * Used for water binding code generation
+	 **/
+	private bool is_dwater(int tile_id){
+		if (tile_id == 3)
+			return true;
+		return false;
+	}
+
+	/**
+	 * Used for water binding code generation
+	 **/
+	private bool is_abwater(int tile_id){
+		if (tile_id == 1 || tile_id == 2)
+			return true;
+		return false;
+	}
+	
+	/**
+	 * Generate al posible water combinations and store them on autotiles
+	 */
+	private void generate_binded_water(Cairo.ImageSurface surcace_tileset){
+
+		/**
+		 * Simulate all posible combinations
+		 **/
+		int[4] terrain_ids = {1,2,3,4};
+		/**
+		 * 1- WaterA
+		 * 2- WaterB
+		 * 3- DeepWater
+		 * 4- Ground
+		 **/
+		
+		// Main foreach controlates base water type
+		foreach (int tile_id in terrain_ids)
+		foreach (int tile_u in terrain_ids)
+		foreach (int tile_d in terrain_ids)
+		foreach (int tile_l in terrain_ids)
+		foreach (int tile_r in terrain_ids)
+		foreach (int tile_ul in terrain_ids)
+		foreach (int tile_ur in terrain_ids)
+		foreach (int tile_dl in terrain_ids)
+		foreach (int tile_dr in terrain_ids){
+			if (tile_id == 4)
+				// Once main foreach reaches ground, we have finished
+				break;
+			// Initialize code vars
+			int u=1, d=2, l=4, r=8, ul=0, ur=0, dl=0, dr=0;
+			
+			if (is_water (tile_u))
+			    u = 0;
+			if (is_water (tile_d))
+			    d = 0;
+			if (is_water (tile_l))
+			    l = 0;
+			if (is_water (tile_r))
+			    r = 0;
+			// DeepWater Special Corners
+			//UpperLeft
+			if (is_dwater (tile_id)){
+				if (is_abwater(tile_u) && is_abwater (tile_l) && is_abwater (tile_ul))
+					ul = 21;}
+			else{
+				if (is_dwater (tile_u) && is_dwater (tile_l))
+					ul = 21;}
+			//UpperRight
+			if (is_dwater (tile_id)){
+				if (is_abwater(tile_u) && is_abwater (tile_r) && is_abwater (tile_ur))
+					ur = 41;}
+			else{
+				if (is_dwater (tile_u) && is_dwater (tile_r))
+					ur = 41;}
+			//LowerLeft
+			if (is_dwater (tile_id)){
+				if (is_abwater(tile_d) && is_abwater (tile_l) && is_abwater (tile_dl))
+					dl = 70;}
+			else{
+				if (is_dwater (tile_d) && is_dwater (tile_l))
+					dl = 70;}
+			//LowerRight
+			if (is_dwater (tile_id)){
+				if (is_abwater(tile_d) && is_abwater (tile_r) && is_abwater (tile_dr))
+					dr = 138;}
+			else{
+				if (is_dwater (tile_d) && is_dwater (tile_r))
+					dr = 138;}
+			//Overdraw ground corners
+			if ((u+l) == 0 && tile_ul == 4)
+			    ul = 16;
+			if ((u+r) == 0 && tile_ur == 4)
+			    ur = 32;
+			if ((d+l) == 0 && tile_dl == 4)
+			    dl = 64;
+			if ((d+r) == 0 && tile_dr == 4)
+			    dr = 128;
+
+			int binding_code = tile_id * 300 + u+d+l+r+ul+ur+dl+dr;
+			// Skip painting if tile is already stored
+			if (this.autotiles.get(binding_code) != null)
+				continue;
+
+			// Water B uses second block of 3x4 tiles for borders
+			// Water A and Deep Water uses first block
+			int border_xoffset = (tile_id == 2) ? 48 : 0;
+
+			/*
+			 * Get base
+			 */
+			var surface_tile = new Cairo.ImageSurface (Cairo.Format.ARGB32, 16, 16);
+			var ctx = new Cairo.Context (surface_tile);
+			ctx.set_operator (Cairo.Operator.SOURCE);
+			ctx.rectangle (0, 0, 16, 16);
+			if (is_abwater (tile_id))
+				ctx.set_source_surface (surcace_tileset, 0, -64);
+			else
+			    ctx.set_source_surface (surcace_tileset, 0, -112);
+			ctx.fill ();
+
+			// Draw Corners
+			//UpperLeft corner
+			int dest_x = 0, dest_y = 0;
+			int corner = u+l+ul;
+			if (corner > 0){
+				ctx.rectangle (dest_x, dest_y, 8, 8);
+				if (corner == 1)
+					ctx.set_source_surface (surcace_tileset, dest_x-border_xoffset-0, dest_y-32);
+				if (corner == 4)
+					ctx.set_source_surface (surcace_tileset, dest_x-border_xoffset-0, dest_y-16);
+				if (corner == 5)
+					ctx.set_source_surface (surcace_tileset, dest_x-border_xoffset-0, dest_y-0);
+				if (corner == 16)
+					ctx.set_source_surface (surcace_tileset, dest_x-border_xoffset-0, dest_y-48);
+				if (corner == 21){
+					if (is_abwater (tile_id))
+						ctx.set_source_surface (surcace_tileset, dest_x-0, dest_y-80);
+					else
+						ctx.set_source_surface (surcace_tileset, dest_x-0, dest_y-96);
+				}
+				ctx.fill();
+			}
+
+			//UpperRight corner
+			dest_x = 8;
+			dest_y = 0;
+			corner = u+r+ur;
+			if (corner > 0){
+				ctx.rectangle (dest_x, dest_y, 8, 8);
+				if (corner == 1)
+					ctx.set_source_surface (surcace_tileset, dest_x-border_xoffset-8, dest_y-32);
+				if (corner == 8)
+					ctx.set_source_surface (surcace_tileset, dest_x-border_xoffset-8, dest_y-16);
+				if (corner == 9)
+					ctx.set_source_surface (surcace_tileset, dest_x-border_xoffset-8, dest_y-0);
+				if (corner == 32)
+					ctx.set_source_surface (surcace_tileset, dest_x-border_xoffset-8, dest_y-48);
+				if (corner == 41){
+					if (is_abwater (tile_id))
+						ctx.set_source_surface (surcace_tileset, dest_x-8, dest_y-80);
+					else
+						ctx.set_source_surface (surcace_tileset, dest_x-8, dest_y-96);
+				}
+				ctx.fill();
+			}
+			// corner
+			dest_x = 0;
+			dest_y = 8;
+			corner = d+l+dl;
+			if (corner > 0){
+				ctx.rectangle (dest_x, dest_y, 8, 8);
+				if (corner == 2)
+					ctx.set_source_surface (surcace_tileset, dest_x-border_xoffset-0, dest_y-40);
+				if (corner == 4)
+					ctx.set_source_surface (surcace_tileset, dest_x-border_xoffset-0, dest_y-24);
+				if (corner == 6)
+					ctx.set_source_surface (surcace_tileset, dest_x-border_xoffset-0, dest_y-8);
+				if (corner == 64)
+					ctx.set_source_surface (surcace_tileset, dest_x-border_xoffset-0, dest_y-56);
+				if (corner == 70){
+					if (is_abwater (tile_id))
+						ctx.set_source_surface (surcace_tileset, dest_x-0, dest_y-88);
+					else
+						ctx.set_source_surface (surcace_tileset, dest_x-0, dest_y-104);
+				}
+				ctx.fill();
+			}
+			    
+			// corner
+			dest_x = 8;
+			dest_y = 8;
+			corner = d+r+dr;
+			if (corner > 0){
+				ctx.rectangle (dest_x, dest_y, 8, 8);
+				if (corner == 2)
+					ctx.set_source_surface (surcace_tileset, dest_x-border_xoffset-8, dest_y-40);
+				if (corner == 8)
+					ctx.set_source_surface (surcace_tileset, dest_x-border_xoffset-8, dest_y-24);
+				if (corner == 10)
+					ctx.set_source_surface (surcace_tileset, dest_x-border_xoffset-8, dest_y-8);
+				if (corner == 128)
+					ctx.set_source_surface (surcace_tileset, dest_x-border_xoffset-8, dest_y-56);
+				if (corner == 138){
+					if (is_abwater (tile_id))
+						ctx.set_source_surface (surcace_tileset, dest_x-8, dest_y-88);
+					else
+						ctx.set_source_surface (surcace_tileset, dest_x-8, dest_y-104);
+				}
+				ctx.fill();
+			}
+			/*
+			 * Register tile
+			 */
+			this.autotiles.set (binding_code, surface_tile);
+		}
+	}
+	/**
+	 * Generate al posible ground combinations and store them on autotiles
+	 */
 	private void generate_binded_tiles (int tile_id, Cairo.ImageSurface surface_block){
 		
 		/**
-		 * Simulate al posible combinations
+		 * Simulate all posible combinations
 		 */
 
 		bool[2] is_binded = {true,false};
@@ -174,18 +410,12 @@ public class Tileset {
 		foreach (bool bdl in is_binded)
 		foreach (bool bdr in is_binded){
 			
-			int u = 0;
-			int d = 0;
-			int l = 0;
-			int r = 0;
+			int u = 0, d = 0, l = 0, r = 0;
 			if (bu) u = 1;
 			if (bd) d = 2;
 			if (bl) l = 4;
 			if (br) r = 8;
-			int ul = 0;
-			int ur = 0;
-			int dl = 0;
-			int dr = 0;
+			int ul = 0, ur = 0, dl = 0, dr = 0;
 			if (u + l == 0 && bul)
 				ul = 16;
 			if (u + r == 0 && bur)
@@ -279,7 +509,7 @@ public class Tileset {
 			/*
 			 * Register tile
 			 */
-			int binding_code = (tile_id + 2)*250+ul+u+ur+l+r+dl+d+dr;
+			int binding_code = (tile_id + 2)*300+ul+u+ur+l+r+dl+d+dr;
 			this.autotiles.set (binding_code, surface_tile);
 		}
 	}
@@ -317,7 +547,7 @@ public class Tileset {
 		ctx.fill();
 		// The remaining autotiles
 		for (int tile_id = 5; tile_id < 17; tile_id++) {
-			surface_autotile = this.autotiles.get ((tile_id + 2) * 250+15);
+			surface_autotile = this.autotiles.get ((tile_id + 2) * 300+15);
 			dest_x = ((tile_id+1) % 6) * 16;
 			dest_y = ((tile_id+1) / 6) * 16;
 			ctx.rectangle (dest_x, dest_y, 16, 16);
@@ -391,7 +621,7 @@ public class Tileset {
 
 		// Is an autotile?
 		if (binding_code != null)
-			return this.autotiles.get(tile_id * 250 + binding_code);
+			return this.autotiles.get(tile_id * 300 + binding_code);
 		
 		// Find the tile coordinates
 		int orig_x = ((tile_id - 1) % 6) * 16;

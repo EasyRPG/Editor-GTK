@@ -507,23 +507,18 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 
 	private int? generate_binding_code(int y, int x){
 		int tile_id = this.lower_layer[y,x];
-		//TODO: bind Water
+		if (is_water (y,x))
+		    return generate_water_binding_code (y,x);
 		if (tile_id < 7 || tile_id >18)
 			return null;
 		
 		/**
 		 * Generate binding_grid
 		 */
-		int u = 0;
-		int d = 0;
-		int l = 0;
-		int r = 0;
-		int ul = 0;
-		int ur = 0;
-		int dl = 0;
-		int dr = 0;
-		int h = this.height_in_tiles;
-		int w = this.width_in_tiles;
+		int u = 0, d = 0, l = 0, r = 0, ul = 0, ur = 0, dl = 0, dr = 0;
+		
+		int h = this.height_in_tiles -1;
+		int w = this.width_in_tiles -1;
 
 		if (y > 0 && this.lower_layer[y-1,x] != tile_id)
 			u = 1;
@@ -544,4 +539,95 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 
 		return u+r+l+d+ul+ur+dl+dr;
 	}
+
+	/**
+	 * Used for water binding code generation
+	 * 1- WaterA
+	 * 2- WaterB
+	 * 3- DeepWater
+	 **/
+	private bool is_water(int y, int x){
+		if (this.lower_layer[y,x] < 4 && this.lower_layer[y,x] > 0)
+			return true;
+		else
+			return false;
+	}
+
+	/**
+	 * Used for water binding code generation
+	 **/
+	private bool is_dwater(int y, int x){
+		if (this.lower_layer[y,x] == 3)
+			return true;
+		else
+			return false;
+	}
+
+	/**
+	 * Used for water binding code generation
+	 **/
+	private bool is_abwater(int y, int x){
+		if (this.lower_layer[y,x] == 1 || this.lower_layer[y,x] == 2)
+			return true;
+		else
+			return false;
+	}
+
+	private int? generate_water_binding_code(int y, int x){
+		/**
+		 * Generate binding_grid
+		 */
+		int u=1, d=2, l=4, r=8, ul=0, ur=0, dl=0, dr=0;
+		
+		int h = this.height_in_tiles -1;
+		int w = this.width_in_tiles -1;
+
+		if (y == 0 || is_water(y-1,x))
+			u = 0;
+		if (y == h || is_water(y+1,x))
+			d = 0;
+		if (x == 0 || is_water(y,x-1))
+			l = 0;
+		if (x == w || is_water(y,x+1))
+			r = 0;
+		
+		if ((u+l) == 0 && x > 0 && y > 0){
+			if (is_water(y-1,x-1) == false)
+				ul = 16;
+			else if (is_abwater(y,x) && is_dwater (y-1,x) && is_dwater (y,x-1))
+				ul = 21;
+			else if (is_dwater (y,x) && is_abwater(y-1,x) && is_abwater (y,x-1) && is_abwater (y-1,x-1))
+				ul = 21;
+		}
+		
+		if ((u+r) == 0 && x < w && y > 0){
+			if (is_water(y-1,x+1) == false)
+				ur = 32;
+			else if (is_abwater(y,x) && is_dwater (y-1,x) && is_dwater (y,x+1))
+				ur = 41;
+			else if (is_dwater (y,x) && is_abwater(y-1,x) && is_abwater (y,x+1) && is_abwater (y-1,x+1))
+				ur = 41;
+		}
+		
+		if ((d+l) == 0 && x > 0 && y < h){
+			if (is_water(y+1,x-1) == false)
+				dl = 64;
+			else if (is_abwater(y,x) && is_dwater (y+1,x) && is_dwater (y,x-1))
+				dl = 70;
+			else if (is_dwater (y,x) && is_abwater(y+1,x) && is_abwater (y,x-1) && is_abwater (y+1,x-1))
+				dl = 70;
+		}
+
+		if ((d+r) == 0 && x < w && y < h){
+			if (is_water(y+1,x+1) == false)
+				dr = 128;
+			else if (is_abwater(y,x) && is_dwater (y+1,x) && is_dwater (y,x+1))
+				dr = 138;
+			else if (is_dwater (y,x) && is_abwater(y+1,x) && is_abwater (y,x+1) && is_abwater (y+1,x+1))
+				dr = 138;
+		}
+		
+		return (u+d+l+r+ul+ur+dl+dr);
+	}
+
 }
