@@ -45,7 +45,7 @@ public class MapShiftDialog : Gtk.Dialog {
 		var input_amount = new Gtk.SpinButton.with_range(1.0,500.0,1.0);
 		var frame_amount = new Gtk.Frame ("Number of Units");
 		var frame_dir    = new Gtk.Frame ("Direction");
-		var table_dir    = new Gtk.Table (3, 3, true);
+		var table_dir    = new Gtk.Grid ();
 		button_up    = new Gtk.ToggleButton ();
 		button_down  = new Gtk.ToggleButton ();
 		button_left  = new Gtk.ToggleButton ();
@@ -67,10 +67,10 @@ public class MapShiftDialog : Gtk.Dialog {
 		frame_dir.add (table_dir);
 		frame_amount.add (input_amount);
 
-		table_dir.attach_defaults (button_up, 1, 2, 0, 1);
-		table_dir.attach_defaults (button_down, 1, 2, 2, 3);
-		table_dir.attach_defaults (button_left, 0, 1, 1, 2);
-		table_dir.attach_defaults (button_right, 2, 3, 1, 2);
+		table_dir.attach (button_up, 1, 2, 0, 1);
+		table_dir.attach (button_down, 1, 2, 2, 3);
+		table_dir.attach (button_left, 0, 1, 1, 2);
+		table_dir.attach (button_right, 2, 3, 1, 2);
 
 		main_box.pack_start (hbox, true, true, 0);
 
