@@ -157,8 +157,11 @@ public class MaptreeTreeStore : Gtk.TreeStore, Gtk.TreeDragSource, Gtk.TreeDragD
 		/* remove ourselves */
 		this.get_value (iter, 0, out v);
 		result.append(v.get_int());
+#if VALA_0_18
+		this.remove(ref iter);
+#else
 		this.remove(iter);
-
+#endif
 		return result;
 	}
 }
