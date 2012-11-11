@@ -83,7 +83,7 @@ public class Editor {
 		this.main_window.show_all ();
 
 		// If a project_file was specified, open the project
-		string project_file = (this.files != null) ? files[0] : null;
+		string project_file = (files != null) ? files[0] : null;
 		if(project_file != null) {
 			this.open_project (project_file);
 		}
@@ -299,6 +299,7 @@ public class Editor {
 	/**
 	 * Writes project data to the .rproject file.
 	 */
+/*
 	private void save_project_data () throws Error {
 		XmlNode root, node;
 		string rproject_file = this.base_path + this.project_filename;
@@ -326,10 +327,12 @@ public class Editor {
 		writer.generate ();
 		writer.write (rproject_file);
 	}
+*/
 
 	/**
 	 * Writes game data to the game.xml file.
 	 */
+/*
 	private void save_game_data () throws Error {
 		XmlNode root, node;
 		string game_file = this.base_path + "data/game.xml";
@@ -360,6 +363,7 @@ public class Editor {
 		writer.generate ();
 		writer.write (game_file);
 	}
+*/
 
 	/**
 	 * Loads XML data from the maptree file.
