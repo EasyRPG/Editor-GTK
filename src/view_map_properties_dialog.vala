@@ -36,8 +36,8 @@ public class MapPropertiesDialog : Gtk.Dialog {
 		private Gtk.ComboBoxText input_tileset;
 		private Gtk.SpinButton input_width;
 		private Gtk.SpinButton input_height;
-		private OptionTable options;
-		private PanoramaTable panorama;
+		private OptionGrid options;
+		private PanoramaGrid panorama;
 
 		public BasicPage (Editor editor, Map map) {
 			Object(orientation: Gtk.Orientation.HORIZONTAL, spacing:5, halign:Gtk.Align.START, valign:Gtk.Align.START);
@@ -59,25 +59,25 @@ public class MapPropertiesDialog : Gtk.Dialog {
 			left_box.pack_start (frame_tileset, true, false);
 
 			var frame_dimensions = new Gtk.Frame ("Dimensions");
-			var table_dimensions = new Gtk.Grid ();
+			var grid_dimensions = new Gtk.Grid ();
 			input_width = new Gtk.SpinButton (new Gtk.Adjustment ((double) map.width, 1.0, 500.0, 1.0, 5.0, 0.0), 1.0, 0);
 			input_height = new Gtk.SpinButton (new Gtk.Adjustment ((double) map.height, 1.0, 500.0, 1.0, 5.0, 0.0), 1.0, 0);
-			table_dimensions.attach (new Gtk.Label ("Width:"), 0, 1, 0, 1);
-			table_dimensions.attach (input_width, 1, 2, 0, 1);
-			table_dimensions.attach (new Gtk.Label ("Height:"), 0, 1, 1, 2);
-			table_dimensions.attach (input_height, 1, 2, 1, 2);
-			frame_dimensions.add (table_dimensions);
+			grid_dimensions.attach (new Gtk.Label ("Width:"), 0, 0, 1, 1);
+			grid_dimensions.attach (input_width, 1, 0, 1, 1);
+			grid_dimensions.attach (new Gtk.Label ("Height:"), 0, 1, 1, 1);
+			grid_dimensions.attach (input_height, 1, 1, 1, 1);
+			frame_dimensions.add (grid_dimensions);
 			left_box.pack_start (frame_dimensions, true, false);
 
 			var frame_options = new Gtk.Frame ("Options");
-			options = new OptionTable (map);
+			options = new OptionGrid (map);
 			frame_options.add (options);
 			left_box.pack_start (frame_options, true, false);
 
 			this.pack_start (left_box, true, false);
 
 			var frame_panorama = new Gtk.Frame ("Background");
-			panorama = new PanoramaTable (map);
+			panorama = new PanoramaGrid (map);
 			frame_panorama.add (panorama);
 			this.pack_start (frame_panorama, true, false);
 		}
@@ -97,7 +97,7 @@ public class MapPropertiesDialog : Gtk.Dialog {
 		}
 	}
 
-	private class PanoramaTable : Gtk.Grid {
+	private class PanoramaGrid : Gtk.Grid {
 		private Gtk.CheckButton        input_enabled;
 		private Gtk.CheckButton        input_h_scroll;
 		private Gtk.CheckButton        input_h_auto;
@@ -108,11 +108,11 @@ public class MapPropertiesDialog : Gtk.Dialog {
 		private Gtk.Image              output_image;
 		private Gtk.FileChooserButton  input_image;
 
-		public PanoramaTable (Map map) {
+		public PanoramaGrid (Map map) {
 
 			input_enabled = new Gtk.CheckButton.with_label ("Use Panorama Background");
 			input_enabled.set_active (map.panorama_use);
-			this.attach (input_enabled, 0, 2, 0, 1);
+			this.attach (input_enabled, 0, 0, 2, 1);
 
 			var frame_image = new Gtk.Frame ("Image");
 			var box_image = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
@@ -125,7 +125,7 @@ public class MapPropertiesDialog : Gtk.Dialog {
 			box_image.pack_start (input_image, true, false);
 
 			frame_image.add (box_image); 
-			this.attach (frame_image, 0, 1, 1, 2);
+			this.attach (frame_image, 0, 1, 1, 1);
 
 			var box_scrolling = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
@@ -155,7 +155,7 @@ public class MapPropertiesDialog : Gtk.Dialog {
 
 			box_scrolling.pack_start (frame_h_scrolling, true, false);
 			box_scrolling.pack_start (frame_v_scrolling, true, false);
-			this.attach (box_scrolling, 1, 2, 1, 2);
+			this.attach (box_scrolling, 1, 1, 1, 1);
 
 			input_enabled.toggled.connect (update_sensitivity);
 			input_h_scroll.toggled.connect (update_sensitivity);
@@ -195,7 +195,7 @@ public class MapPropertiesDialog : Gtk.Dialog {
 		}
 	}
 
-	private class OptionTable : Gtk.Grid {
+	private class OptionGrid : Gtk.Grid {
 		private Gtk.ComboBoxText      input_teleport;
 		private Gtk.ComboBoxText      input_escape;
 		private Gtk.ComboBoxText      input_save;
@@ -205,35 +205,12 @@ public class MapPropertiesDialog : Gtk.Dialog {
 		private Gtk.ComboBoxText      input_bbg;
 		private Gtk.FileChooserButton input_bbg_file;
 
-		public OptionTable (Map map) {
+		public OptionGrid (Map map) {
 
 			var str_teleport = new Gtk.Label ("Teleport:");
 			str_teleport.set_halign (Gtk.Align.START);
 			str_teleport.set_tooltip_markup ("allow or forbid the ability to teleport out of the map");
-			attach (str_teleport, 0, 1, 0, 1);
-
-			var str_escape = new Gtk.Label ("Escape:");
-			str_escape.set_halign (Gtk.Align.START);
-			str_escape.set_tooltip_markup ("allow or forbid the ability to escape out of fights");
-			attach (str_escape, 0, 1, 1, 2);
-
-			var str_save = new Gtk.Label ("Save:");
-			str_save.set_halign (Gtk.Align.START);
-			str_save.set_tooltip_markup ("allow or forbid saving in the map");
-			attach (str_save, 0, 1, 2, 3);
-
-			var str_wrapping = new Gtk.Label ("Wrapping:");
-			str_wrapping.set_halign (Gtk.Align.START);
-			str_wrapping.set_tooltip_markup ("appear on the other side of the map, when walking across the map borders");
-			attach (str_wrapping, 0, 1, 3, 4);
-
-			var str_music = new Gtk.Label ("Background Music:");
-			str_music.set_halign (Gtk.Align.START);
-			attach (str_music, 0, 1, 4, 5);
-
-			var str_bbg = new Gtk.Label ("Battle Background:");
-			str_bbg.set_halign (Gtk.Align.START);
-			attach (str_bbg, 0, 1, 5, 6);
+			attach (str_teleport, 0, 0, 1, 1);
 
 			input_teleport = new Gtk.ComboBoxText ();
 			input_teleport.append ("parent", "same as parent map");
@@ -241,7 +218,12 @@ public class MapPropertiesDialog : Gtk.Dialog {
 			input_teleport.append ("allow", "allow");
 			input_teleport.append ("forbid", "forbid");
 			input_teleport.set_active (model_to_combobox (map.teleport_type, map.teleport_allow));
-			attach (input_teleport, 1, 3, 0, 1);
+			attach (input_teleport, 1, 0, 2, 1);
+
+			var str_escape = new Gtk.Label ("Escape:");
+			str_escape.set_halign (Gtk.Align.START);
+			str_escape.set_tooltip_markup ("allow or forbid the ability to escape out of fights");
+			attach (str_escape, 0, 1, 1, 1);
 
 			input_escape = new Gtk.ComboBoxText ();
 			input_escape.append ("parent", "same as parent map");
@@ -249,7 +231,12 @@ public class MapPropertiesDialog : Gtk.Dialog {
 			input_escape.append ("allow", "allow");
 			input_escape.append ("forbid", "forbid");
 			input_escape.set_active (model_to_combobox (map.escape_type, map.escape_allow));
-			attach (input_escape, 1, 3, 1, 2);
+			attach (input_escape, 1, 1, 2, 1);
+
+			var str_save = new Gtk.Label ("Save:");
+			str_save.set_halign (Gtk.Align.START);
+			str_save.set_tooltip_markup ("allow or forbid saving in the map");
+			attach (str_save, 0, 2, 1, 1);
 
 			input_save = new Gtk.ComboBoxText ();
 			input_save.append ("parent", "same as parent map");
@@ -257,7 +244,12 @@ public class MapPropertiesDialog : Gtk.Dialog {
 			input_save.append ("allow", "allow");
 			input_save.append ("forbid", "forbid");
 			input_save.set_active (model_to_combobox (map.save_type, map.save_allow));
-			attach (input_save, 1, 3, 2, 3);
+			attach (input_save, 1, 2, 2, 1);
+
+			var str_wrapping = new Gtk.Label ("Wrapping:");
+			str_wrapping.set_halign (Gtk.Align.START);
+			str_wrapping.set_tooltip_markup ("appear on the other side of the map, when walking across the map borders");
+			attach (str_wrapping, 0, 3, 1, 1);
 
 			input_wrapping = new Gtk.ComboBoxText ();
 			input_wrapping.append ("none", "None");
@@ -265,27 +257,35 @@ public class MapPropertiesDialog : Gtk.Dialog {
 			input_wrapping.append ("horizontal", "Horizontal");
 			input_wrapping.append ("both", "Both");
 			input_wrapping.set_active (map.scroll_type);
-			attach (input_wrapping, 1, 3, 3, 4);
+			attach (input_wrapping, 1, 3, 2, 1);
+
+			var str_music = new Gtk.Label ("Background Music:");
+			str_music.set_halign (Gtk.Align.START);
+			attach (str_music, 0, 4, 1, 1);
 
 			input_music = new Gtk.ComboBoxText ();
 			input_music.append ("parent", "same as parent map");
 			input_music.append ("event", "entrust to event");
 			input_music.append ("specify", "specify");
 			input_music.set_active (map.bgm_type);
-			attach (input_music, 1, 2, 4, 5);
+			attach (input_music, 1, 4, 1, 1);
 
 			input_music_file = new Gtk.FileChooserButton ("Choose Soundtrack", Gtk.FileChooserAction.OPEN);
-			attach (input_music_file, 2, 3, 4, 5);
+			attach (input_music_file, 2, 4, 1, 1);
+
+			var str_bbg = new Gtk.Label ("Battle Background:");
+			str_bbg.set_halign (Gtk.Align.START);
+			attach (str_bbg, 0, 5, 1, 1);
 
 			input_bbg = new Gtk.ComboBoxText ();
 			input_bbg.append ("parent", "same as parent map");
 			input_bbg.append ("terrain", "use terrain settings");
 			input_bbg.append ("specify", "specify");
 			input_bbg.set_active (map.backdrop_type);
-			attach (input_bbg, 1, 2, 5, 6);
+			attach (input_bbg, 1, 5, 1, 1);
 
 			input_bbg_file = new Gtk.FileChooserButton ("Choose Image", Gtk.FileChooserAction.OPEN);
-			attach (input_bbg_file, 2, 3, 5, 6);
+			attach (input_bbg_file, 2, 5, 1, 1);
 
 			input_music.changed.connect (update_sensitivity);
 			input_bbg.changed.connect (update_sensitivity);
