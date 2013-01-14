@@ -20,11 +20,11 @@
 /**
  * The maptree menu.
  */
-public class MapTreeMenu : Gtk.Menu {
+public class MaptreeMenu : Gtk.Menu {
 	/**
 	 * Builds the maptree Menu for map nodes.
 	 */
-	public MapTreeMenu () {
+	public MaptreeMenu () {
 		var item_prop = new Gtk.ImageMenuItem.from_stock (Gtk.Stock.PROPERTIES, null);
 		item_prop.set_label ("Map Properties");
 		item_prop.activate.connect(() => {map_properties ();});
@@ -85,7 +85,7 @@ public class MapTreeMenu : Gtk.Menu {
 	/**
 	 * Builds the maptree Menu for project directory
 	 */
-	public MapTreeMenu.root () {
+	public MaptreeMenu.root () {
 		var item_new_map = new Gtk.ImageMenuItem.from_stock (Gtk.Stock.NEW, null);
 		item_new_map.set_label ("New Map");
 		item_new_map.activate.connect(() => {map_new ();});

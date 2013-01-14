@@ -22,8 +22,8 @@
  */
 public class MaptreeTreeView : Gtk.TreeView {
 	private MaptreeTreeStore maptree_model;
-	private MapTreeMenu menu_root;
-	private MapTreeMenu menu_map;
+	private MaptreeMenu menu_root;
+	private MaptreeMenu menu_map;
 	private int map_id;
 
 	public signal void map_selected (int map_id);
@@ -75,8 +75,8 @@ public class MaptreeTreeView : Gtk.TreeView {
 		this.set_model (maptree_model);
 		this.maptree_model.map_path_changed.connect(this.on_map_path_changed);
 
-		menu_root = new MapTreeMenu.root();
-		menu_map = new MapTreeMenu();
+		menu_root = new MaptreeMenu.root();
+		menu_map = new MaptreeMenu();
 
 		// Connect signals
 		this.cursor_changed.connect (on_change);
