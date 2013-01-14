@@ -21,36 +21,36 @@ VALAFLAGS =  \
 bin_PROGRAMS = easyrpg-editor
 
 easyrpg_editor_SOURCES = \
-	action_map_edit.vala \
-	action_stack.vala \
 	action.vala \
 	controller.vala \
-	drawingarea_map.vala \
-	drawingarea_tile_palette.vala \
+	database_dialog.vala \
 	editor.vala \
 	enum.vala \
 	i_paint_tiles.vala \
 	i_select_tiles.vala \
 	main_window.vala \
-	menu_maptree.vala \
+	map_drawingarea.vala \
+	map_edit_action.vala \
+	map_properties_dialog.vala \
+	map_shift_dialog.vala \
+	maptree_menu.vala \
+	maptree_treestore.vala \
+	maptree_treeview.vala \
 	model_map.vala \
 	model_party.vala \
 	model.vala \
 	model_vehicle.vala \
+	project_create_dialog.vala \
 	resources.vala \
+	stack.vala \
 	structs.vala \
+	tile_palette_drawingarea.vala \
 	tiled_drawingarea.vala \
 	tiled_map_drawingarea.vala \
 	tileset.vala \
-	treestore_maptree.vala \
-	treeview_maptree.vala \
 	utils.vala \
 	view_actor.vala \
-	view_database_dialog.vala \
 	view_generic_widgets.vala \
-	view_map_properties_dialog.vala \
-	view_map_shift_dialog.vala \
-	view_project_create_dialog.vala \
 	xml_node.vala \
 	xml_parser.vala \
 	xml_writer.vala
