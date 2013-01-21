@@ -21,8 +21,8 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 	// Size properties
 	private int tile_width;
 	private int tile_height;
-	protected int width_in_tiles;
-	protected int height_in_tiles;
+	private int width_in_tiles;
+	private int height_in_tiles;
 
 	/**
 	 * Returns the current scale.
@@ -64,6 +64,34 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 	 */
 	protected void set_tile_height (int height) {
 		this.tile_height = height;
+	}
+
+	/**
+	 * Returns the width in tiles.
+	 */
+	public int get_width_in_tiles () {
+		return this.width_in_tiles;
+	}
+
+	/**
+	 * Sets the width in tiles.
+	 */
+	protected void set_width_in_tiles (int width) {
+		this.width_in_tiles = width;
+	}
+
+	/**
+	 * Returns the height in tiles.
+	 */
+	public int get_height_in_tiles () {
+		return this.height_in_tiles;
+	}
+
+	/**
+	 * Sets the height in tiles.
+	 */
+	protected void set_height_in_tiles (int height) {
+		this.height_in_tiles = height;
 	}
 
 	/**
