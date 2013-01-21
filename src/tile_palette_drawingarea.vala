@@ -167,7 +167,7 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 		ctx.restore ();
 
 		// Draw the tile selector
-		this.draw_selector (ctx, 32);
+		this.draw_selector (ctx, 32, 32);
 
 		return true;
 	}

@@ -25,17 +25,17 @@ public interface ISelectTiles {
 	/**
 	 * Draws the tile selector in a Cairo Context.
 	 */
-	protected void draw_selector (Cairo.Context ctx, int tile_size) {
+	protected void draw_selector (Cairo.Context ctx, int tile_width, int tile_height) {
 		// Create a copy of the rect and normalize it
 		// The original tile_selector rect SHOULD NOT be normalized
 		Rect selector = this.tile_selector;
 		selector.normalize ();
 
 		ctx.rectangle (
-			selector.x * tile_size,
-			selector.y * tile_size,
-			selector.width * tile_size,
-			selector.height * tile_size
+			selector.x * tile_width,
+			selector.y * tile_height,
+			selector.width * tile_width,
+			selector.height * tile_height
 		);
 
 		// Selector properties
