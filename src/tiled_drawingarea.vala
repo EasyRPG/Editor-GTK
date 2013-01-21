@@ -48,7 +48,7 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 	/**
 	 * Sets the tile width.
 	 */
-	public void set_tile_width (int width) {
+	protected void set_tile_width (int width) {
 		this.tile_width = width;
 	}
 
@@ -62,7 +62,7 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 	/**
 	 * Sets the tile height.
 	 */
-	public void set_tile_height (int height) {
+	protected void set_tile_height (int height) {
 		this.tile_height = height;
 	}
 
