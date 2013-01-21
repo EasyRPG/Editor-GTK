@@ -29,8 +29,8 @@ public interface IPaintTiles : TiledMapDrawingArea, ISelectTiles {
 		// Create a new surface with the same size as the selector
 		this.surface_painting_layer = new Cairo.ImageSurface (
 			Cairo.Format.ARGB32,
-			selector.width * this.get_tile_width (),
-			selector.height * this.get_tile_height ()
+			selector.width * this.get_scaled_tile_width (),
+			selector.height * this.get_scaled_tile_height ()
 		);
 
 		// Copy the selected tiles to the drawing layer surface
@@ -59,8 +59,8 @@ public interface IPaintTiles : TiledMapDrawingArea, ISelectTiles {
 
 		ctx.set_source_surface (
 			this.tileset.get_layer_tiles (this.get_current_layer ()),
-			-selector.x * 16,
-			-selector.y * 16
+			-selector.x * this.get_tile_width (),
+			-selector.y * this.get_tile_height ()
 		);
 
 		ctx.get_source ().set_filter (Cairo.Filter.FAST);
@@ -116,16 +116,16 @@ public interface IPaintTiles : TiledMapDrawingArea, ISelectTiles {
 
 		var ctx = new Cairo.Context (surface_dest);
 		ctx.rectangle (
-			(selector.x - offset_x) * this.get_tile_width (),
-			(selector.y - offset_y) * this.get_tile_height (),
-			selector.width * this.get_tile_width (),
-			selector.height * this.get_tile_height ()
+			(selector.x - offset_x) * this.get_scaled_tile_width (),
+			(selector.y - offset_y) * this.get_scaled_tile_height (),
+			selector.width * this.get_scaled_tile_width (),
+			selector.height * this.get_scaled_tile_height ()
 		);
 		
 		ctx.set_source_surface (
 			this.surface_painting_layer,
-			(selector.x - offset_x) * this.get_tile_width (),
-			(selector.y - offset_y) * this.get_tile_height ()
+			(selector.x - offset_x) * this.get_scaled_tile_width (),
+			(selector.y - offset_y) * this.get_scaled_tile_height ()
 		);
 
 		ctx.set_operator (Cairo.Operator.SOURCE);

@@ -35,6 +35,9 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	public TiledMapDrawingArea (Gtk.ScrolledWindow scrolled_window) {
 		this.scrolled_window = scrolled_window;
 
+		this.set_tile_width (16);
+		this.set_tile_height (16);
+
 		this.set_size_request (-1, -1);
 		this.set_halign (Gtk.Align.CENTER);
 		this.set_valign (Gtk.Align.CENTER);
@@ -164,12 +167,12 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 		// Find the visible rect, if displaying only a part of the DrawingArea
 		if (h_page_size < drawing_width || v_page_size < drawing_height) {
 			// Coordinates of the top-left tile to be drawn (first one)
-			int first_x = (int) (h_value / this.get_tile_width ());
-			int first_y = (int) (v_value / this.get_tile_height ());
+			int first_x = (int) (h_value / this.get_scaled_tile_width ());
+			int first_y = (int) (v_value / this.get_scaled_tile_height ());
 
 			// Coordinates of the bottom-right tile to be drawn (last one)
-			int last_x = (int) ((h_value + h_page_size) / this.get_tile_width ());
-			int last_y = (int) ((v_value + v_page_size) / this.get_tile_height ());
+			int last_x = (int) ((h_value + h_page_size) / this.get_scaled_tile_width ());
+			int last_y = (int) ((v_value + v_page_size) / this.get_scaled_tile_height ());
 
 			if (last_x > this.get_width_in_tiles () - 1) {
 				last_x = this.get_width_in_tiles () - 1;
@@ -200,16 +203,16 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 		var old_upper_layer = this.surface_upper_layer;
 
 		// Set a new size for the surfaces
-		int surface_width = visible_rect.width * this.get_tile_width ();
-		int surface_height = visible_rect.height * this.get_tile_height ();
+		int surface_width = visible_rect.width * this.get_scaled_tile_width ();
+		int surface_height = visible_rect.height * this.get_scaled_tile_height ();
 
 		// Create new surfaces
 		this.surface_lower_layer = new Cairo.ImageSurface (Cairo.Format.RGB24, surface_width, surface_height);
 		this.surface_upper_layer = new Cairo.ImageSurface (Cairo.Format.ARGB32, surface_width, surface_height);
 
 		// Find how many tiles should be shifted to the right and bottom
-		int offset_x = (this.drawn_tiles.x - visible_rect.x) * this.get_tile_width ();
-		int offset_y = (this.drawn_tiles.y - visible_rect.y) * this.get_tile_height ();
+		int offset_x = (this.drawn_tiles.x - visible_rect.x) * this.get_scaled_tile_width ();
+		int offset_y = (this.drawn_tiles.y - visible_rect.y) * this.get_scaled_tile_height ();
 
 		// Draw the tiles
 		var ctx = new Cairo.Context (this.surface_lower_layer);
