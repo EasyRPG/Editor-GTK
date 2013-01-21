@@ -97,14 +97,14 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 		this.surface_upper_layer = new Cairo.ImageSurface (Cairo.Format.ARGB32, surface_width, surface_height);
 
 		// Reset the draw status scheme
-		this.draw_status = new bool[this.height_in_tiles, this.width_in_tiles];
+		this.draw_status = new bool[this.get_height_in_tiles (), this.get_width_in_tiles ()];
 
 		// Reset the drawn rect
 		this.drawn_tiles = Rect (0, 0, 0, 0);
 
 		// Set a new size for the DrawingArea
-		int drawing_width = this.width_in_tiles * this.get_tile_width ();
-		int drawing_height = this.height_in_tiles * this.get_tile_height ();
+		int drawing_width = this.get_width_in_tiles () * this.get_tile_width ();
+		int drawing_height = this.get_height_in_tiles () * this.get_tile_height ();
 		this.set_size_request (drawing_width, drawing_height);
 
 		// Redraw the DrawingArea
@@ -426,7 +426,7 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 		int width = palette_selector.width;
 		int height = palette_selector.height;
 
-		if (x < 0 || x >= this.width_in_tiles || y < 0 || y >= this.height_in_tiles) {
+		if (x < 0 || x >= this.get_width_in_tiles () || y < 0 || y >= this.get_height_in_tiles ()) {
 			return false;
 		}
 

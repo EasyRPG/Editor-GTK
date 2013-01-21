@@ -135,8 +135,8 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 		this.upper_layer = upper_layer;
 
 		// Map width and height (in tiles)
-		this.width_in_tiles = lower_layer.length[1];
-		this.height_in_tiles = lower_layer.length[0];
+		this.set_width_in_tiles (lower_layer.length[1]);
+		this.set_height_in_tiles (lower_layer.length[0]);
 	}
 
 	/**
@@ -146,7 +146,7 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	 * should be drawn on the DrawingArea.
 	 */
 	public Rect get_visible_rect () {
-		var visible_rect = Rect (0, 0, this.width_in_tiles, this.height_in_tiles);
+		var visible_rect = Rect (0, 0, this.get_width_in_tiles (), this.get_height_in_tiles ());
 
 		// Get the adjustment values
 		var hadjustment = this.scrolled_window.get_hadjustment ();
@@ -171,12 +171,12 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 			int last_x = (int) ((h_value + h_page_size) / this.get_tile_width ());
 			int last_y = (int) ((v_value + v_page_size) / this.get_tile_height ());
 
-			if (last_x > this.width_in_tiles - 1) {
-				last_x = this.width_in_tiles - 1;
+			if (last_x > this.get_width_in_tiles () - 1) {
+				last_x = this.get_width_in_tiles () - 1;
 			}
 
-			if (last_y > this.height_in_tiles - 1) {
-				last_y = this.height_in_tiles - 1;
+			if (last_y > this.get_height_in_tiles () - 1) {
+				last_y = this.get_height_in_tiles () - 1;
 			}
 
 			int width = (last_x - first_x) + 1;
