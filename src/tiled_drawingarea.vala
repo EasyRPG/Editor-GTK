@@ -12,15 +12,28 @@
  * A tiled DrawingArea.
  */
 public abstract class TiledDrawingArea : Gtk.DrawingArea {
-	// References
+	/*
+	 * References
+	 */
 	public Tileset tileset {get; set; default = null;}
 
-	// Status values
+	/*
+	 * Status values
+	 */
 	private Scale current_scale;
 
-	// Size properties
+	/*
+	 * Size properties
+	 */
+	// The real tile size
 	private int tile_width;
 	private int tile_height;
+
+	// The scaled tile size (this changes based on the current scale)
+	private int scaled_tile_width;
+	private int scaled_tile_height;
+
+	// The size (in tiles) of the DrawingArea
 	private int width_in_tiles;
 	private int height_in_tiles;
 
@@ -64,6 +77,34 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 	 */
 	protected void set_tile_height (int height) {
 		this.tile_height = height;
+	}
+
+	/**
+	 * Returns the scaled tile width.
+	 */
+	public int get_scaled_tile_width () {
+		return this.scaled_tile_width;
+	}
+
+	/**
+	 * Sets the scaled tile width.
+	 */
+	protected void set_scaled_tile_width (int width) {
+		this.scaled_tile_width = width;
+	}
+
+	/**
+	 * Returns the scaled tile height.
+	 */
+	public int get_scaled_tile_height () {
+		return this.scaled_tile_height;
+	}
+
+	/**
+	 * Sets the scaled tile height.
+	 */
+	protected void set_scaled_tile_height (int height) {
+		this.scaled_tile_height = height;
 	}
 
 	/**
@@ -117,7 +158,7 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 		}
 
 		// Draws the tile on (x,y)
-		ctx.rectangle (x, y, 16, 16);
+		ctx.rectangle (x, y, this.get_tile_width (), this.get_tile_height ());
 		ctx.set_source_surface (tile, x, y);
 		ctx.get_source ().set_filter (Cairo.Filter.FAST);
 		ctx.set_operator (Cairo.Operator.SOURCE);
@@ -147,7 +188,7 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 				break;
 		}
 
-		ctx.rectangle (x, y, 16, 16);
+		ctx.rectangle (x, y, this.get_tile_width (), this.get_tile_height ());
 		ctx.get_source ().set_filter (Cairo.Filter.FAST);
 		ctx.set_operator (Cairo.Operator.CLEAR);
 
