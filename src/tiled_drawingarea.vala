@@ -1,6 +1,6 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * Copyright (C) 2012 EasyRPG Project
+ * Copyright (C) 2012-2013 EasyRPG Project
  *
  * License: https://github.com/EasyRPG/Editor/blob/master/COPYING GPL
  *
@@ -12,11 +12,6 @@
  * A tiled DrawingArea.
  */
 public abstract class TiledDrawingArea : Gtk.DrawingArea {
-	/*
-	 * References
-	 */
-	public Tileset tileset {get; set; default = null;}
-
 	/*
 	 * Status values
 	 */
@@ -38,7 +33,7 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 	private int height_in_tiles;
 
 	/**
-	 * Returns the current scale.
+	 * Gets the current scale.
 	 */
 	public Scale get_current_scale () {
 		return this.current_scale;
@@ -52,7 +47,7 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 	}
 
 	/**
-	 * Returns the tile width.
+	 * Gets the tile width.
 	 */
 	public int get_tile_width () {
 		return this.tile_width;
@@ -66,7 +61,7 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 	}
 
 	/**
-	 * Returns the tile height.
+	 * Gets the tile height.
 	 */
 	public int get_tile_height () {
 		return this.tile_height;
@@ -78,9 +73,9 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 	protected void set_tile_height (int height) {
 		this.tile_height = height;
 	}
-
+	
 	/**
-	 * Returns the scaled tile width.
+	 * Gets the scaled tile width.
 	 */
 	public int get_scaled_tile_width () {
 		return this.scaled_tile_width;
@@ -94,7 +89,7 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 	}
 
 	/**
-	 * Returns the scaled tile height.
+	 * Gets the scaled tile height.
 	 */
 	public int get_scaled_tile_height () {
 		return this.scaled_tile_height;
@@ -108,7 +103,7 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 	}
 
 	/**
-	 * Returns the width in tiles.
+	 * Gets the width in tiles.
 	 */
 	public int get_width_in_tiles () {
 		return this.width_in_tiles;
@@ -122,7 +117,7 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 	}
 
 	/**
-	 * Returns the height in tiles.
+	 * Gets the height in tiles.
 	 */
 	public int get_height_in_tiles () {
 		return this.height_in_tiles;
@@ -207,23 +202,6 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 	 */
 	public void disable_draw () {
 		this.draw.disconnect (this.on_draw);
-	}
-
-	/**
-	 * Clears the tileset.
-	 */
-	protected void clear_tileset () {
-		if (this.tileset != null) {
-			this.tileset.clear ();
-			this.tileset = null;
-		}
-	}
-
-	/**
-	 * Clears the DrawingArea.
-	 */
-	public virtual void clear () {
-		this.clear_tileset ();
 	}
 
 	/**
