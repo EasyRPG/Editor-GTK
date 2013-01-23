@@ -1,6 +1,6 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * Copyright (C) 2011-2012 EasyRPG Project
+ * Copyright (C) 2011-2013 EasyRPG Project
  *
  * License: https://github.com/EasyRPG/Editor/blob/master/COPYING GPL
  *
@@ -13,14 +13,24 @@
  * The map DrawingArea.
  */
 public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
-	// References
+	/*
+	 * References
+	 */
 	private TilePaletteDrawingArea palette;
 
-	// The painting layer and painted tiles
-	public Cairo.ImageSurface surface_painting_layer {get; set; default = null;}
+	/*
+	 * Schemes
+	 */
 	public int[,] painted_tiles {get; set; default = null;}
 
-	// Tile selector
+	/*
+	 * Surfaces
+	 */
+	public Cairo.ImageSurface surface_painting_layer {get; set; default = null;}
+
+	/*
+	 * Tile selector
+	 */
 	protected Rect tile_selector {get; set; default = Rect (0, 0, 0, 0);}
 
 	/**
@@ -112,10 +122,17 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 	}
 
 	/**
-	 * Clears the DrawingArea.
+	 * Clears the MapDrawingArea.
 	 */
 	public override void clear () {
+		// Call the parent clear ()
 		base.clear ();
+
+		// Clear surfaces
+		this.surface_painting_layer = null;
+
+		// Clear schemes
+		this.painted_tiles = {{},{}};
 
 		// Change the size to fluid
 		this.set_size_request (-1, -1);
