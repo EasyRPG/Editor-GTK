@@ -44,6 +44,8 @@ easyrpg_editor_SOURCES = \
 	project_create_dialog.vala \
 	resources.vala \
 	rm2k_chipset_imageset.vala \
+	rm2k_chipset_lower_imageset.vala \
+	rm2k_chipset_upper_imageset.vala \
 	stack.vala \
 	structs.vala \
 	tile_palette_drawingarea.vala \
