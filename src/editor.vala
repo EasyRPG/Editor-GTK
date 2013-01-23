@@ -685,11 +685,15 @@ public class Editor {
 		Map map = this.maps.get (map_id);
 
 		// Load the tileset into the palette and the maprender
-		var tileset = new Tileset (this.base_path + "graphics/tilesets/" + map.tileset);
+		var lower_layer_imageset = new RM2KChipsetLowerImageset (this.base_path + "graphics/tilesets/" + map.tileset);
+		lower_layer_imageset.load_images ();
+		var upper_layer_imageset = new RM2KChipsetUpperImageset (this.base_path + "graphics/tilesets/" + map.tileset);
+		upper_layer_imageset.load_images ();
 
 		// Get the palette ready
 		var palette = this.main_window.drawingarea_palette;
-		palette.tileset = tileset;
+		palette.lower_layer_imageset = lower_layer_imageset;
+		palette.upper_layer_imageset = upper_layer_imageset;
 		palette.load_tiles (this.main_window.get_current_layer ());
 		palette.enable_draw ();
 
@@ -699,7 +703,8 @@ public class Editor {
 
 		// Get the maprender ready
 		var maprender = this.main_window.drawingarea_maprender;
-		maprender.tileset = tileset;
+		maprender.lower_layer_imageset = lower_layer_imageset;
+		maprender.upper_layer_imageset = upper_layer_imageset;
 		maprender.load_layer_schemes (map.lower_layer, map.upper_layer);
 		maprender.set_current_layer (this.main_window.get_current_layer ());
 		maprender.set_current_scale (this.main_window.get_current_scale ());
