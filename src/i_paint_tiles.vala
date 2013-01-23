@@ -12,8 +12,11 @@
  * Adds the tile painting feature.
  */
 public interface IPaintTiles : TiledMapDrawingArea, ISelectTiles {
+	public abstract AbstractImageset? lower_layer_imageset {get; set; default = null;}
+	public abstract AbstractImageset? upper_layer_imageset {get; set; default = null;}
+
 	// Tileset
-	public abstract Tileset tileset {get; set; default = null;}
+//	public abstract Tileset tileset {get; set; default = null;}
 
 	// The painting layer and painted tiles
 	public abstract Cairo.ImageSurface surface_painting_layer {get; set; default = null;}
@@ -57,8 +60,17 @@ public interface IPaintTiles : TiledMapDrawingArea, ISelectTiles {
 				break;
 		}
 
+		Cairo.ImageSurface surface_tiles;
+
+		if (this.get_current_layer () == LayerType.LOWER) {
+			surface_tiles = this.lower_layer_imageset.get_imageset_surface ();
+		}
+		else {
+			surface_tiles = this.upper_layer_imageset.get_imageset_surface ();
+		}
+
 		ctx.set_source_surface (
-			this.tileset.get_layer_tiles (this.get_current_layer ()),
+			surface_tiles,
 			-selector.x * this.get_tile_width (),
 			-selector.y * this.get_tile_height ()
 		);
@@ -68,7 +80,12 @@ public interface IPaintTiles : TiledMapDrawingArea, ISelectTiles {
 		ctx.fill ();
 
 		// Store the painted tiles ids
-		this.painted_tiles = this.tileset.get_tiles_ids (selector);
+		if (this.get_current_layer () == LayerType.LOWER) {
+			this.painted_tiles = this.lower_layer_imageset.get_image_ids (selector);
+		}
+		else {
+			this.painted_tiles = this.upper_layer_imageset.get_image_ids (selector);
+		}
 
 		// Redraw the DrawingArea
 		this.queue_draw ();

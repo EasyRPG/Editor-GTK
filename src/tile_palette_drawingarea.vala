@@ -13,6 +13,12 @@
  * The tile palette DrawingArea.
  */
 public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
+	/*
+	 * References
+	 */
+	public AbstractImageset? lower_layer_imageset {get; set; default = null;}
+	public AbstractImageset? upper_layer_imageset {get; set; default = null;}
+
 	// Surface
 	protected Cairo.ImageSurface surface_tiles;
 
@@ -36,7 +42,12 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 	 * Displays a set of tiles.
 	 */
 	public void load_tiles (LayerType layer) {
-		this.surface_tiles = this.tileset.get_layer_tiles (layer);
+		if (layer == LayerType.LOWER) {
+			this.surface_tiles = this.lower_layer_imageset.get_imageset_surface ();
+		}
+		else {
+			this.surface_tiles = this.upper_layer_imageset.get_imageset_surface ();
+		}
 
 		// If the returned surface is null, stop the process
 		if (this.surface_tiles == null) {

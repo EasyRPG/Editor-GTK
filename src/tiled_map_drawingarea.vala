@@ -1,6 +1,6 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * Copyright (C) 2012 EasyRPG Project
+ * Copyright (C) 2012-2013 EasyRPG Project
  *
  * License: https://github.com/EasyRPG/Editor/blob/master/COPYING GPL
  *
@@ -16,6 +16,8 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	 * References
 	 */
 	protected weak Gtk.ScrolledWindow scrolled_window;
+	public AbstractImageset? lower_layer_imageset {get; set; default = null;}
+	public AbstractImageset? upper_layer_imageset {get; set; default = null;}
 
 	/*
 	 * Status values
@@ -447,7 +449,7 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 
 				// Get and draw the lower layer tile, if any
 				if (lower_tile_id != 0) {
-					var surface_tile = this.tileset.get_tile (lower_tile_id, LayerType.LOWER);
+					var surface_tile = this.lower_layer_imageset.get_image (lower_tile_id);
 					// The standard 16x16 tile size is used because of the use of scale ()
 					this.draw_tile (surface_tile, this.lower_layer_surface, (dest_x + col) * 16, (dest_y + row) * 16);
 				}
@@ -457,7 +459,7 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 
 				// Get and draw the upper layer tile, if any
 				if (upper_tile_id != 0) {
-					var surface_tile = this.tileset.get_tile (upper_tile_id, LayerType.UPPER);
+					var surface_tile = this.upper_layer_imageset.get_image (upper_tile_id);
 					// The standard 16x16 tile size is used because of the use of scale ()
 					this.draw_tile (surface_tile, this.upper_layer_surface, (dest_x + col) * 16, (dest_y + row) * 16);
 				}
