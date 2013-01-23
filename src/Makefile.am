@@ -51,7 +51,6 @@ easyrpg_editor_SOURCES = \
 	tile_palette_drawingarea.vala \
 	tiled_drawingarea.vala \
 	tiled_map_drawingarea.vala \
-	tileset.vala \
 	utils.vala \
 	view_actor.vala \
 	view_generic_widgets.vala \
