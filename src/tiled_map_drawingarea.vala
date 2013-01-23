@@ -26,18 +26,18 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	private DrawingTool current_drawing_tool;
 
 	/*
-	 * Map schemes
+	 * Schemes
 	 */
 	protected int[,] lower_layer_scheme;
 	protected int[,] upper_layer_scheme;
 	protected bool[,] draw_status;
+	protected Rect drawn_tiles;
 
 	/*
-	 * Map layers
+	 * Surfaces
 	 */
 	protected Cairo.ImageSurface lower_layer_surface;
 	protected Cairo.ImageSurface upper_layer_surface;
-	protected Rect drawn_tiles;
 
 	/**
 	 * Builds the TiledMapDrawingArea.
@@ -482,7 +482,7 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	}
 
 	/**
-	 * Clears the surfaces.
+	 * Clears surfaces.
 	 */
 	protected void clear_surfaces () {
 		this.lower_layer_surface = null;
@@ -490,7 +490,7 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	}
 
 	/**
-	 * Clears the schemes.
+	 * Clears schemes.
 	 */
 	protected void clear_schemes () {
 		this.lower_layer_scheme = {{},{}};
@@ -499,10 +499,12 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	}
 
 	/**
-	 * Clears the DrawingArea.
+	 * Clears the TiledMapDrawingArea.
 	 */
-	public override void clear () {
-		base.clear ();
+	public void clear () {
+		// Clear imagesets
+		this.lower_layer_imageset.clear ();
+		this.upper_layer_imageset.clear ();
 
 		this.clear_surfaces ();
 		this.clear_schemes ();
