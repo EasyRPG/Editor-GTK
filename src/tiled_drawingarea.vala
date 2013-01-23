@@ -205,6 +205,11 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 	}
 
 	/**
+	 * Clears the TiledDrawingArea.
+	 */
+	public abstract void clear ();
+
+	/**
 	 * Manages the reactions to the draw signal.
 	 */
 	protected abstract bool on_draw (Cairo.Context ctx);
