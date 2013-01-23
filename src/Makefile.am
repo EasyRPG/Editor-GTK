@@ -21,6 +21,7 @@ VALAFLAGS =  \
 bin_PROGRAMS = easyrpg-editor
 
 easyrpg_editor_SOURCES = \
+	abstract_imageset.vala \
 	action.vala \
 	controller.vala \
 	database_dialog.vala \
@@ -42,6 +43,7 @@ easyrpg_editor_SOURCES = \
 	model_vehicle.vala \
 	project_create_dialog.vala \
 	resources.vala \
+	rm2k_chipset_imageset.vala \
 	stack.vala \
 	structs.vala \
 	tile_palette_drawingarea.vala \
