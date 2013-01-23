@@ -93,8 +93,8 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 		int surface_height = visible_rect.height * this.get_scaled_tile_height ();
 
 		// Cairo surface instances
-		this.surface_lower_layer = new Cairo.ImageSurface (Cairo.Format.RGB24, surface_width, surface_height);
-		this.surface_upper_layer = new Cairo.ImageSurface (Cairo.Format.ARGB32, surface_width, surface_height);
+		this.lower_layer_surface = new Cairo.ImageSurface (Cairo.Format.RGB24, surface_width, surface_height);
+		this.upper_layer_surface = new Cairo.ImageSurface (Cairo.Format.ARGB32, surface_width, surface_height);
 
 		// Reset the draw status scheme
 		this.draw_status = new bool[this.get_height_in_tiles (), this.get_width_in_tiles ()];
@@ -177,8 +177,8 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 		int v_page_size = (int) vadjustment.get_page_size ();
 
 		// Get the surfaces size
-		int surface_width = this.surface_lower_layer.get_width ();
-		int surface_height = this.surface_lower_layer.get_height ();
+		int surface_width = this.lower_layer_surface.get_width ();
+		int surface_height = this.lower_layer_surface.get_height ();
 
 		// Get the DrawingArea size
 		int drawing_width = this.get_allocated_width ();
@@ -201,7 +201,7 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 		switch (this.get_current_layer ()) {
 			case LayerType.LOWER:
 				// Paint the lower layer
-				ctx.set_source_surface (this.surface_lower_layer, x, y);
+				ctx.set_source_surface (this.lower_layer_surface, x, y);
 				ctx.set_operator (Cairo.Operator.SOURCE);
 				ctx.paint ();
 
@@ -213,7 +213,7 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 				);
 
 				// Blend the upper layer with opacity 0.5
-				ctx.set_source_surface (this.surface_upper_layer, x, y);
+				ctx.set_source_surface (this.upper_layer_surface, x, y);
 				ctx.set_operator (Cairo.Operator.OVER);
 				ctx.paint_with_alpha (0.5);
 
@@ -223,7 +223,7 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 
 			case LayerType.UPPER:
 				// Paint the lower layer
-				ctx.set_source_surface (this.surface_lower_layer, x, y);
+				ctx.set_source_surface (this.lower_layer_surface, x, y);
 				ctx.set_operator (Cairo.Operator.SOURCE);
 				ctx.paint ();
 
@@ -234,7 +234,7 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 
 				// We need a new reference for the surface
 				// In some cases, a modified version of the upper layer will be used
-				Cairo.ImageSurface surface_upper_layer = this.surface_upper_layer;
+				Cairo.ImageSurface upper_layer_surface = this.upper_layer_surface;
 
 				// Paint the painting layer if it is defined
 				if (this.surface_painting_layer != null) {
@@ -243,15 +243,15 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 					 * drawing layer (a preview of the tiles that will be painted)
 					 * without changing anything in the upper layer.
 					 */
-					surface_upper_layer = new Cairo.ImageSurface (
+					upper_layer_surface = new Cairo.ImageSurface (
 						Cairo.Format.ARGB32,
-						this.surface_upper_layer.get_width (),
-						this.surface_upper_layer.get_height ()
+						this.upper_layer_surface.get_width (),
+						this.upper_layer_surface.get_height ()
 					);
 
 					// Copy the current upper layer to this new surface
-					var temp_ctx = new Cairo.Context (surface_upper_layer);
-					temp_ctx.set_source_surface (this.surface_upper_layer, 0, 0);
+					var temp_ctx = new Cairo.Context (upper_layer_surface);
+					temp_ctx.set_source_surface (this.upper_layer_surface, 0, 0);
 					temp_ctx.set_operator (Cairo.Operator.SOURCE);
 					temp_ctx.paint ();
 
@@ -264,7 +264,7 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 				}
 
 				// Blend the upper layer
-				ctx.set_source_surface (surface_upper_layer, x, y);
+				ctx.set_source_surface (upper_layer_surface, x, y);
 				ctx.set_operator (Cairo.Operator.OVER);
 				ctx.paint ();
 
@@ -274,12 +274,12 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 
 			case LayerType.EVENT:
 				// Paint the lower layer
-				ctx.set_source_surface (this.surface_lower_layer, x, y);
+				ctx.set_source_surface (this.lower_layer_surface, x, y);
 				ctx.set_operator (Cairo.Operator.SOURCE);
 				ctx.paint ();
 
 				// Blend the upper layer
-				ctx.set_source_surface (this.surface_upper_layer, x, y);
+				ctx.set_source_surface (this.upper_layer_surface, x, y);
 				ctx.set_operator (Cairo.Operator.OVER);
 				ctx.paint ();
 
