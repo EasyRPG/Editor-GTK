@@ -191,10 +191,6 @@ public class Editor {
 		this.main_window.treeview_maptree.clear ();
 		this.current_map_id = 0;
 
-		// Clear the tile palette and map DrawingAreas
-		this.main_window.drawingarea_palette.clear ();
-		this.main_window.drawingarea_maprender.clear ();
-
 		// Enable/disable some widgets
 		this.main_window.set_project_status ("closed");
 
