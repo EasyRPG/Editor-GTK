@@ -26,7 +26,7 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 	/*
 	 * Surfaces
 	 */
-	public Cairo.ImageSurface surface_painting_layer {get; set; default = null;}
+	public Cairo.ImageSurface painting_layer_surface {get; set; default = null;}
 
 	/*
 	 * Tile selector
@@ -129,7 +129,7 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 		base.clear ();
 
 		// Clear surfaces
-		this.surface_painting_layer = null;
+		this.painting_layer_surface = null;
 
 		// Clear schemes
 		this.painted_tiles = {{},{}};
@@ -254,7 +254,7 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 				Cairo.ImageSurface upper_layer_surface = this.upper_layer_surface;
 
 				// Paint the painting layer if it is defined
-				if (this.surface_painting_layer != null) {
+				if (this.painting_layer_surface != null) {
 					/*
 					 * We need to display the upper layer and the tiles in the
 					 * drawing layer (a preview of the tiles that will be painted)

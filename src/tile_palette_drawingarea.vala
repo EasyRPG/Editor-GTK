@@ -1,6 +1,6 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * Copyright (C) 2011-2012 EasyRPG Project
+ * Copyright (C) 2011-2013 EasyRPG Project
  *
  * License: https://github.com/EasyRPG/Editor/blob/master/COPYING GPL
  *
@@ -20,7 +20,7 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 	public AbstractImageset? upper_layer_imageset {get; set; default = null;}
 
 	// Surface
-	protected Cairo.ImageSurface surface_tiles;
+	protected Cairo.ImageSurface palette_surface;
 
 	// Tile selector
 	protected Rect tile_selector {get; set; default = Rect (0, 0, 0, 0);}
@@ -43,21 +43,21 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 	 */
 	public void load_tiles (LayerType layer) {
 		if (layer == LayerType.LOWER) {
-			this.surface_tiles = this.lower_layer_imageset.get_imageset_surface ();
+			this.palette_surface = this.lower_layer_imageset.get_imageset_surface ();
 		}
 		else {
-			this.surface_tiles = this.upper_layer_imageset.get_imageset_surface ();
+			this.palette_surface = this.upper_layer_imageset.get_imageset_surface ();
 		}
 
 		// If the returned surface is null, stop the process
-		if (this.surface_tiles == null) {
+		if (this.palette_surface == null) {
 			return;
 		}
 
 		// Resize the DrawingArea to match the size of the surface
 		this.set_size_request (
-			this.surface_tiles.get_width () * 2,
-			this.surface_tiles.get_height () * 2
+			this.palette_surface.get_width () * 2,
+			this.palette_surface.get_height () * 2
 		);
 
 		// Redraw the DrawingArea
@@ -159,7 +159,7 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 	 */
 	public override bool on_draw (Cairo.Context ctx) {
 		// If the surface is null, stop the process
-		if (this.surface_tiles == null) {
+		if (this.palette_surface == null) {
 			return false;
 		}
 
@@ -168,7 +168,7 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 
 		// The palette must be scaled to 2x (32x32 tile size)
 		ctx.scale (2, 2);
-		ctx.set_source_surface (this.surface_tiles, 0, 0);
+		ctx.set_source_surface (this.palette_surface, 0, 0);
 
 		// Fast interpolation, similar to nearest-neighbor
 		ctx.get_source ().set_filter (Cairo.Filter.FAST);

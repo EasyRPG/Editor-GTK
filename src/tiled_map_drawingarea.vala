@@ -449,9 +449,9 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 
 				// Get and draw the lower layer tile, if any
 				if (lower_tile_id != 0) {
-					var surface_tile = this.lower_layer_imageset.get_image (lower_tile_id);
+					var tile_surface = this.lower_layer_imageset.get_image (lower_tile_id);
 					// The standard 16x16 tile size is used because of the use of scale ()
-					this.draw_tile (surface_tile, this.lower_layer_surface, (dest_x + col) * 16, (dest_y + row) * 16);
+					this.draw_tile (tile_surface, this.lower_layer_surface, (dest_x + col) * 16, (dest_y + row) * 16);
 				}
 				else {
 					this.clear_tile (this.lower_layer_surface, (dest_x + col) * 16, (dest_y + row) * 16);
@@ -459,9 +459,9 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 
 				// Get and draw the upper layer tile, if any
 				if (upper_tile_id != 0) {
-					var surface_tile = this.upper_layer_imageset.get_image (upper_tile_id);
+					var tile_surface = this.upper_layer_imageset.get_image (upper_tile_id);
 					// The standard 16x16 tile size is used because of the use of scale ()
-					this.draw_tile (surface_tile, this.upper_layer_surface, (dest_x + col) * 16, (dest_y + row) * 16);
+					this.draw_tile (tile_surface, this.upper_layer_surface, (dest_x + col) * 16, (dest_y + row) * 16);
 				}
 				else {
 					this.clear_tile (this.upper_layer_surface, (dest_x + col) * 16, (dest_y + row) * 16);
