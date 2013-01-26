@@ -167,6 +167,12 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 	 * Draws the map according to the active layer and scale.
 	 */
 	public override bool on_draw (Cairo.Context ctx) {
+		// If the surfaces are null, stop the process
+		if (this.lower_layer_surface == null || this.upper_layer_surface == null) {
+			return false;
+		}
+
+		// Save the context initial state
 		ctx.save();
 
 		// Get the visible rect
