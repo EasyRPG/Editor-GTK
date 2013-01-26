@@ -68,8 +68,6 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 	 * Clears the DrawingArea.
 	 */
 	public override void clear () {
-		base.clear ();
-
 		// Make sure it keeps the correct size
 		this.set_size_request (192, -1);
 
