@@ -330,7 +330,7 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 
 			col++;
 
-			// Advance to the next row whecleaning is complete for this rowed
+			// Advance to the next row when cleaning is complete for this one
 			if (col == rect.x + rect.width) {
 				col = rect.x;
 				row++;
