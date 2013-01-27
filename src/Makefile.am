@@ -23,7 +23,6 @@ bin_PROGRAMS = easyrpg-editor
 easyrpg_editor_SOURCES = \
 	abstract_imageset.vala \
 	action.vala \
-	controller.vala \
 	database_dialog.vala \
 	editor.vala \
 	enum.vala \
