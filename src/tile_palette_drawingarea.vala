@@ -89,7 +89,7 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 	public void disable_tile_selection () {
 		this.button_press_event.disconnect (this.on_button_press);
 		this.motion_notify_event.disconnect (this.on_button_motion);
-		this.clear_selector ();
+		this.clear_tile_selector ();
 	}
 
 	/**
@@ -109,7 +109,7 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 	 * Manages the reactions to a "left click" event.
 	 */
 	public bool on_left_click (Gdk.EventButton event) {
-		// Update the selector
+		// Update the tile selector
 		this.tile_selector = Rect (
 			((int) event.x) / 32,
 			((int) event.y) / 32,
@@ -176,7 +176,7 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 		ctx.restore ();
 
 		// Draw the tile selector
-		this.draw_selector (ctx, 32, 32);
+		this.draw_tile_selector (ctx, 32, 32);
 
 		return true;
 	}

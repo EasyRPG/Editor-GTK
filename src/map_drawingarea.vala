@@ -241,7 +241,7 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 				ctx.paint_with_alpha (0.5);
 
 				// Draw the tile selector
-				this.draw_selector (ctx, this.get_scaled_tile_width (), this.get_scaled_tile_height ());
+				this.draw_tile_selector (ctx, this.get_scaled_tile_width (), this.get_scaled_tile_height ());
 				break;
 
 			case LayerType.UPPER:
@@ -292,7 +292,7 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 				ctx.paint ();
 
 				// Draw the tile selector
-				this.draw_selector (ctx, this.get_scaled_tile_width (), this.get_scaled_tile_height ());
+				this.draw_tile_selector (ctx, this.get_scaled_tile_width (), this.get_scaled_tile_height ());
 				break;
 
 			case LayerType.EVENT:
