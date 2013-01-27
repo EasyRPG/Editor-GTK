@@ -1,20 +1,13 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * editor.vala
- * Copyright (C) EasyRPG Project 2011-2012
+ * Copyright (C) 2011-2012 EasyRPG Project
  *
- * EasyRPG is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * License: https://github.com/EasyRPG/Editor/blob/master/COPYING GPL
  *
- * EasyRPG is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Authors:
+ * - Mariano Suligoy (MarianoGNU) <marianognu.easyrpg@gmail.com>
+ * - Aitor García (Falc) <aitor.falc@gmail.com>
+ * - Sebastian Reichel (sre) <sre@ring0.de>
  */
 
 /**
@@ -197,10 +190,6 @@ public class Editor {
 		// Empty the maptree TreeView
 		this.main_window.treeview_maptree.clear ();
 		this.current_map_id = 0;
-
-		// Clear the tile palette and map DrawingAreas
-		this.main_window.drawingarea_palette.clear ();
-		this.main_window.drawingarea_maprender.clear ();
 
 		// Enable/disable some widgets
 		this.main_window.set_project_status ("closed");
@@ -692,11 +681,15 @@ public class Editor {
 		Map map = this.maps.get (map_id);
 
 		// Load the tileset into the palette and the maprender
-		var tileset = new Tileset (this.base_path + "graphics/tilesets/" + map.tileset);
+		var lower_layer_imageset = new RM2KChipsetLowerImageset (this.base_path + "graphics/tilesets/" + map.tileset);
+		lower_layer_imageset.load_images ();
+		var upper_layer_imageset = new RM2KChipsetUpperImageset (this.base_path + "graphics/tilesets/" + map.tileset);
+		upper_layer_imageset.load_images ();
 
 		// Get the palette ready
 		var palette = this.main_window.drawingarea_palette;
-		palette.tileset = tileset;
+		palette.lower_layer_imageset = lower_layer_imageset;
+		palette.upper_layer_imageset = upper_layer_imageset;
 		palette.load_tiles (this.main_window.get_current_layer ());
 		palette.enable_draw ();
 
@@ -706,7 +699,8 @@ public class Editor {
 
 		// Get the maprender ready
 		var maprender = this.main_window.drawingarea_maprender;
-		maprender.tileset = tileset;
+		maprender.lower_layer_imageset = lower_layer_imageset;
+		maprender.upper_layer_imageset = upper_layer_imageset;
 		maprender.load_layer_schemes (map.lower_layer, map.upper_layer);
 		maprender.set_current_layer (this.main_window.get_current_layer ());
 		maprender.set_current_scale (this.main_window.get_current_scale ());

@@ -1,53 +1,45 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * i_paint_tiles.vala
- * Copyright (C) EasyRPG Project 2012
+ * Copyright (C) 2012-2013 EasyRPG Project
  *
- * EasyRPG is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * License: https://github.com/EasyRPG/Editor/blob/master/COPYING GPL
  *
- * EasyRPG is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Authors:
+ * - Aitor García (Falc) <aitor.falc@gmail.com>
  */
 
 /**
  * Adds the tile painting feature.
  */
 public interface IPaintTiles : TiledMapDrawingArea, ISelectTiles {
-	// Tileset
-	public abstract Tileset tileset {get; set; default = null;}
+	// Map imagesets
+	public abstract AbstractImageset? lower_layer_imageset {get; set; default = null;}
+	public abstract AbstractImageset? upper_layer_imageset {get; set; default = null;}
 
 	// The painting layer and painted tiles
-	public abstract Cairo.ImageSurface surface_painting_layer {get; set; default = null;}
+	public abstract Cairo.ImageSurface painting_layer_surface {get; set; default = null;}
 	public abstract int[,] painted_tiles {get; set; default = null;}
 
 	/**
 	 * Paints with pencil.
 	 */
-	protected void paint_with_pencil (Rect selector) {
-		// Normalize the selector rect
-		selector.normalize ();
+	protected void paint_with_pencil (Rect tile_selector) {
+		// Normalize the tile selector rect
+		tile_selector.normalize ();
 
-		// Create a new surface with the same size as the selector
-		this.surface_painting_layer = new Cairo.ImageSurface (
+		// Create a new surface with the same size as the tile selector
+		this.painting_layer_surface = new Cairo.ImageSurface (
 			Cairo.Format.ARGB32,
-			selector.width * this.tile_size,
-			selector.height * this.tile_size
+			tile_selector.width * this.get_scaled_tile_width (),
+			tile_selector.height * this.get_scaled_tile_height ()
 		);
 
 		// Copy the selected tiles to the drawing layer surface
-		var ctx = new Cairo.Context (this.surface_painting_layer);
+		var ctx = new Cairo.Context (this.painting_layer_surface);
 		ctx.rectangle (
 			0, 0,
-			this.surface_painting_layer.get_width (),
-			this.surface_painting_layer.get_height ()
+			this.painting_layer_surface.get_width (),
+			this.painting_layer_surface.get_height ()
 		);
 
 		// Sets the correct scale factor
@@ -66,10 +58,19 @@ public interface IPaintTiles : TiledMapDrawingArea, ISelectTiles {
 				break;
 		}
 
+		Cairo.ImageSurface tiles_surface;
+
+		if (this.get_current_layer () == LayerType.LOWER) {
+			tiles_surface = this.lower_layer_imageset.get_imageset_surface ();
+		}
+		else {
+			tiles_surface = this.upper_layer_imageset.get_imageset_surface ();
+		}
+
 		ctx.set_source_surface (
-			this.tileset.get_layer_tiles (this.get_current_layer ()),
-			-selector.x * 16,
-			-selector.y * 16
+			tiles_surface,
+			-tile_selector.x * this.get_tile_width (),
+			-tile_selector.y * this.get_tile_height ()
 		);
 
 		ctx.get_source ().set_filter (Cairo.Filter.FAST);
@@ -77,7 +78,12 @@ public interface IPaintTiles : TiledMapDrawingArea, ISelectTiles {
 		ctx.fill ();
 
 		// Store the painted tiles ids
-		this.painted_tiles = this.tileset.get_tiles_ids (selector);
+		if (this.get_current_layer () == LayerType.LOWER) {
+			this.painted_tiles = this.lower_layer_imageset.get_image_ids (tile_selector);
+		}
+		else {
+			this.painted_tiles = this.upper_layer_imageset.get_image_ids (tile_selector);
+		}
 
 		// Redraw the DrawingArea
 		this.queue_draw ();
@@ -89,7 +95,7 @@ public interface IPaintTiles : TiledMapDrawingArea, ISelectTiles {
 	protected void apply_painted_tiles (LayerType layer) {
 		// Get the destination layer scheme and surface
 		int[,] scheme = this.get_layer_scheme (layer);
-		Cairo.ImageSurface surface_dest = this.get_layer_surface (layer);
+		Cairo.ImageSurface dest_surface = this.get_layer_surface (layer);
 
 		int col = 0;
 		int row = 0;
@@ -115,33 +121,33 @@ public interface IPaintTiles : TiledMapDrawingArea, ISelectTiles {
 		this.set_layer_scheme (layer, scheme);
 
 		// Copy the tile selector rect and normalize it
-		Rect selector = this.tile_selector;
-		selector.normalize ();
+		Rect tile_selector = this.tile_selector;
+		tile_selector.normalize ();
 
 		// The visible_rect x,y coordinates are used as offsets
 		Rect visible_rect = this.get_visible_rect ();
 		int offset_x = visible_rect.x;
 		int offset_y = visible_rect.y;
 
-		var ctx = new Cairo.Context (surface_dest);
+		var ctx = new Cairo.Context (dest_surface);
 		ctx.rectangle (
-			(selector.x - offset_x) * tile_size,
-			(selector.y - offset_y) * tile_size,
-			selector.width * tile_size,
-			selector.height * tile_size
+			(tile_selector.x - offset_x) * this.get_scaled_tile_width (),
+			(tile_selector.y - offset_y) * this.get_scaled_tile_height (),
+			tile_selector.width * this.get_scaled_tile_width (),
+			tile_selector.height * this.get_scaled_tile_height ()
 		);
 		
 		ctx.set_source_surface (
-			this.surface_painting_layer,
-			(selector.x - offset_x) * tile_size,
-			(selector.y - offset_y) * tile_size
+			this.painting_layer_surface,
+			(tile_selector.x - offset_x) * this.get_scaled_tile_width (),
+			(tile_selector.y - offset_y) * this.get_scaled_tile_height ()
 		);
 
 		ctx.set_operator (Cairo.Operator.SOURCE);
 		ctx.fill ();
 
 		// Set the surface to null
-		this.surface_painting_layer = null;
+		this.painting_layer_surface = null;
 
 		// Redraw the DrawingArea
 		this.queue_draw ();
@@ -149,17 +155,17 @@ public interface IPaintTiles : TiledMapDrawingArea, ISelectTiles {
 
 	protected void draw_painting_layer (Cairo.Context ctx, int x = 0, int y = 0) {
 		// If the painting layer is not defined, stop the process
-		if (this.surface_painting_layer == null) {
+		if (this.painting_layer_surface == null) {
 			return;
 		}
 
 		ctx.rectangle (
 			x, y,
-			this.surface_painting_layer.get_width (),
-			this.surface_painting_layer.get_height ()
+			this.painting_layer_surface.get_width (),
+			this.painting_layer_surface.get_height ()
 		);
 			
-		ctx.set_source_surface (this.surface_painting_layer, x, y);
+		ctx.set_source_surface (this.painting_layer_surface, x, y);
 		ctx.set_operator (Cairo.Operator.OVER);
 		ctx.fill ();
 	}

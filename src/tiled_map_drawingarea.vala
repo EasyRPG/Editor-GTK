@@ -1,42 +1,43 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * tiled_map_drawingarea.vala
- * Copyright (C) EasyRPG Project 2012
+ * Copyright (C) 2012-2013 EasyRPG Project
  *
- * EasyRPG is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * License: https://github.com/EasyRPG/Editor/blob/master/COPYING GPL
  *
- * EasyRPG is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Authors:
+ * - Aitor García (Falc) <aitor.falc@gmail.com>
  */
 
 /**
  * A tiled DrawingArea that represents a map.
  */
 public abstract class TiledMapDrawingArea : TiledDrawingArea {
-	// References
+	/*
+	 * References
+	 */
 	protected weak Gtk.ScrolledWindow scrolled_window;
+	public AbstractImageset? lower_layer_imageset {get; set; default = null;}
+	public AbstractImageset? upper_layer_imageset {get; set; default = null;}
 
-	// Status values
+	/*
+	 * Status values
+	 */
 	private LayerType current_layer;
 	private DrawingTool current_drawing_tool;
 
-	// Map scheme
-	protected int[,] lower_layer;
-	protected int[,] upper_layer;
+	/*
+	 * Schemes
+	 */
+	protected int[,] lower_layer_scheme;
+	protected int[,] upper_layer_scheme;
 	protected bool[,] draw_status;
-
-	// Layers
-	protected Cairo.ImageSurface surface_lower_layer;
-	protected Cairo.ImageSurface surface_upper_layer;
 	protected Rect drawn_tiles;
+
+	/*
+	 * Surfaces
+	 */
+	protected Cairo.ImageSurface lower_layer_surface;
+	protected Cairo.ImageSurface upper_layer_surface;
 
 	/**
 	 * Builds the TiledMapDrawingArea.
@@ -44,13 +45,16 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	public TiledMapDrawingArea (Gtk.ScrolledWindow scrolled_window) {
 		this.scrolled_window = scrolled_window;
 
+		this.set_tile_width (16);
+		this.set_tile_height (16);
+
 		this.set_size_request (-1, -1);
 		this.set_halign (Gtk.Align.CENTER);
 		this.set_valign (Gtk.Align.CENTER);
 	}
 
 	/**
-	 * Returns the current layer.
+	 * Gets the current layer.
 	 */
 	public LayerType get_current_layer () {
 		return this.current_layer;
@@ -64,7 +68,7 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	}
 
 	/**
-	 * Returns the current drawing tool.
+	 * Gets the current drawing tool.
 	 */
 	public DrawingTool get_current_drawing_tool () {
 		return this.current_drawing_tool;
@@ -78,7 +82,7 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	}
 	
 	/**
-	 * Returns a copy of a layer scheme.
+	 * Gets a copy of a layer scheme.
 	 *
 	 * This is a convenience method that simplifies the code required to get a
 	 * layer scheme, since it accepts get_current_layer () as a parameter.
@@ -86,10 +90,10 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	public int[,]? get_layer_scheme (LayerType layer) {
 		switch (layer) {
 			case LayerType.LOWER:
-				return this.lower_layer;
+				return this.lower_layer_scheme;
 
 			case LayerType.UPPER:
-				return this.upper_layer;
+				return this.upper_layer_scheme;
 
 			default:
 				return null;
@@ -105,11 +109,11 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	public void set_layer_scheme (LayerType layer, int[,] layer_scheme) {
 		switch (layer) {
 			case LayerType.LOWER:
-				this.lower_layer = layer_scheme;
+				this.lower_layer_scheme = layer_scheme;
 				break;
 
 			case LayerType.UPPER:
-				this.upper_layer = layer_scheme;
+				this.upper_layer_scheme = layer_scheme;
 				break;
 
 			default:
@@ -118,7 +122,7 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	}
 
 	/**
-	 * Returns a reference to the specified layer surface.
+	 * Gets a reference to the specified layer surface.
 	 *
 	 * This is a convenience method that simplifies the code required to get a
 	 * layer surface, since it accepts get_current_layer () as a parameter.
@@ -126,10 +130,10 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	public Cairo.ImageSurface? get_layer_surface (LayerType layer) {
 		switch (layer) {
 			case LayerType.LOWER:
-				return this.surface_lower_layer;
+				return this.lower_layer_surface;
 
 			case LayerType.UPPER:
-				return this.surface_upper_layer;
+				return this.upper_layer_surface;
 
 			default:
 				return null;
@@ -139,13 +143,13 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	/**
 	 * Loads the layer schemes.
 	 */
-	public void load_layer_schemes (int[,] lower_layer, int[,] upper_layer) {
-		this.lower_layer = lower_layer;
-		this.upper_layer = upper_layer;
+	public void load_layer_schemes (int[,] lower_layer_scheme, int[,] upper_layer_scheme) {
+		this.lower_layer_scheme = lower_layer_scheme;
+		this.upper_layer_scheme = upper_layer_scheme;
 
 		// Map width and height (in tiles)
-		this.width_in_tiles = lower_layer.length[1];
-		this.height_in_tiles = lower_layer.length[0];
+		this.set_width_in_tiles (lower_layer_scheme.length[1]);
+		this.set_height_in_tiles (lower_layer_scheme.length[0]);
 	}
 
 	/**
@@ -155,7 +159,7 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	 * should be drawn on the DrawingArea.
 	 */
 	public Rect get_visible_rect () {
-		var visible_rect = Rect (0, 0, this.width_in_tiles, this.height_in_tiles);
+		var visible_rect = Rect (0, 0, this.get_width_in_tiles (), this.get_height_in_tiles ());
 
 		// Get the adjustment values
 		var hadjustment = this.scrolled_window.get_hadjustment ();
@@ -173,19 +177,19 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 		// Find the visible rect, if displaying only a part of the DrawingArea
 		if (h_page_size < drawing_width || v_page_size < drawing_height) {
 			// Coordinates of the top-left tile to be drawn (first one)
-			int first_x = (int) (h_value / this.tile_size);
-			int first_y = (int) (v_value / this.tile_size);
+			int first_x = (int) (h_value / this.get_scaled_tile_width ());
+			int first_y = (int) (v_value / this.get_scaled_tile_height ());
 
 			// Coordinates of the bottom-right tile to be drawn (last one)
-			int last_x = (int) ((h_value + h_page_size) / this.tile_size);
-			int last_y = (int) ((v_value + v_page_size) / this.tile_size);
+			int last_x = (int) ((h_value + h_page_size) / this.get_scaled_tile_width ());
+			int last_y = (int) ((v_value + v_page_size) / this.get_scaled_tile_height ());
 
-			if (last_x > this.width_in_tiles - 1) {
-				last_x = this.width_in_tiles - 1;
+			if (last_x > this.get_width_in_tiles () - 1) {
+				last_x = this.get_width_in_tiles () - 1;
 			}
 
-			if (last_y > this.height_in_tiles - 1) {
-				last_y = this.height_in_tiles - 1;
+			if (last_y > this.get_height_in_tiles () - 1) {
+				last_y = this.get_height_in_tiles () - 1;
 			}
 
 			int width = (last_x - first_x) + 1;
@@ -205,27 +209,27 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	 */
 	protected void update_surfaces (Rect visible_rect) {
 		// New references for the layer surfaces
-		var old_lower_layer = this.surface_lower_layer;
-		var old_upper_layer = this.surface_upper_layer;
+		var old_lower_layer = this.lower_layer_surface;
+		var old_upper_layer = this.upper_layer_surface;
 
 		// Set a new size for the surfaces
-		int surface_width = visible_rect.width * this.tile_size;
-		int surface_height = visible_rect.height * this.tile_size;
+		int surface_width = visible_rect.width * this.get_scaled_tile_width ();
+		int surface_height = visible_rect.height * this.get_scaled_tile_height ();
 
 		// Create new surfaces
-		this.surface_lower_layer = new Cairo.ImageSurface (Cairo.Format.RGB24, surface_width, surface_height);
-		this.surface_upper_layer = new Cairo.ImageSurface (Cairo.Format.ARGB32, surface_width, surface_height);
+		this.lower_layer_surface = new Cairo.ImageSurface (Cairo.Format.RGB24, surface_width, surface_height);
+		this.upper_layer_surface = new Cairo.ImageSurface (Cairo.Format.ARGB32, surface_width, surface_height);
 
 		// Find how many tiles should be shifted to the right and bottom
-		int offset_x = (this.drawn_tiles.x - visible_rect.x) * this.tile_size;
-		int offset_y = (this.drawn_tiles.y - visible_rect.y) * this.tile_size;
+		int offset_x = (this.drawn_tiles.x - visible_rect.x) * this.get_scaled_tile_width ();
+		int offset_y = (this.drawn_tiles.y - visible_rect.y) * this.get_scaled_tile_height ();
 
 		// Draw the tiles
-		var ctx = new Cairo.Context (this.surface_lower_layer);
+		var ctx = new Cairo.Context (this.lower_layer_surface);
 		ctx.set_source_surface (old_lower_layer, offset_x, offset_y);
 		ctx.paint ();
 
-		ctx = new Cairo.Context (this.surface_upper_layer);
+		ctx = new Cairo.Context (this.upper_layer_surface);
 		ctx.set_source_surface (old_upper_layer, offset_x, offset_y);
 		ctx.paint ();
 	}
@@ -326,7 +330,7 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 
 			col++;
 
-			// Advance to the next row whecleaning is complete for this rowed
+			// Advance to the next row when cleaning is complete for this one
 			if (col == rect.x + rect.width) {
 				col = rect.x;
 				row++;
@@ -440,27 +444,27 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 			// Draw the tile if not already drawn
 			if (!is_drawn) {
 				// Get the tile ids
-				int lower_tile_id = this.lower_layer[rect.y + row, rect.x + col];
-				int upper_tile_id = this.upper_layer[rect.y + row, rect.x + col];
+				int lower_tile_id = this.lower_layer_scheme[rect.y + row, rect.x + col];
+				int upper_tile_id = this.upper_layer_scheme[rect.y + row, rect.x + col];
 
 				// Get and draw the lower layer tile, if any
 				if (lower_tile_id != 0) {
-					var surface_tile = this.tileset.get_tile (lower_tile_id, LayerType.LOWER);
+					var tile_surface = this.lower_layer_imageset.get_image (lower_tile_id);
 					// The standard 16x16 tile size is used because of the use of scale ()
-					this.draw_tile (surface_tile, this.surface_lower_layer, (dest_x + col) * 16, (dest_y + row) * 16);
+					this.draw_tile (tile_surface, this.lower_layer_surface, (dest_x + col) * 16, (dest_y + row) * 16);
 				}
 				else {
-					this.clear_tile (this.surface_lower_layer, (dest_x + col) * 16, (dest_y + row) * 16);
+					this.clear_tile (this.lower_layer_surface, (dest_x + col) * 16, (dest_y + row) * 16);
 				}
 
 				// Get and draw the upper layer tile, if any
 				if (upper_tile_id != 0) {
-					var surface_tile = this.tileset.get_tile (upper_tile_id, LayerType.UPPER);
+					var tile_surface = this.upper_layer_imageset.get_image (upper_tile_id);
 					// The standard 16x16 tile size is used because of the use of scale ()
-					this.draw_tile (surface_tile, this.surface_upper_layer, (dest_x + col) * 16, (dest_y + row) * 16);
+					this.draw_tile (tile_surface, this.upper_layer_surface, (dest_x + col) * 16, (dest_y + row) * 16);
 				}
 				else {
-					this.clear_tile (this.surface_upper_layer, (dest_x + col) * 16, (dest_y + row) * 16);
+					this.clear_tile (this.upper_layer_surface, (dest_x + col) * 16, (dest_y + row) * 16);
 				}
 
 				// Mark the tile as drawn
@@ -478,27 +482,29 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	}
 
 	/**
-	 * Clears the surfaces.
+	 * Clears surfaces.
 	 */
 	protected void clear_surfaces () {
-		this.surface_lower_layer = null;
-		this.surface_upper_layer = null;
+		this.lower_layer_surface = null;
+		this.upper_layer_surface = null;
 	}
 
 	/**
-	 * Clears the schemes.
+	 * Clears schemes.
 	 */
 	protected void clear_schemes () {
-		this.lower_layer = {{},{}};
-		this.upper_layer = {{},{}};
+		this.lower_layer_scheme = {{},{}};
+		this.upper_layer_scheme = {{},{}};
 		this.draw_status = {{},{}};
 	}
 
 	/**
-	 * Clears the DrawingArea.
+	 * Clears the TiledMapDrawingArea.
 	 */
 	public override void clear () {
-		base.clear ();
+		// Clear imagesets
+		this.lower_layer_imageset.clear ();
+		this.upper_layer_imageset.clear ();
 
 		this.clear_surfaces ();
 		this.clear_schemes ();

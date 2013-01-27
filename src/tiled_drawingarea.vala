@@ -1,39 +1,39 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * tiled_drawingarea.vala
- * Copyright (C) EasyRPG Project 2012
+ * Copyright (C) 2012-2013 EasyRPG Project
  *
- * EasyRPG is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * License: https://github.com/EasyRPG/Editor/blob/master/COPYING GPL
  *
- * EasyRPG is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Authors:
+ * - Aitor García (Falc) <aitor.falc@gmail.com>
  */
 
 /**
  * A tiled DrawingArea.
  */
 public abstract class TiledDrawingArea : Gtk.DrawingArea {
-	// References
-	public Tileset tileset {get; set; default = null;}
-
-	// Status values
+	/*
+	 * Status values
+	 */
 	private Scale current_scale;
 
-	// Size properties
-	public int tile_size;
-	protected int width_in_tiles;
-	protected int height_in_tiles;
+	/*
+	 * Size properties
+	 */
+	// The real tile size
+	private int tile_width;
+	private int tile_height;
+
+	// The scaled tile size (this changes based on the current scale)
+	private int scaled_tile_width;
+	private int scaled_tile_height;
+
+	// The size (in tiles) of the DrawingArea
+	private int width_in_tiles;
+	private int height_in_tiles;
 
 	/**
-	 * Returns the current scale.
+	 * Gets the current scale.
 	 */
 	public Scale get_current_scale () {
 		return this.current_scale;
@@ -44,6 +44,90 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 	 */
 	public virtual void set_current_scale (Scale scale) {
 		this.current_scale = scale;
+	}
+
+	/**
+	 * Gets the tile width.
+	 */
+	public int get_tile_width () {
+		return this.tile_width;
+	}
+
+	/**
+	 * Sets the tile width.
+	 */
+	protected void set_tile_width (int width) {
+		this.tile_width = width;
+	}
+
+	/**
+	 * Gets the tile height.
+	 */
+	public int get_tile_height () {
+		return this.tile_height;
+	}
+
+	/**
+	 * Sets the tile height.
+	 */
+	protected void set_tile_height (int height) {
+		this.tile_height = height;
+	}
+	
+	/**
+	 * Gets the scaled tile width.
+	 */
+	public int get_scaled_tile_width () {
+		return this.scaled_tile_width;
+	}
+
+	/**
+	 * Sets the scaled tile width.
+	 */
+	protected void set_scaled_tile_width (int width) {
+		this.scaled_tile_width = width;
+	}
+
+	/**
+	 * Gets the scaled tile height.
+	 */
+	public int get_scaled_tile_height () {
+		return this.scaled_tile_height;
+	}
+
+	/**
+	 * Sets the scaled tile height.
+	 */
+	protected void set_scaled_tile_height (int height) {
+		this.scaled_tile_height = height;
+	}
+
+	/**
+	 * Gets the width in tiles.
+	 */
+	public int get_width_in_tiles () {
+		return this.width_in_tiles;
+	}
+
+	/**
+	 * Sets the width in tiles.
+	 */
+	protected void set_width_in_tiles (int width) {
+		this.width_in_tiles = width;
+	}
+
+	/**
+	 * Gets the height in tiles.
+	 */
+	public int get_height_in_tiles () {
+		return this.height_in_tiles;
+	}
+
+	/**
+	 * Sets the height in tiles.
+	 */
+	protected void set_height_in_tiles (int height) {
+		this.height_in_tiles = height;
 	}
 
 	/**
@@ -69,7 +153,7 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 		}
 
 		// Draws the tile on (x,y)
-		ctx.rectangle (x, y, 16, 16);
+		ctx.rectangle (x, y, this.get_tile_width (), this.get_tile_height ());
 		ctx.set_source_surface (tile, x, y);
 		ctx.get_source ().set_filter (Cairo.Filter.FAST);
 		ctx.set_operator (Cairo.Operator.SOURCE);
@@ -99,7 +183,7 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 				break;
 		}
 
-		ctx.rectangle (x, y, 16, 16);
+		ctx.rectangle (x, y, this.get_tile_width (), this.get_tile_height ());
 		ctx.get_source ().set_filter (Cairo.Filter.FAST);
 		ctx.set_operator (Cairo.Operator.CLEAR);
 
@@ -121,21 +205,9 @@ public abstract class TiledDrawingArea : Gtk.DrawingArea {
 	}
 
 	/**
-	 * Clears the tileset.
+	 * Clears the TiledDrawingArea.
 	 */
-	protected void clear_tileset () {
-		if (this.tileset != null) {
-			this.tileset.clear ();
-			this.tileset = null;
-		}
-	}
-
-	/**
-	 * Clears the DrawingArea.
-	 */
-	public virtual void clear () {
-		this.clear_tileset ();
-	}
+	public abstract void clear ();
 
 	/**
 	 * Manages the reactions to the draw signal.

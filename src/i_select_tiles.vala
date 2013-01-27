@@ -1,20 +1,11 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * i_select_tiles.vala
- * Copyright (C) EasyRPG Project 2012
+ * Copyright (C) 2012-2013 EasyRPG Project
  *
- * EasyRPG is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * License: https://github.com/EasyRPG/Editor/blob/master/COPYING GPL
  *
- * EasyRPG is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Authors:
+ * - Aitor García (Falc) <aitor.falc@gmail.com>
  */
 
 /**
@@ -27,27 +18,27 @@ public interface ISelectTiles {
 	/**
 	 * Clears the tile selector.
 	 */
-	protected void clear_selector () {
+	protected void clear_tile_selector () {
 		this.tile_selector = Rect (0, 0, 0, 0);
 	}
 
 	/**
 	 * Draws the tile selector in a Cairo Context.
 	 */
-	protected void draw_selector (Cairo.Context ctx, int tile_size) {
+	protected void draw_tile_selector (Cairo.Context ctx, int tile_width, int tile_height) {
 		// Create a copy of the rect and normalize it
 		// The original tile_selector rect SHOULD NOT be normalized
-		Rect selector = this.tile_selector;
-		selector.normalize ();
+		Rect tile_selector = this.tile_selector;
+		tile_selector.normalize ();
 
 		ctx.rectangle (
-			selector.x * tile_size,
-			selector.y * tile_size,
-			selector.width * tile_size,
-			selector.height * tile_size
+			tile_selector.x * tile_width,
+			tile_selector.y * tile_height,
+			tile_selector.width * tile_width,
+			tile_selector.height * tile_height
 		);
 
-		// Selector properties
+		// Tile selector properties
 		ctx.set_source_rgb (1.0, 1.0, 1.0);
 		ctx.set_line_width (2.0);
 		ctx.set_operator (Cairo.Operator.OVER);
