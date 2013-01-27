@@ -1,20 +1,12 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * treeview_maptree.vala
- * Copyright (C) EasyRPG Project 2011-2012
+ * Copyright (C) 2011-2012 EasyRPG Project
  *
- * EasyRPG is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * License: https://github.com/EasyRPG/Editor/blob/master/COPYING GPL
  *
- * EasyRPG is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Authors:
+ * - Aitor García (Falc) <aitor.falc@gmail.com>
+ * - Sebastian Reichel (sre) <sre@ring0.de>
  */
 
 /**
@@ -22,8 +14,8 @@
  */
 public class MaptreeTreeView : Gtk.TreeView {
 	private MaptreeTreeStore maptree_model;
-	private MapTreeMenu menu_root;
-	private MapTreeMenu menu_map;
+	private MaptreeMenu menu_root;
+	private MaptreeMenu menu_map;
 	private int map_id;
 
 	public signal void map_selected (int map_id);
@@ -75,8 +67,8 @@ public class MaptreeTreeView : Gtk.TreeView {
 		this.set_model (maptree_model);
 		this.maptree_model.map_path_changed.connect(this.on_map_path_changed);
 
-		menu_root = new MapTreeMenu.root();
-		menu_map = new MapTreeMenu();
+		menu_root = new MaptreeMenu.root();
+		menu_map = new MaptreeMenu();
 
 		// Connect signals
 		this.cursor_changed.connect (on_change);

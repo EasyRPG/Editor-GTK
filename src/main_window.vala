@@ -1,20 +1,13 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * main_window.vala
- * Copyright (C) EasyRPG Project 2011-2012
+ * Copyright (C) 2011-2012 EasyRPG Project
  *
- * EasyRPG is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * License: https://github.com/EasyRPG/Editor/blob/master/COPYING GPL
  *
- * EasyRPG is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Authors:
+ * - Mariano Suligoy (MarianoGNU) <marianognu.easyrpg@gmail.com>
+ * - Francisco de la Peña (fdelapena) <fran@fran.cr>
+ * - Aitor García (Falc) <aitor.falc@gmail.com>
  */
 
 /**
