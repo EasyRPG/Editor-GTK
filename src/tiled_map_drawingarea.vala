@@ -503,8 +503,13 @@ public abstract class TiledMapDrawingArea : TiledDrawingArea {
 	 */
 	public override void clear () {
 		// Clear imagesets
-		this.lower_layer_imageset.clear ();
-		this.upper_layer_imageset.clear ();
+		if (this.lower_layer_imageset != null) {
+			this.lower_layer_imageset.clear ();
+		}
+
+		if (this.upper_layer_imageset != null) {
+			this.upper_layer_imageset.clear ();
+		}
 
 		this.clear_surfaces ();
 		this.clear_schemes ();
