@@ -1,28 +1,26 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * drawingarea_tile_palette.vala
- * Copyright (C) EasyRPG Project 2011-2012
+ * Copyright (C) 2011-2013 EasyRPG Project
  *
- * EasyRPG is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * License: https://github.com/EasyRPG/Editor/blob/master/COPYING GPL
  *
- * EasyRPG is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Authors:
+ * - Aitor García (Falc) <aitor.falc@gmail.com>
+ * - Sebastian Reichel (sre) <sre@ring0.de>
  */
 
 /**
  * The tile palette DrawingArea.
  */
 public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
+	/*
+	 * References
+	 */
+	public AbstractImageset? lower_layer_imageset {get; set; default = null;}
+	public AbstractImageset? upper_layer_imageset {get; set; default = null;}
+
 	// Surface
-	protected Cairo.ImageSurface surface_tiles;
+	protected Cairo.ImageSurface palette_surface;
 
 	// Tile selector
 	protected Rect tile_selector {get; set; default = Rect (0, 0, 0, 0);}
@@ -44,17 +42,22 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 	 * Displays a set of tiles.
 	 */
 	public void load_tiles (LayerType layer) {
-		this.surface_tiles = this.tileset.get_layer_tiles (layer);
+		if (layer == LayerType.LOWER) {
+			this.palette_surface = this.lower_layer_imageset.get_imageset_surface ();
+		}
+		else {
+			this.palette_surface = this.upper_layer_imageset.get_imageset_surface ();
+		}
 
 		// If the returned surface is null, stop the process
-		if (this.surface_tiles == null) {
+		if (this.palette_surface == null) {
 			return;
 		}
 
 		// Resize the DrawingArea to match the size of the surface
 		this.set_size_request (
-			this.surface_tiles.get_width () * 2,
-			this.surface_tiles.get_height () * 2
+			this.palette_surface.get_width () * 2,
+			this.palette_surface.get_height () * 2
 		);
 
 		// Redraw the DrawingArea
@@ -65,8 +68,6 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 	 * Clears the DrawingArea.
 	 */
 	public override void clear () {
-		base.clear ();
-
 		// Make sure it keeps the correct size
 		this.set_size_request (192, -1);
 
@@ -88,7 +89,7 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 	public void disable_tile_selection () {
 		this.button_press_event.disconnect (this.on_button_press);
 		this.motion_notify_event.disconnect (this.on_button_motion);
-		this.clear_selector ();
+		this.clear_tile_selector ();
 	}
 
 	/**
@@ -108,7 +109,7 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 	 * Manages the reactions to a "left click" event.
 	 */
 	public bool on_left_click (Gdk.EventButton event) {
-		// Update the selector
+		// Update the tile selector
 		this.tile_selector = Rect (
 			((int) event.x) / 32,
 			((int) event.y) / 32,
@@ -156,7 +157,7 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 	 */
 	public override bool on_draw (Cairo.Context ctx) {
 		// If the surface is null, stop the process
-		if (this.surface_tiles == null) {
+		if (this.palette_surface == null) {
 			return false;
 		}
 
@@ -165,7 +166,7 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 
 		// The palette must be scaled to 2x (32x32 tile size)
 		ctx.scale (2, 2);
-		ctx.set_source_surface (this.surface_tiles, 0, 0);
+		ctx.set_source_surface (this.palette_surface, 0, 0);
 
 		// Fast interpolation, similar to nearest-neighbor
 		ctx.get_source ().set_filter (Cairo.Filter.FAST);
@@ -175,7 +176,7 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 		ctx.restore ();
 
 		// Draw the tile selector
-		this.draw_selector (ctx, 32);
+		this.draw_tile_selector (ctx, 32, 32);
 
 		return true;
 	}

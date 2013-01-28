@@ -1,30 +1,21 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * treeview_maptree.vala
- * Copyright (C) EasyRPG Project 2012
+ * Copyright (C) 2012 EasyRPG Project
  *
- * EasyRPG is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * License: https://github.com/EasyRPG/Editor/blob/master/COPYING GPL
  *
- * EasyRPG is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Authors:
+ * - Sebastian Reichel (sre) <sre@ring0.de>
  */
 
 /**
  * The maptree menu.
  */
-public class MapTreeMenu : Gtk.Menu {
+public class MaptreeMenu : Gtk.Menu {
 	/**
 	 * Builds the maptree Menu for map nodes.
 	 */
-	public MapTreeMenu () {
+	public MaptreeMenu () {
 		var item_prop = new Gtk.ImageMenuItem.from_stock (Gtk.Stock.PROPERTIES, null);
 		item_prop.set_label ("Map Properties");
 		item_prop.activate.connect(() => {map_properties ();});
@@ -85,7 +76,7 @@ public class MapTreeMenu : Gtk.Menu {
 	/**
 	 * Builds the maptree Menu for project directory
 	 */
-	public MapTreeMenu.root () {
+	public MaptreeMenu.root () {
 		var item_new_map = new Gtk.ImageMenuItem.from_stock (Gtk.Stock.NEW, null);
 		item_new_map.set_label ("New Map");
 		item_new_map.activate.connect(() => {map_new ();});

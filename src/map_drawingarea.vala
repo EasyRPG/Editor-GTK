@@ -1,34 +1,36 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * drawingarea_map.vala
- * Copyright (C) EasyRPG Project 2011-2012
+ * Copyright (C) 2011-2013 EasyRPG Project
  *
- * EasyRPG is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * License: https://github.com/EasyRPG/Editor/blob/master/COPYING GPL
  *
- * EasyRPG is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Authors:
+ * - Aitor García (Falc) <aitor.falc@gmail.com>
+ * - Sebastian Reichel (sre) <sre@ring0.de>
  */
 
 /**
  * The map DrawingArea.
  */
 public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
-	// References
+	/*
+	 * References
+	 */
 	private TilePaletteDrawingArea palette;
 
-	// The painting layer and painted tiles
-	public Cairo.ImageSurface surface_painting_layer {get; set; default = null;}
+	/*
+	 * Schemes
+	 */
 	public int[,] painted_tiles {get; set; default = null;}
 
-	// Tile selector
+	/*
+	 * Surfaces
+	 */
+	public Cairo.ImageSurface painting_layer_surface {get; set; default = null;}
+
+	/*
+	 * Tile selector
+	 */
 	protected Rect tile_selector {get; set; default = Rect (0, 0, 0, 0);}
 
 	/**
@@ -73,19 +75,23 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 		// Clear the surfaces
 		this.clear_surfaces ();
 
-		// Change the tile size
+		// Change the scaled tile size
 		switch (scale) {
 			case Scale.1_1:
-				this.tile_size = 32;
+				this.set_scaled_tile_width(32);
+				this.set_scaled_tile_height(32);
 				break;
 			case Scale.1_2:
-				this.tile_size = 16;
+				this.set_scaled_tile_width(16);
+				this.set_scaled_tile_height(16);
 				break;
 			case Scale.1_4:
-				this.tile_size = 8;
+				this.set_scaled_tile_width(8);
+				this.set_scaled_tile_height(8);
 				break;
 			case Scale.1_8:
-				this.tile_size = 4;
+				this.set_scaled_tile_width(4);
+				this.set_scaled_tile_height(4);
 				break;
 			default:
 				return;
@@ -93,22 +99,22 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 
 		// Set a new size for the surfaces
 		var visible_rect = get_visible_rect ();
-		int surface_width = visible_rect.width * this.tile_size;
-		int surface_height = visible_rect.height * this.tile_size;
+		int surface_width = visible_rect.width * this.get_scaled_tile_width ();
+		int surface_height = visible_rect.height * this.get_scaled_tile_height ();
 
 		// Cairo surface instances
-		this.surface_lower_layer = new Cairo.ImageSurface (Cairo.Format.RGB24, surface_width, surface_height);
-		this.surface_upper_layer = new Cairo.ImageSurface (Cairo.Format.ARGB32, surface_width, surface_height);
+		this.lower_layer_surface = new Cairo.ImageSurface (Cairo.Format.RGB24, surface_width, surface_height);
+		this.upper_layer_surface = new Cairo.ImageSurface (Cairo.Format.ARGB32, surface_width, surface_height);
 
 		// Reset the draw status scheme
-		this.draw_status = new bool[this.height_in_tiles, this.width_in_tiles];
+		this.draw_status = new bool[this.get_height_in_tiles (), this.get_width_in_tiles ()];
 
 		// Reset the drawn rect
 		this.drawn_tiles = Rect (0, 0, 0, 0);
 
 		// Set a new size for the DrawingArea
-		int drawing_width = this.width_in_tiles * this.tile_size;
-		int drawing_height = this.height_in_tiles * this.tile_size;
+		int drawing_width = this.get_width_in_tiles () * this.get_scaled_tile_width ();
+		int drawing_height = this.get_height_in_tiles () * this.get_scaled_tile_height ();
 		this.set_size_request (drawing_width, drawing_height);
 
 		// Redraw the DrawingArea
@@ -116,10 +122,17 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 	}
 
 	/**
-	 * Clears the DrawingArea.
+	 * Clears the MapDrawingArea.
 	 */
 	public override void clear () {
+		// Call the parent clear ()
 		base.clear ();
+
+		// Clear surfaces
+		this.painting_layer_surface = null;
+
+		// Clear schemes
+		this.painted_tiles = {{},{}};
 
 		// Change the size to fluid
 		this.set_size_request (-1, -1);
@@ -154,6 +167,12 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 	 * Draws the map according to the active layer and scale.
 	 */
 	public override bool on_draw (Cairo.Context ctx) {
+		// If the surfaces are null, stop the process
+		if (this.lower_layer_surface == null || this.upper_layer_surface == null) {
+			return false;
+		}
+
+		// Save the context initial state
 		ctx.save();
 
 		// Get the visible rect
@@ -181,8 +200,8 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 		int v_page_size = (int) vadjustment.get_page_size ();
 
 		// Get the surfaces size
-		int surface_width = this.surface_lower_layer.get_width ();
-		int surface_height = this.surface_lower_layer.get_height ();
+		int surface_width = this.lower_layer_surface.get_width ();
+		int surface_height = this.lower_layer_surface.get_height ();
 
 		// Get the DrawingArea size
 		int drawing_width = this.get_allocated_width ();
@@ -193,8 +212,8 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 
 		// If the visible rect is smaller than the DrawingArea, find where to paint
 		if (h_page_size < drawing_width || v_page_size < drawing_height) {
-			x = visible_rect.x * this.tile_size;
-			y = visible_rect.y * this.tile_size;
+			x = visible_rect.x * this.get_scaled_tile_width ();
+			y = visible_rect.y * this.get_scaled_tile_height ();
 		}
 
 		// Clear the DrawingArea
@@ -205,29 +224,29 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 		switch (this.get_current_layer ()) {
 			case LayerType.LOWER:
 				// Paint the lower layer
-				ctx.set_source_surface (this.surface_lower_layer, x, y);
+				ctx.set_source_surface (this.lower_layer_surface, x, y);
 				ctx.set_operator (Cairo.Operator.SOURCE);
 				ctx.paint ();
 
 				// Blend the drawing layer
 				this.draw_painting_layer (
 					ctx,
-					this.tile_selector.x * this.tile_size,
-					this.tile_selector.y * this.tile_size
+					this.tile_selector.x * this.get_scaled_tile_width (),
+					this.tile_selector.y * this.get_scaled_tile_height ()
 				);
 
 				// Blend the upper layer with opacity 0.5
-				ctx.set_source_surface (this.surface_upper_layer, x, y);
+				ctx.set_source_surface (this.upper_layer_surface, x, y);
 				ctx.set_operator (Cairo.Operator.OVER);
 				ctx.paint_with_alpha (0.5);
 
 				// Draw the tile selector
-				this.draw_selector (ctx, this.tile_size);
+				this.draw_tile_selector (ctx, this.get_scaled_tile_width (), this.get_scaled_tile_height ());
 				break;
 
 			case LayerType.UPPER:
 				// Paint the lower layer
-				ctx.set_source_surface (this.surface_lower_layer, x, y);
+				ctx.set_source_surface (this.lower_layer_surface, x, y);
 				ctx.set_operator (Cairo.Operator.SOURCE);
 				ctx.paint ();
 
@@ -238,52 +257,52 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 
 				// We need a new reference for the surface
 				// In some cases, a modified version of the upper layer will be used
-				Cairo.ImageSurface surface_upper_layer = this.surface_upper_layer;
+				Cairo.ImageSurface upper_layer_surface = this.upper_layer_surface;
 
 				// Paint the painting layer if it is defined
-				if (this.surface_painting_layer != null) {
+				if (this.painting_layer_surface != null) {
 					/*
 					 * We need to display the upper layer and the tiles in the
 					 * drawing layer (a preview of the tiles that will be painted)
 					 * without changing anything in the upper layer.
 					 */
-					surface_upper_layer = new Cairo.ImageSurface (
+					upper_layer_surface = new Cairo.ImageSurface (
 						Cairo.Format.ARGB32,
-						this.surface_upper_layer.get_width (),
-						this.surface_upper_layer.get_height ()
+						this.upper_layer_surface.get_width (),
+						this.upper_layer_surface.get_height ()
 					);
 
 					// Copy the current upper layer to this new surface
-					var temp_ctx = new Cairo.Context (surface_upper_layer);
-					temp_ctx.set_source_surface (this.surface_upper_layer, 0, 0);
+					var temp_ctx = new Cairo.Context (upper_layer_surface);
+					temp_ctx.set_source_surface (this.upper_layer_surface, 0, 0);
 					temp_ctx.set_operator (Cairo.Operator.SOURCE);
 					temp_ctx.paint ();
 
 					// Blend the drawing layer
 					this.draw_painting_layer (
 						temp_ctx,
-						(this.tile_selector.x - visible_rect.x) * this.tile_size,
-						(this.tile_selector.y - visible_rect.y) * this.tile_size
+						(this.tile_selector.x - visible_rect.x) * this.get_scaled_tile_width (),
+						(this.tile_selector.y - visible_rect.y) * this.get_scaled_tile_height ()
 					);
 				}
 
 				// Blend the upper layer
-				ctx.set_source_surface (surface_upper_layer, x, y);
+				ctx.set_source_surface (upper_layer_surface, x, y);
 				ctx.set_operator (Cairo.Operator.OVER);
 				ctx.paint ();
 
 				// Draw the tile selector
-				this.draw_selector (ctx, this.tile_size);
+				this.draw_tile_selector (ctx, this.get_scaled_tile_width (), this.get_scaled_tile_height ());
 				break;
 
 			case LayerType.EVENT:
 				// Paint the lower layer
-				ctx.set_source_surface (this.surface_lower_layer, x, y);
+				ctx.set_source_surface (this.lower_layer_surface, x, y);
 				ctx.set_operator (Cairo.Operator.SOURCE);
 				ctx.paint ();
 
 				// Blend the upper layer
-				ctx.set_source_surface (this.surface_upper_layer, x, y);
+				ctx.set_source_surface (this.upper_layer_surface, x, y);
 				ctx.set_operator (Cairo.Operator.OVER);
 				ctx.paint ();
 
@@ -302,7 +321,7 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 					ctx.move_to (grid_x, 0);
 					ctx.line_to (grid_x, y + surface_height);
 
-					grid_x += this.tile_size;
+					grid_x += this.get_scaled_tile_width ();
 				}
 
 				// Add the horizontal lines to the path
@@ -310,7 +329,7 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 					ctx.move_to (0, grid_y);
 					ctx.line_to (x + surface_width, grid_y);
 
-					grid_y += this.tile_size;
+					grid_y += this.get_scaled_tile_height ();
 				}
 
 				// Draw the path with a translucent black and one pixel width
@@ -420,8 +439,8 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 	 * Manages the reactions to the motion event.
 	 */
 	public bool on_motion (Gdk.EventMotion event) {
-		int x = ((int) event.x) / this.tile_size;
-		int y = ((int) event.y) / this.tile_size;
+		int x = ((int) event.x) / this.get_scaled_tile_width ();
+		int y = ((int) event.y) / this.get_scaled_tile_height ();
 
 		// Get the selection width and height
 		Rect palette_selector = this.palette.tile_selector;
@@ -430,7 +449,7 @@ public class MapDrawingArea : TiledMapDrawingArea, ISelectTiles, IPaintTiles {
 		int width = palette_selector.width;
 		int height = palette_selector.height;
 
-		if (x < 0 || x >= this.width_in_tiles || y < 0 || y >= this.height_in_tiles) {
+		if (x < 0 || x >= this.get_width_in_tiles () || y < 0 || y >= this.get_height_in_tiles ()) {
 			return false;
 		}
 
