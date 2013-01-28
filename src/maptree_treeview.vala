@@ -1,6 +1,6 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * Copyright (C) 2011-2012 EasyRPG Project
+ * Copyright (C) 2011-2013 EasyRPG Project
  *
  * License: https://github.com/EasyRPG/Editor/blob/master/COPYING GPL
  *
@@ -92,28 +92,35 @@ public class MaptreeTreeView : Gtk.TreeView {
 	 * Clears the model.
 	 */
 	public void clear () {
+		this.cursor_changed.disconnect (on_change);
 		this.maptree_model.clear ();
+		this.cursor_changed.connect (on_change);
 	}
 
 	/**
 	 * This method is triggered everytime a row (map) is selected.
 	 */
 	public void on_change () {
+		Gtk.TreeSelection selection = this.get_selection ();
+
+		// If the selection is null, stop the process
+		if (selection == null) {
+			return;
+		}
+
+		selection.set_mode (Gtk.SelectionMode.SINGLE);
+
+		// Get the tree iter of the selected row
 		Gtk.TreeIter selected;
+		selection.get_selected (null, out selected);
 
-		// Don't try to load a map_id if there isn't any row selected (not probable but just in case)
-		if (this.get_selection ().get_selected (null, out selected)) {
-			var maptree_model = this.get_model ();
+		// Get the map id
+		GLib.Value value;
+		this.get_model ().get_value (selected, 0, out value);
+		this.map_id = value.get_int ();
 
-			GLib.Value value;
-			maptree_model.get_value (selected, 0, out value);
-
-			this.map_id = value.get_int ();
-			map_selected (map_id);
-		}
-		else {
-			this.map_id = -1;
-		}
+		// Emit the "map_selected" signal
+		map_selected (map_id);
 	}
 
 	/**
