@@ -13,7 +13,7 @@
  */
 public interface ISelectTiles {
 	// The tile selector rect
-	public abstract Rect tile_selector {get; set; default = Rect (0, 0, 0, 0);}
+	public abstract Rect tile_selector {get; set;}
 
 	/**
 	 * Clears the tile selector.

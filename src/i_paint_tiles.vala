@@ -13,12 +13,12 @@
  */
 public interface IPaintTiles : TiledMapDrawingArea, ISelectTiles {
 	// Map imagesets
-	public abstract AbstractImageset? lower_layer_imageset {get; set; default = null;}
-	public abstract AbstractImageset? upper_layer_imageset {get; set; default = null;}
+	public abstract AbstractImageset? lower_layer_imageset {get; set;}
+	public abstract AbstractImageset? upper_layer_imageset {get; set;}
 
 	// The painting layer and painted tiles
-	public abstract Cairo.ImageSurface painting_layer_surface {get; set; default = null;}
-	public abstract int[,] painted_tiles {get; set; default = null;}
+	public abstract Cairo.ImageSurface painting_layer_surface {get; set;}
+	public abstract int[,] painted_tiles {get; set;}
 
 	/**
 	 * Paints with pencil.
