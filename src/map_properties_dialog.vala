@@ -7,6 +7,7 @@
  * Authors:
  * - Sebastian Reichel (sre) <sre@ring0.de>
  * - Aitor García (Falc) <aitor.falc@gmail.com>
+ * - Francisco de la Peña (fdelapena) <fran@fran.cr>
  */
 
 /**

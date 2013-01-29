@@ -8,6 +8,7 @@
  * - Mariano Suligoy (MarianoGNU) <marianognu.easyrpg@gmail.com>
  * - Aitor García (Falc) <aitor.falc@gmail.com>
  * - Sebastian Reichel (sre) <sre@ring0.de>
+ * - Francisco de la Peña (fdelapena) <fran@fran.cr>
  */
 
 /**
