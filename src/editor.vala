@@ -8,6 +8,7 @@
  * - Mariano Suligoy (MarianoGNU) <marianognu.easyrpg@gmail.com>
  * - Aitor García (Falc) <aitor.falc@gmail.com>
  * - Sebastian Reichel (sre) <sre@ring0.de>
+ * - Francisco de la Peña (fdelapena) <fran@fran.cr>
  */
 
 /**
@@ -76,7 +77,7 @@ public class Editor {
 		this.main_window.show_all ();
 
 		// If a project_file was specified, open the project
-		string project_file = (this.files != null) ? files[0] : null;
+		string project_file = (files != null) ? files[0] : null;
 		if(project_file != null) {
 			this.open_project (project_file);
 		}
@@ -141,17 +142,8 @@ public class Editor {
 			Gtk.Stock.OPEN, Gtk.ResponseType.ACCEPT
 		);
 
-		/*
-		 * FIXME
-		 * FileFilter.set_filter_name is not implemented yet but will work soon.
-		 * More info: https://bugzilla.gnome.org/show_bug.cgi?id=647122
-		 *
-		 * Using proposed workaround "gtk_file_filter_set_name".
-		 */
 		var file_filter = new Gtk.FileFilter();
-		//file_filter.set_name ("EasyRPG Project (*.rproject)");
-		//file_filter.set_filter_name ("EasyRPG Project (*.rproject)");
-		gtk_file_filter_set_name (file_filter, "EasyRPG Project (*.rproject)");
+		file_filter.set_filter_name ("EasyRPG Project (*.rproject)");
 		file_filter.add_pattern ("*.rproject"); // for case-insensitive patterns -> add_custom()
 		open_project_dialog.add_filter (file_filter);
 
@@ -1125,6 +1117,3 @@ public class Editor {
 		return 0;
 	}	
 }
-
-// Workaround
-extern void gtk_file_filter_set_name (Gtk.FileFilter filter, string name);

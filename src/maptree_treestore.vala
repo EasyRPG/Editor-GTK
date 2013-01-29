@@ -7,6 +7,7 @@
  * Authors:
  * - Aitor García (Falc) <aitor.falc@gmail.com>
  * - Sebastian Reichel (sre) <sre@ring0.de>
+ * - Francisco de la Peña (fdelapena) <fran@fran.cr>
  */
 
 /**
@@ -149,8 +150,11 @@ public class MaptreeTreeStore : Gtk.TreeStore, Gtk.TreeDragSource, Gtk.TreeDragD
 		/* remove ourselves */
 		this.get_value (iter, 0, out v);
 		result.append(v.get_int());
+#if VALA_0_18
+		this.remove(ref iter);
+#else
 		this.remove(iter);
-
+#endif
 		return result;
 	}
 }
