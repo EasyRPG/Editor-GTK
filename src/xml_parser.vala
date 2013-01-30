@@ -46,7 +46,7 @@ public class XmlParser {
 	 */
 	public XmlParser () {
 		this.context = new GLib.MarkupParseContext (
-			this.parser, // MarkupParser instance
+			parser, // MarkupParser instance
 			0,		// MarkupParseFlags
 			this,   // User data
 			null	// User data destroy notifier
