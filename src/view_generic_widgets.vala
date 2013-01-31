@@ -80,7 +80,7 @@ public class GroupFrame : Gtk.Frame {
 	/**
 	 * Constructor
 	 * 
-	 * @param label an string with the label title
+	 * @param title an string with the label title
 	 * @param orientation the orientation for the main container
 	 */
 	public GroupFrame (string title, Gtk.Orientation orientation = Gtk.Orientation.VERTICAL){
@@ -192,7 +192,7 @@ public class GroupFrame : Gtk.Frame {
 	/**
 	 * Add a customized widget to the frame
 	 * 
-	 * @param box the box to be added
+	 * @param widget the box to be added
 	 * @param expand bool indicating if box should be expanded
 	 * @param fill bool indicating if the box should fill the space
 	 * @param paddling the paddling

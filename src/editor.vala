@@ -538,7 +538,7 @@ public class Editor {
 	/**
 	 * Loads XML data from a map file.
 	 *
-	 * @param The id of the map to load.
+	 * @param map_id The id of the map to load.
 	 */
 	public bool load_map_data (int map_id) {
 		var parser = new XmlParser ();
