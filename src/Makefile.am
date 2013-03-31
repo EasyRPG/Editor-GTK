@@ -5,9 +5,9 @@
 
 
 AM_CPPFLAGS = \
-	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
+	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
 	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
-	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
+	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\" \
 	$(EASYRPG_EDITOR_CFLAGS)
 
 AM_CFLAGS =\
@@ -15,14 +15,12 @@ AM_CFLAGS =\
 	 -Wno-unused-but-set-variable\
 	 -g
 
-VALAFLAGS =  \
-	--pkg gtk+-3.0 --pkg gio-2.0 --vapidir . --pkg config
-
 bin_PROGRAMS = easyrpg-editor
 
 easyrpg_editor_SOURCES = \
 	abstract_imageset.vala \
 	action.vala \
+	config.vapi \
 	database_dialog.vala \
 	editor.vala \
 	enum.vala \
@@ -47,15 +45,18 @@ easyrpg_editor_SOURCES = \
 	rm2k_chipset_upper_imageset.vala \
 	stack.vala \
 	structs.vala \
-	tile_palette_drawingarea.vala \
 	tiled_drawingarea.vala \
 	tiled_map_drawingarea.vala \
+	tile_palette_drawingarea.vala \
 	utils.vala \
 	view_actor.vala \
 	view_generic_widgets.vala \
 	xml_node.vala \
 	xml_parser.vala \
 	xml_writer.vala
+
+easyrpg_editor_VALAFLAGS =  \
+	--pkg gtk+-3.0 --pkg gio-2.0
 
 easyrpg_editor_LDFLAGS = \
 	-Wl,--export-dynamic
