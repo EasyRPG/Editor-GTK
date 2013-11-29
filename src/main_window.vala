@@ -543,7 +543,6 @@ public class MainWindow : Gtk.ApplicationWindow {
 
 		// Close application
 		action_quit.activate.connect (on_close);
-		this.destroy.connect (on_close);
 	}
 
 	public void set_undo_available(bool status) {
@@ -719,7 +718,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 	 * Closes this view and quit the application.
 	 */
 	private void on_close () {
-		Gtk.main_quit ();
+		this.destroy ();
 	}
 
 	private void menu_item_select_cb (Gtk.Widget item){
