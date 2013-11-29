@@ -1,6 +1,6 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * Copyright (C) 2011-2012 EasyRPG Project
+ * Copyright (C) 2011-2013 EasyRPG Project
  *
  * License: https://github.com/EasyRPG/Editor/blob/master/COPYING GPL
  *
@@ -14,7 +14,7 @@
 /**
  * Editor is the application class, the starting point for the app.
  */
-public class Editor {
+public class Editor : Gtk.Application {
 	// MainWindow instance
 	private MainWindow main_window;
 
@@ -43,16 +43,27 @@ public class Editor {
 	static bool opt_version;
 
 	// Const
-	const OptionEntry[] option_entries = {
+	private const OptionEntry[] option_entries = {
 		{ "version", 'v', OptionFlags.IN_MAIN, OptionArg.NONE, ref opt_version, "output version information and exit", null },
 		{ "", 0, 0, OptionArg.FILENAME_ARRAY, ref files, "input project file", "FILE" },
 		{null}
+	};
+
+	private const ActionEntry[] actions = {
+		{ "quit", on_menu_quit }
 	};
 
 	/**
 	 * Editor constructor.
 	 */
 	public Editor () {
+		Object(application_id: "easyrpg.editor", flags: ApplicationFlags.FLAGS_NONE);
+		this.add_action_entries (this.actions, this);
+	}
+
+
+
+	protected override void activate () {
 		// Append icon paths
 		Gtk.IconTheme.get_default().append_search_path ("../data/icons");
 		Gtk.IconTheme.get_default().append_search_path ("data/icons");
@@ -67,12 +78,7 @@ public class Editor {
 
 		// Connect the map reorder signal from treeview_maptree
 		this.main_window.treeview_maptree.map_reordered.connect(this.on_map_reordered);
-	}
 
-	/**
-	 * Run!
-	 */
-	public void run () {
 		// Show the main window
 		this.main_window.show_all ();
 
@@ -1084,12 +1090,14 @@ public class Editor {
 		stdout.printf ("%s %s\n", Resources.APP_NAME, Resources.APP_VERSION);
 	}
 
+	private void on_menu_quit () {
+		Gtk.main_quit ();
+	}
+
 	/**
 	 * The application entry point.
 	 */
-	static int main (string[] args) {
-		Gtk.init (ref args);
-
+	public static int main (string[] args) {
 		/* parse parameters from shell */
 		var context = new OptionContext ("- EasyRPG Editor");
 		context.set_help_enabled (true);
@@ -1110,10 +1118,6 @@ public class Editor {
 		}
 
 		var app = new Editor ();
-		app.run ();
-
-		Gtk.main ();
-
-		return 0;
-	}	
+		return app.run ();
+	}
 }
