@@ -1,6 +1,6 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * Copyright (C) 2011-2012 EasyRPG Project
+ * Copyright (C) 2011-2013 EasyRPG Project
  *
  * License: https://github.com/EasyRPG/Editor/blob/master/COPYING GPL
  *
@@ -13,7 +13,7 @@
 /**
  * The main window view.
  */
-public class MainWindow : Gtk.Window {
+public class MainWindow : Gtk.ApplicationWindow {
 	// Reference to Editor
 	private Editor editor;
 
@@ -57,10 +57,14 @@ public class MainWindow : Gtk.Window {
 	 * @param editor A reference to the Editor class.
 	 */
 	public MainWindow (Editor editor) {
+		Object(application: editor);
+
 		/*
 		 * Initialize properties
 		 */
 		this.editor = editor;
+		this.set_title ("EasyRPG Editor");
+		this.set_wmclass (this.get_title (), this.get_title ());
 		this.set_icon (Resources.load_icon_as_pixbuf ("easyrpg", 48));
 		this.set_default_size (500, 400);
 
@@ -539,7 +543,6 @@ public class MainWindow : Gtk.Window {
 
 		// Close application
 		action_quit.activate.connect (on_close);
-		this.destroy.connect (on_close);
 	}
 
 	public void set_undo_available(bool status) {
@@ -715,7 +718,7 @@ public class MainWindow : Gtk.Window {
 	 * Closes this view and quit the application.
 	 */
 	private void on_close () {
-		Gtk.main_quit ();
+		this.destroy ();
 	}
 
 	private void menu_item_select_cb (Gtk.Widget item){
