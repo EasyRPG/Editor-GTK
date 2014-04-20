@@ -116,6 +116,13 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 			1, 1
 		);
 
+		// FIXME this should be extracted to a method, or obtained via superclass methods
+		int num_cols = this.palette_surface.get_width() / 16;
+		int num_rows = this.palette_surface.get_height() / 16;
+
+		this.tile_selector.x = this.tile_selector.x.clamp(0, num_cols - 1);
+		this.tile_selector.y = this.tile_selector.x.clamp(0, num_rows - 1);
+
 		// Redraw the DrawingArea
 		this.queue_draw();
 
@@ -123,10 +130,16 @@ public class TilePaletteDrawingArea : TiledDrawingArea, ISelectTiles {
 	}
 
 	public bool on_button_motion (Gdk.EventMotion event) {
+		// FIXME this should be extracted to a method, or obtained via superclass methods
+		int num_cols = this.palette_surface.get_width() / 16;
+		int num_rows = this.palette_surface.get_height() / 16;
+
 		Rect new_tile_selector = this.tile_selector;
 
 		int dest_x = ((int) event.x) / 32;
+		dest_x = dest_x.clamp(0, num_cols - 1);
 		int dest_y = ((int) event.y) / 32;
+		dest_y = dest_y.clamp(0, num_rows - 1);
 
 		new_tile_selector.width = (dest_x - this.tile_selector.x).abs () + 1;
 		new_tile_selector.height = (dest_y - this.tile_selector.y).abs () + 1;
