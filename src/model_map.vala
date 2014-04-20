@@ -766,63 +766,98 @@ public class Map : Model {
 	}
 
 	public void shift(Direction dir, int amount) {
+		// fix amount to be within valid values (range [0 .. <width or height> - 1])
+		bool negative = false;
+		if (amount < 0) {
+			amount = -amount;
+			negative = true;
+		}
+		int max;
+		if (dir == Direction.RIGHT || dir == Direction.LEFT) {
+			max = this.width;
+		} else {
+			max = this.height;
+		}
+		amount = amount % max;
+		if (negative) {
+			amount = (max - amount) % max;
+		}
+		if (amount < 1) {
+			return;
+		}
+		// reversal algorithm
+		int p;
 		switch (dir) {
 			case Direction.RIGHT:
-				for (int y = 0; y < this.height; y++) {
-					for (int x = this.width-1; x >= 0; x--) {
-						if (x - amount >= 0) {
-							this.lower_layer[y,x] = this.lower_layer[y,x-amount];
-							this.upper_layer[y,x] = this.upper_layer[y,x-amount];
-						} else {
-							this.lower_layer[y,x] = 0;
-							this.upper_layer[y,x] = 0;
-						}
-					}
-				}
+				p = this.width - amount;
+				reverse_columns(0, p - 1);
+				reverse_columns(p, this.width - 1);
+				reverse_columns(0, this.width - 1);
 				break;
 			case Direction.LEFT:
-				for (int y = 0; y < this.height; y++) {
-					for (int x = 0; x < this.width; x++) {
-						if (x + amount < this.width) {
-							this.lower_layer[y,x] = this.lower_layer[y,x+amount];
-							this.upper_layer[y,x] = this.upper_layer[y,x+amount];
-						} else {
-							this.lower_layer[y,x] = 0;
-							this.upper_layer[y,x] = 0;
-						}
-					}
-				}
+				p = amount;
+				reverse_columns(0, p - 1);
+				reverse_columns(p, this.width - 1);
+				reverse_columns(0, this.width - 1);
 				break;
 			case Direction.UP:
-				for (int y = 0; y < this.height; y++) {
-					for (int x = 0; x < this.width; x++) {
-						if (y + amount < this.height) {
-							this.lower_layer[y,x] = this.lower_layer[y+amount,x];
-							this.upper_layer[y,x] = this.upper_layer[y+amount,x];
-						} else {
-							this.lower_layer[y,x] = 0;
-							this.upper_layer[y,x] = 0;
-						}
-					}
-				}
+				p = amount;
+				reverse_rows(0, p - 1);
+				reverse_rows(p, this.height - 1);
+				reverse_rows(0, this.height - 1);
 				break;
 			case Direction.DOWN:
-				for (int y = this.height-1; y >= 0; y--) {
-					for (int x = 0; x < this.width; x++) {
-						if (y - amount >= 0) {
-							this.lower_layer[y,x] = this.lower_layer[y-amount,x];
-							this.upper_layer[y,x] = this.upper_layer[y-amount,x];
-						} else {
-							this.lower_layer[y,x] = 0;
-							this.upper_layer[y,x] = 0;
-						}
-					}
-				}
+				p = this.height - amount;
+				reverse_rows(0, p - 1);
+				reverse_rows(p, this.height - 1);
+				reverse_rows(0, this.height - 1);
 				break;
 			default:
 				warning ("Map Shift: Direction %s not supported!", dir.to_string());
 				break;
 		}
+	}
+
+	private void reverse_rows(int first, int last) {
+		if (first == last) {
+			return;
+		}
+		int mid = (last - first - 1) / 2;
+		for (int i = 0; i <= mid; i++) {
+			// swap rows
+			int row1 = first + i;
+			int row2 = last - i;
+			for (int x = 0; x < this.width; x++) {
+				swap(x, row1, x, row2);
+			}
+		}
+	}
+
+	private void reverse_columns(int first, int last) {
+		if (first == last) {
+			return;
+		}
+		int mid = (last - first - 1) / 2;
+		for (int i = 0; i <= mid; i++) {
+			// swap columns
+			int col1 = first + i;
+			int col2 = last - i;
+			for (int y = 0; y < this.height; y++) {
+				swap(col1, y, col2, y);
+			}
+		}
+	}
+
+	private void swap(int x1, int y1, int x2, int y2) {
+		int tmp;
+
+		tmp = this.lower_layer[y1,x1];
+		this.lower_layer[y1,x1] = this.lower_layer[y2,x2];
+		this.lower_layer[y2,x2] = tmp;
+
+		tmp = this.upper_layer[y1,x1];
+		this.upper_layer[y1,x1] = this.upper_layer[y2,x2];
+		this.upper_layer[y2,x2] = tmp;
 	}
 
 	/**
