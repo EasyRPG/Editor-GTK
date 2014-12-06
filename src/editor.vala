@@ -1050,6 +1050,11 @@ public class Editor : Gtk.Application {
 		database_dialog.destroy ();
 	}
 
+	public void show_module_list () {
+		var module_list_dialog = new ModuleListDialog (this);
+		//	module_list_dialog.run ();
+		//module_list_dialog.destroy ();
+	}
 	/**
 	 * Instantiates and shows the about dialog.
 	 */
@@ -1071,11 +1076,6 @@ public class Editor : Gtk.Application {
 		about_dialog.destroy ();
 	}
 
-	public void show_module_list () {
-		var module_list_dialog = new ModuleListDialog (this);
-		//	module_list_dialog.run ();
-		//module_list_dialog.destroy ();
-	}
 	private void update_undo_redo_buttons () {
 		bool can_undo = false, can_redo = false;
 

@@ -22,6 +22,7 @@ easyrpg_editor_SOURCES = \
 	action.vala \
 	config.vapi \
 	database_dialog.vala \
+	module_list_dialog.vala \
 	editor.vala \
 	enum.vala \
 	i_paint_tiles.vala \
