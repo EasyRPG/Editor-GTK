@@ -115,6 +115,8 @@ public class MainWindow : Gtk.ApplicationWindow {
 		action_content.set_icon_name (Gtk.Stock.HELP);
 		var action_about = new Gtk.Action ("ActionAbout", "_About", "See information about this program's current version", null);
 		action_about.set_icon_name (Gtk.Stock.ABOUT);
+		var action_loaded_modules = new Gtk.Action ("ActionLoadModules", "_List Modules", "List loaded modules", null);
+
 		var action_undo = new Gtk.Action ("ActionUndo", "_Undo", "Undo last change", Gtk.Stock.UNDO);
 		var action_redo = new Gtk.Action ("ActionRedo", "_Redo", "Redo last change", Gtk.Stock.REDO);
 		var action_select_tool = new Gtk.RadioAction ("ActionSelect", "_Select", "Select a part of the map", null, DrawingTool.SELECT);
@@ -227,6 +229,9 @@ public class MainWindow : Gtk.ApplicationWindow {
 		var menuitem_scale = new Gtk.MenuItem ();
 		menuitem_scale.use_underline = true;
 		menuitem_scale.set_label ("_Scale");
+		var menuitem_modules = new Gtk.MenuItem ();
+		menuitem_modules.use_underline = true;
+		menuitem_modules.set_label ("_Modules");
 
 		// Submenus
 		var menu_project = new Gtk.Menu ();
@@ -236,6 +241,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 		var menu_tools = new Gtk.Menu ();
 		var menu_test = new Gtk.Menu ();
 		var menu_help = new Gtk.Menu ();
+		var menu_modules = new Gtk.Menu ();
 
 		// Submenu items
 		var menuitem_new = action_new.create_menu_item () as Gtk.ImageMenuItem;
@@ -251,6 +257,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 		var menuitem_playtest = action_playtest.create_menu_item () as Gtk.ImageMenuItem;
 		var menuitem_content = action_content.create_menu_item () as Gtk.ImageMenuItem;
 		var menuitem_about = action_about.create_menu_item () as Gtk.ImageMenuItem;
+		var menuitem_loaded_modules = action_loaded_modules.create_menu_item () as Gtk.ImageMenuItem;
 
 		// Radio items
 		var menuitem_lower_layer = action_lower_layer.create_menu_item () as Gtk.CheckMenuItem;
@@ -295,6 +302,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 		menu_help.add (menuitem_content);
 		menu_help.add (new Gtk.SeparatorMenuItem ());
 		menu_help.add (menuitem_about);
+		menu_modules.add (menuitem_loaded_modules);
 
 		// Submenus
 		menuitem_project.set_submenu (menu_project);
@@ -304,6 +312,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 		menuitem_tools.set_submenu (menu_tools);
 		menuitem_test.set_submenu (menu_test);
 		menuitem_help.set_submenu (menu_help);
+		menuitem_modules.set_submenu (menu_modules);
 
 		// Toplevel
 		this.menubar_main = new Gtk.MenuBar ();
@@ -312,6 +321,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 		this.menubar_main.add (menuitem_tools);
 		this.menubar_main.add (menuitem_test);
 		this.menubar_main.add (menuitem_help);
+		this.menubar_main.add (menuitem_modules);
 
 		/*
 		 * Main toolbar layout
@@ -497,6 +507,8 @@ public class MainWindow : Gtk.ApplicationWindow {
 		// Show about dialog
 		action_about.activate.connect (this.editor.on_about);
 
+		// Show module list dialog
+		action_loaded_modules.activate.connect (this.editor.show_module_list);
 		// Change edition mode
 		this.radio_layer.changed.connect (this.on_layer_change);
 		this.radio_scale.changed.connect (this.on_scale_change);
