@@ -144,8 +144,8 @@ public class Editor : Gtk.Application {
 		var open_project_dialog = new Gtk.FileChooserDialog (
 			"Open Project", this.main_window,
 			Gtk.FileChooserAction.OPEN,
-			Gtk.Stock.CANCEL, Gtk.ResponseType.CANCEL,
-			Gtk.Stock.OPEN, Gtk.ResponseType.ACCEPT
+			Resources.STOCK_LABEL_CANCEL, Gtk.ResponseType.CANCEL,
+			Resources.STOCK_LABEL_OPEN, Gtk.ResponseType.ACCEPT
 		);
 
 		var file_filter = new Gtk.FileFilter();
@@ -359,7 +359,7 @@ public class Editor : Gtk.Application {
 		XmlParser parser = new XmlParser ();
 
 		// Load icons for maptree treestore
-		var folder_icon = Resources.load_icon_as_pixbuf (Gtk.Stock.DIRECTORY, 16);
+		var folder_icon = Resources.load_icon_as_pixbuf (Resources.STOCK_ICON_DIRECTORY, 16);
 		var map_icon = Resources.load_icon_as_pixbuf (Resources.ICON_MAP, 16);
 
 		/*
@@ -965,8 +965,8 @@ public class Editor : Gtk.Application {
 		var dialog = new Gtk.Dialog.with_buttons(
 			"Delete Map?", this.main_window,
 			Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
-			Gtk.Stock.CANCEL, Gtk.ResponseType.CANCEL,
-			Gtk.Stock.OK, Gtk.ResponseType.OK,
+			Resources.STOCK_ICON_CANCEL, Gtk.ResponseType.CANCEL,
+			Resources.STOCK_ICON_OK, Gtk.ResponseType.OK,
 			null
 		);
 
@@ -1052,8 +1052,8 @@ public class Editor : Gtk.Application {
 
 	public void show_module_list () {
 		var module_list_dialog = new ModuleListDialog (this);
-		//	module_list_dialog.run ();
-		//module_list_dialog.destroy ();
+		module_list_dialog.run ();
+		module_list_dialog.destroy ();
 	}
 	/**
 	 * Instantiates and shows the about dialog.

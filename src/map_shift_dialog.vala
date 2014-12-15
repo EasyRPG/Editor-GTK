@@ -29,8 +29,8 @@ public class MapShiftDialog : Gtk.Dialog {
 
 		/* Init dialog */
 		this.set_title("Map Shift");
-		this.add_button (Gtk.Stock.CANCEL, Gtk.ResponseType.CANCEL);
-		this.add_button (Gtk.Stock.OK, Gtk.ResponseType.OK);
+		this.add_button (Resources.STOCK_LABEL_CANCEL, Gtk.ResponseType.CANCEL);
+		this.add_button (Resources.STOCK_LABEL_OK, Gtk.ResponseType.OK);
 
 		/* Init window's elements */
 		var hbox         = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 5);
@@ -44,10 +44,10 @@ public class MapShiftDialog : Gtk.Dialog {
 		button_right = new Gtk.ToggleButton ();
 
 		/* load button images */
-		button_up.add (new Gtk.Image.from_stock (Gtk.Stock.GO_UP, Gtk.IconSize.BUTTON));
-		button_down.add (new Gtk.Image.from_stock (Gtk.Stock.GO_DOWN, Gtk.IconSize.BUTTON));
-		button_left.add (new Gtk.Image.from_stock (Gtk.Stock.GO_BACK, Gtk.IconSize.BUTTON));
-		button_right.add (new Gtk.Image.from_stock (Gtk.Stock.GO_FORWARD, Gtk.IconSize.BUTTON));
+		button_up.add (new Gtk.Image.from_stock (Resources.STOCK_ICON_GO_UP, Gtk.IconSize.BUTTON));
+		button_down.add (new Gtk.Image.from_stock (Resources.STOCK_ICON_GO_DOWN, Gtk.IconSize.BUTTON));
+		button_left.add (new Gtk.Image.from_stock (Resources.STOCK_ICON_GO_BACK, Gtk.IconSize.BUTTON));
+		button_right.add (new Gtk.Image.from_stock (Resources.STOCK_ICON_GO_FORWARD, Gtk.IconSize.BUTTON));
 
 		/* set inital button state */
 		updateDirection(this.dir);

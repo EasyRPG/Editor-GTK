@@ -31,10 +31,10 @@ public class DatabaseDialog : Gtk.Dialog {
 		 */
 		this.editor = editor;
 		this.set_title("Database");
-		this.add_button (Gtk.Stock.OK, 0);
-		this.add_button (Gtk.Stock.CANCEL, 1);
-		this.add_button (Gtk.Stock.APPLY, 2);
-		this.add_button (Gtk.Stock.HELP, 3);
+		this.add_button (Resources.STOCK_LABEL_OK, 0);
+		this.add_button (Resources.STOCK_LABEL_CANCEL, 1);
+		this.add_button (Resources.STOCK_LABEL_APPLY, 2);
+		this.add_button (Resources.STOCK_LABEL_HELP, 3);
 
 		/*
 		 * Initialize widgets

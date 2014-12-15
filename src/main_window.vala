@@ -72,19 +72,19 @@ public class MainWindow : Gtk.ApplicationWindow {
 		 * Initialize actions
 		 */
 		var action_new = new Gtk.Action ("ActionNew", "_New", "Create a new project", null);
-		action_new.set_icon_name (Gtk.Stock.NEW);
+		action_new.set_icon_name (Resources.STOCK_ICON_NEW);
 		var action_open = new Gtk.Action ("ActionOpen", "_Open", "Open a saved project", null);
-		action_open.set_icon_name (Gtk.Stock.OPEN);
+		action_open.set_icon_name (Resources.STOCK_ICON_OPEN);
 		var action_close = new Gtk.Action ("ActionClose", "_Close", "Close current project", null);
-		action_close.set_icon_name (Gtk.Stock.CLOSE);
+		action_close.set_icon_name (Resources.STOCK_ICON_CLOSE);
 		var action_create_game_disk = new Gtk.Action ("ActionCreateGameDisk", "_Create Game Disk", "", null);
 		action_create_game_disk.set_icon_name (Resources.ICON_BUILD_PROJECT);
 		var action_quit = new Gtk.Action ("ActionQuit", "_Quit", "Quit EasyRPG Game Editor", null);
-		action_quit.set_icon_name (Gtk.Stock.QUIT);
+		action_quit.set_icon_name (Resources.STOCK_ICON_QUIT);
 		var action_save = new Gtk.Action ("ActionSave", "_Save", "Save all maps changes", null);
-		action_save.set_icon_name (Gtk.Stock.SAVE);
+		action_save.set_icon_name (Resources.STOCK_ICON_SAVE);
 		var action_revert = new Gtk.Action ("ActionRevert", "_Revert", "Revert maps to last saved state", null);
-		action_revert.set_icon_name (Gtk.Stock.CLEAR);
+		action_revert.set_icon_name (Resources.STOCK_ICON_CLEAR);
 		var action_lower_layer = new Gtk.RadioAction ("ActionLowerLayer", "_Lower Layer", "Edit lower layer", null, LayerType.LOWER);
 		action_lower_layer.set_icon_name (Resources.ICON_LOWER_LAYER);
 		var action_upper_layer = new Gtk.RadioAction ("ActionUpperLayer", "_Upper Layer", "Edit upper layer", null, LayerType.UPPER);
@@ -108,17 +108,17 @@ public class MainWindow : Gtk.ApplicationWindow {
 		var action_playtest = new Gtk.Action ("ActionPlaytest", "_Play test", "Make a test of your game", null);
 		action_playtest.set_icon_name (Resources.ICON_PLAYTEST);
 		var action_fullscreen = new Gtk.ToggleAction ("ActionFullScreen", "_Full Screen", "Use full screen in play test mode", null);
-		action_fullscreen.set_icon_name (Gtk.Stock.FULLSCREEN);
+		action_fullscreen.set_icon_name (Resources.STOCK_ICON_FULLSCREEN);
 		var action_show_title = new Gtk.ToggleAction ("ActionShowTitle", "_Show Title", "Show title in play test mode", null);
 		action_show_title.set_icon_name (Resources.ICON_TITLE);
 		var action_content = new Gtk.Action ("ActionContent", "_Content", "View help contents", null);
-		action_content.set_icon_name (Gtk.Stock.HELP);
+		action_content.set_icon_name (Resources.STOCK_ICON_HELP);
 		var action_about = new Gtk.Action ("ActionAbout", "_About", "See information about this program's current version", null);
-		action_about.set_icon_name (Gtk.Stock.ABOUT);
+		action_about.set_icon_name (Resources.STOCK_ICON_ABOUT);
 		var action_loaded_modules = new Gtk.Action ("ActionLoadModules", "_List Modules", "List loaded modules", null);
 
-		var action_undo = new Gtk.Action ("ActionUndo", "_Undo", "Undo last change", Gtk.Stock.UNDO);
-		var action_redo = new Gtk.Action ("ActionRedo", "_Redo", "Redo last change", Gtk.Stock.REDO);
+		var action_undo = new Gtk.Action ("ActionUndo", "_Undo", "Undo last change", Resources.STOCK_ICON_UNDO);
+		var action_redo = new Gtk.Action ("ActionRedo", "_Redo", "Redo last change", Resources.STOCK_ICON_REDO);
 		var action_select_tool = new Gtk.RadioAction ("ActionSelect", "_Select", "Select a part of the map", null, DrawingTool.SELECT);
 		action_select_tool.set_icon_name (Resources.ICON_SELECT);
 		var action_zoom_tool = new Gtk.RadioAction ("ActionZoom", "_Zoom", "Increase or decrease map zoom", null, DrawingTool.ZOOM);

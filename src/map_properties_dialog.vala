@@ -345,8 +345,8 @@ public class MapPropertiesDialog : Gtk.Dialog {
 
 		/* Initialize Dialog */
 		this.set_title ("Map Properties");
-		this.add_button (Gtk.Stock.CANCEL, Gtk.ResponseType.CANCEL);
-		this.add_button (Gtk.Stock.OK, Gtk.ResponseType.OK);
+		this.add_button (Resources.STOCK_LABEL_CANCEL, Gtk.ResponseType.CANCEL);
+		this.add_button (Resources.STOCK_LABEL_OK, Gtk.ResponseType.OK);
 
 		/* Initialize Widgets */
 		this.notebook = new Gtk.Notebook ();

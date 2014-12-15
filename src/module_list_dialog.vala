@@ -17,7 +17,8 @@ public class ModuleListDialog : Gtk.Dialog {
 	 * Properties
 	 */
 	private weak Editor editor;
-
+	private Gtk.ScrolledWindow scrolled;
+	private Gtk.TextView view;
 	/**
 	 * Builds the module list  interface.
 	 * 
@@ -28,23 +29,32 @@ public class ModuleListDialog : Gtk.Dialog {
 		 * Initialize properties
 		 */
 		this.editor = editor;
-		this.set_title("Module List");
-		this.add_button (Gtk.Stock.OK, 0);
-		this.add_button (Gtk.Stock.CANCEL, 1);
-		this.add_button (Gtk.Stock.APPLY, 2);
-		this.add_button (Gtk.Stock.HELP, 3);
+		this.set_title("Modules");
+		this.add_button (Resources.STOCK_LABEL_OK, 0);
+		this.add_button (Resources.STOCK_LABEL_CANCEL, 1);
+		this.add_button (Resources.STOCK_LABEL_APPLY, 2);
+		this.add_button (Resources.STOCK_LABEL_HELP, 3);
 
+		/*
+		 * Initialize widgets
+		 */
+		scrolled = new Gtk.ScrolledWindow (null, null);
+		view = new Gtk.TextView ();
+		view.editable = false;
+		view.cursor_visible = false;
+		view.buffer.text = "Still in development";
 		/*
 		 * Dialog layout
 		 */
-
+		scrolled.add (view);
+		Gtk.Box main_box = this.get_content_area () as Gtk.Box;
+		main_box.pack_start (this.scrolled, true, true, 0);
 		this.show_all ();
 
 		/*
 		 * Connect signals
 		 */
-		//this.response.connect(on_response);
-		//this.close.connect (on_close);
+
 	}
 
 	/**
