@@ -42,7 +42,7 @@ public class ModuleListDialog : Gtk.Dialog {
 		view = new Gtk.TextView ();
 		view.editable = false;
 		view.cursor_visible = false;
-		view.buffer.text = "Still in development";
+		view.buffer.text = "Still in development, just an example";
 		/*
 		 * Dialog layout
 		 */
