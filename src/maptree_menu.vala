@@ -16,7 +16,7 @@ public class MaptreeMenu : Gtk.Menu {
 	 * Builds the maptree Menu for map nodes.
 	 */
 	public MaptreeMenu () {
-		var item_prop = new Gtk.ImageMenuItem.from_stock (Gtk.Stock.PROPERTIES, null);
+		var item_prop = new Gtk.ImageMenuItem.from_stock (Resources.STOCK_ICON_PROPERTIES, null);
 		item_prop.set_label ("Map Properties");
 		item_prop.activate.connect(() => {map_properties ();});
 		append (item_prop);
@@ -24,12 +24,12 @@ public class MaptreeMenu : Gtk.Menu {
 		var item_seperator1 = new Gtk.SeparatorMenuItem ();
 		append (item_seperator1);
 
-		var item_new_map = new Gtk.ImageMenuItem.from_stock (Gtk.Stock.NEW, null);
+		var item_new_map = new Gtk.ImageMenuItem.from_stock (Resources.STOCK_ICON_NEW, null);
 		item_new_map.set_label ("New Map");
 		item_new_map.activate.connect(() => {map_new ();});
 		append (item_new_map);
 
-		var item_dungeon = new Gtk.ImageMenuItem.from_stock (Gtk.Stock.REFRESH, null);
+		var item_dungeon = new Gtk.ImageMenuItem.from_stock (Resources.STOCK_ICON_REFRESH, null);
 		item_dungeon.set_label ("Generate Dungeon");
 		item_dungeon.activate.connect(() => {map_dungeon ();});
 		append (item_dungeon);
@@ -37,17 +37,17 @@ public class MaptreeMenu : Gtk.Menu {
 		var item_seperator2 = new Gtk.SeparatorMenuItem ();
 		append (item_seperator2);
 
-		var item_copy = new Gtk.ImageMenuItem.from_stock (Gtk.Stock.COPY, null);
+		var item_copy = new Gtk.ImageMenuItem.from_stock (Resources.STOCK_ICON_COPY, null);
 		item_copy.set_label ("Copy Map");
 		item_copy.activate.connect(() => {map_copy ();});
 		append (item_copy);
 
-		var item_paste = new Gtk.ImageMenuItem.from_stock (Gtk.Stock.PASTE, null);
+		var item_paste = new Gtk.ImageMenuItem.from_stock (Resources.STOCK_ICON_PASTE, null);
 		item_paste.set_label ("Paste Map");
 		item_paste.activate.connect(() => {map_paste ();});
 		append (item_paste);
 
-		var item_delete = new Gtk.ImageMenuItem.from_stock (Gtk.Stock.DELETE, null);
+		var item_delete = new Gtk.ImageMenuItem.from_stock (Resources.STOCK_ICON_DELETE, null);
 		item_delete.set_label ("Delete Map");
 		item_delete.activate.connect(() => {map_delete ();});
 		append (item_delete);
@@ -77,7 +77,7 @@ public class MaptreeMenu : Gtk.Menu {
 	 * Builds the maptree Menu for project directory
 	 */
 	public MaptreeMenu.root () {
-		var item_new_map = new Gtk.ImageMenuItem.from_stock (Gtk.Stock.NEW, null);
+		var item_new_map = new Gtk.ImageMenuItem.from_stock (Resources.STOCK_ICON_NEW, null);
 		item_new_map.set_label ("New Map");
 		item_new_map.activate.connect(() => {map_new ();});
 		append (item_new_map);
@@ -85,7 +85,7 @@ public class MaptreeMenu : Gtk.Menu {
 		var item_seperator = new Gtk.SeparatorMenuItem ();
 		append (item_seperator);
 
-		var item_paste = new Gtk.ImageMenuItem.from_stock (Gtk.Stock.PASTE, null);
+		var item_paste = new Gtk.ImageMenuItem.from_stock (Resources.STOCK_ICON_PASTE, null);
 		item_paste.set_label ("Paste Map");
 		item_paste.activate.connect(() => {map_paste ();});
 		append (item_paste);

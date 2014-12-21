@@ -25,8 +25,8 @@ public class ProjectCreateDialog : Gtk.Dialog {
 
 		/* Init dialog */
 		this.set_title("New Project");
-		this.add_button (Gtk.Stock.CANCEL, Gtk.ResponseType.CANCEL);
-		this.add_button (Gtk.Stock.OK, Gtk.ResponseType.OK);
+		this.add_button (Resources.STOCK_LABEL_CANCEL, Gtk.ResponseType.CANCEL);
+		this.add_button (Resources.STOCK_LABEL_OK, Gtk.ResponseType.OK);
 
 		/* Layout */
 		var input_name        = new Gtk.Entry ();

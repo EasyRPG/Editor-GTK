@@ -19,9 +19,11 @@ bin_PROGRAMS = easyrpg-editor
 
 easyrpg_editor_SOURCES = \
 	abstract_imageset.vala \
+	resources.vala \
 	action.vala \
 	config.vapi \
 	database_dialog.vala \
+	module_list_dialog.vala \
 	editor.vala \
 	enum.vala \
 	i_paint_tiles.vala \
@@ -39,7 +41,6 @@ easyrpg_editor_SOURCES = \
 	model.vala \
 	model_vehicle.vala \
 	project_create_dialog.vala \
-	resources.vala \
 	rm2k_chipset_imageset.vala \
 	rm2k_chipset_lower_imageset.vala \
 	rm2k_chipset_upper_imageset.vala \

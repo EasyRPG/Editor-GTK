@@ -72,19 +72,19 @@ public class MainWindow : Gtk.ApplicationWindow {
 		 * Initialize actions
 		 */
 		var action_new = new Gtk.Action ("ActionNew", "_New", "Create a new project", null);
-		action_new.set_icon_name (Gtk.Stock.NEW);
+		action_new.set_icon_name (Resources.STOCK_ICON_NEW);
 		var action_open = new Gtk.Action ("ActionOpen", "_Open", "Open a saved project", null);
-		action_open.set_icon_name (Gtk.Stock.OPEN);
+		action_open.set_icon_name (Resources.STOCK_ICON_OPEN);
 		var action_close = new Gtk.Action ("ActionClose", "_Close", "Close current project", null);
-		action_close.set_icon_name (Gtk.Stock.CLOSE);
+		action_close.set_icon_name (Resources.STOCK_ICON_CLOSE);
 		var action_create_game_disk = new Gtk.Action ("ActionCreateGameDisk", "_Create Game Disk", "", null);
 		action_create_game_disk.set_icon_name (Resources.ICON_BUILD_PROJECT);
 		var action_quit = new Gtk.Action ("ActionQuit", "_Quit", "Quit EasyRPG Game Editor", null);
-		action_quit.set_icon_name (Gtk.Stock.QUIT);
+		action_quit.set_icon_name (Resources.STOCK_ICON_QUIT);
 		var action_save = new Gtk.Action ("ActionSave", "_Save", "Save all maps changes", null);
-		action_save.set_icon_name (Gtk.Stock.SAVE);
+		action_save.set_icon_name (Resources.STOCK_ICON_SAVE);
 		var action_revert = new Gtk.Action ("ActionRevert", "_Revert", "Revert maps to last saved state", null);
-		action_revert.set_icon_name (Gtk.Stock.CLEAR);
+		action_revert.set_icon_name (Resources.STOCK_ICON_CLEAR);
 		var action_lower_layer = new Gtk.RadioAction ("ActionLowerLayer", "_Lower Layer", "Edit lower layer", null, LayerType.LOWER);
 		action_lower_layer.set_icon_name (Resources.ICON_LOWER_LAYER);
 		var action_upper_layer = new Gtk.RadioAction ("ActionUpperLayer", "_Upper Layer", "Edit upper layer", null, LayerType.UPPER);
@@ -108,15 +108,17 @@ public class MainWindow : Gtk.ApplicationWindow {
 		var action_playtest = new Gtk.Action ("ActionPlaytest", "_Play test", "Make a test of your game", null);
 		action_playtest.set_icon_name (Resources.ICON_PLAYTEST);
 		var action_fullscreen = new Gtk.ToggleAction ("ActionFullScreen", "_Full Screen", "Use full screen in play test mode", null);
-		action_fullscreen.set_icon_name (Gtk.Stock.FULLSCREEN);
+		action_fullscreen.set_icon_name (Resources.STOCK_ICON_FULLSCREEN);
 		var action_show_title = new Gtk.ToggleAction ("ActionShowTitle", "_Show Title", "Show title in play test mode", null);
 		action_show_title.set_icon_name (Resources.ICON_TITLE);
 		var action_content = new Gtk.Action ("ActionContent", "_Content", "View help contents", null);
-		action_content.set_icon_name (Gtk.Stock.HELP);
+		action_content.set_icon_name (Resources.STOCK_ICON_HELP);
 		var action_about = new Gtk.Action ("ActionAbout", "_About", "See information about this program's current version", null);
-		action_about.set_icon_name (Gtk.Stock.ABOUT);
-		var action_undo = new Gtk.Action ("ActionUndo", "_Undo", "Undo last change", Gtk.Stock.UNDO);
-		var action_redo = new Gtk.Action ("ActionRedo", "_Redo", "Redo last change", Gtk.Stock.REDO);
+		action_about.set_icon_name (Resources.STOCK_ICON_ABOUT);
+		var action_loaded_modules = new Gtk.Action ("ActionLoadModules", "_List Modules", "List loaded modules", null);
+
+		var action_undo = new Gtk.Action ("ActionUndo", "_Undo", "Undo last change", Resources.STOCK_ICON_UNDO);
+		var action_redo = new Gtk.Action ("ActionRedo", "_Redo", "Redo last change", Resources.STOCK_ICON_REDO);
 		var action_select_tool = new Gtk.RadioAction ("ActionSelect", "_Select", "Select a part of the map", null, DrawingTool.SELECT);
 		action_select_tool.set_icon_name (Resources.ICON_SELECT);
 		var action_zoom_tool = new Gtk.RadioAction ("ActionZoom", "_Zoom", "Increase or decrease map zoom", null, DrawingTool.ZOOM);
@@ -227,6 +229,9 @@ public class MainWindow : Gtk.ApplicationWindow {
 		var menuitem_scale = new Gtk.MenuItem ();
 		menuitem_scale.use_underline = true;
 		menuitem_scale.set_label ("_Scale");
+		var menuitem_modules = new Gtk.MenuItem ();
+		menuitem_modules.use_underline = true;
+		menuitem_modules.set_label ("_Modules");
 
 		// Submenus
 		var menu_project = new Gtk.Menu ();
@@ -236,6 +241,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 		var menu_tools = new Gtk.Menu ();
 		var menu_test = new Gtk.Menu ();
 		var menu_help = new Gtk.Menu ();
+		var menu_modules = new Gtk.Menu ();
 
 		// Submenu items
 		var menuitem_new = action_new.create_menu_item () as Gtk.ImageMenuItem;
@@ -251,6 +257,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 		var menuitem_playtest = action_playtest.create_menu_item () as Gtk.ImageMenuItem;
 		var menuitem_content = action_content.create_menu_item () as Gtk.ImageMenuItem;
 		var menuitem_about = action_about.create_menu_item () as Gtk.ImageMenuItem;
+		var menuitem_loaded_modules = action_loaded_modules.create_menu_item () as Gtk.ImageMenuItem;
 
 		// Radio items
 		var menuitem_lower_layer = action_lower_layer.create_menu_item () as Gtk.CheckMenuItem;
@@ -295,6 +302,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 		menu_help.add (menuitem_content);
 		menu_help.add (new Gtk.SeparatorMenuItem ());
 		menu_help.add (menuitem_about);
+		menu_modules.add (menuitem_loaded_modules);
 
 		// Submenus
 		menuitem_project.set_submenu (menu_project);
@@ -304,6 +312,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 		menuitem_tools.set_submenu (menu_tools);
 		menuitem_test.set_submenu (menu_test);
 		menuitem_help.set_submenu (menu_help);
+		menuitem_modules.set_submenu (menu_modules);
 
 		// Toplevel
 		this.menubar_main = new Gtk.MenuBar ();
@@ -312,6 +321,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 		this.menubar_main.add (menuitem_tools);
 		this.menubar_main.add (menuitem_test);
 		this.menubar_main.add (menuitem_help);
+		this.menubar_main.add (menuitem_modules);
 
 		/*
 		 * Main toolbar layout
@@ -497,6 +507,8 @@ public class MainWindow : Gtk.ApplicationWindow {
 		// Show about dialog
 		action_about.activate.connect (this.editor.on_about);
 
+		// Show module list dialog
+		action_loaded_modules.activate.connect (this.editor.show_module_list);
 		// Change edition mode
 		this.radio_layer.changed.connect (this.on_layer_change);
 		this.radio_scale.changed.connect (this.on_scale_change);

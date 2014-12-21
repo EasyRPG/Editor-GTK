@@ -10,27 +10,26 @@
  */
 
 /**
- * The database window view.
+ * The module list window view.
  */
-public class DatabaseDialog : Gtk.Dialog {
+public class ModuleListDialog : Gtk.Dialog {
 	/*
 	 * Properties
 	 */
 	private weak Editor editor;
-	private ActorFrame actor_frame;
-	private Gtk.Notebook notebook;
-
+	private Gtk.ScrolledWindow scrolled;
+	private Gtk.TextView view;
 	/**
-	 * Builds the database interface.
+	 * Builds the module list  interface.
 	 * 
 	 * @param editor A reference to the Editor class.
 	 */
-	public DatabaseDialog (Editor editor) {
+	public ModuleListDialog (Editor editor) {
 		/*
 		 * Initialize properties
 		 */
 		this.editor = editor;
-		this.set_title("Database");
+		this.set_title("Modules");
 		this.add_button (Resources.STOCK_LABEL_OK, 0);
 		this.add_button (Resources.STOCK_LABEL_CANCEL, 1);
 		this.add_button (Resources.STOCK_LABEL_APPLY, 2);
@@ -39,23 +38,23 @@ public class DatabaseDialog : Gtk.Dialog {
 		/*
 		 * Initialize widgets
 		 */
-		this.actor_frame = new ActorFrame ();
-		this.notebook = new Gtk.Notebook();
+		scrolled = new Gtk.ScrolledWindow (null, null);
+		view = new Gtk.TextView ();
+		view.editable = false;
+		view.cursor_visible = false;
+		view.buffer.text = "Still in development, just an example";
 		/*
 		 * Dialog layout
 		 */
-		
-		Gtk.Box main_box = this.get_content_area () as Gtk.Box;		
-		main_box.pack_start (this.notebook, true, true, 0);
-		this.notebook.append_page (this.actor_frame, new Gtk.Label ("Actors"));
-
+		scrolled.add (view);
+		Gtk.Box main_box = this.get_content_area () as Gtk.Box;
+		main_box.pack_start (this.scrolled, true, true, 0);
 		this.show_all ();
 
 		/*
 		 * Connect signals
 		 */
-		//this.response.connect(on_response);
-		//this.close.connect (on_close);
+
 	}
 
 	/**

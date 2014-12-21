@@ -17,6 +17,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Resources {
+
 	public const string APP_NAME = "EasyRPG Editor";
 	public const string APP_ICON = "easyrpg";
 	public const string APP_VERSION = "0.1.0";
@@ -48,6 +49,45 @@ namespace Resources {
 	public const string ICON_CIRCLE = "old_circle";
 	public const string ICON_FILL = "old_fill";
 	public const string ICON_MAP = "old_map";
+	
+	public const string STOCK_LABEL_OK = "_Ok";
+	public const string STOCK_LABEL_CANCEL = "_Cancel";
+	public const string STOCK_LABEL_APPLY = "_Apply";
+	public const string STOCK_LABEL_ABOUT = "_About";
+	public const string STOCK_LABEL_HELP = "_Help";
+	public const string STOCK_LABEL_NEW = "_New";
+	public const string STOCK_LABEL_OPEN = "_Open";
+	public const string STOCK_LABEL_CLOSE = "_Close";
+	public const string STOCK_LABEL_CLEAR = "_Clear";
+	public const string STOCK_LABEL_QUIT = "_Quit";
+	public const string STOCK_LABEL_SAVE = "_Save";
+	public const string STOCK_LABEL_FULLSCREEN = "_Fullscreen";
+	public const string STOCK_LABEL_UNDO = "_Undo";
+	public const string STOCK_LABEL_REDO = "_Redo";
+
+	public const string STOCK_ICON_OK = "gtk-ok";
+	public const string STOCK_ICON_ABOUT = "gtk-about";
+	public const string STOCK_ICON_HELP = "gtk-help";
+	public const string STOCK_ICON_NEW = "gtk-new";
+	public const string STOCK_ICON_OPEN = "gtk-open";
+	public const string STOCK_ICON_CLOSE = "gtk-close";
+	public const string STOCK_ICON_CLEAR = "gtk-clear";
+	public const string STOCK_ICON_QUIT = "gtk-exit";
+	public const string STOCK_ICON_SAVE = "gtk-save";
+	public const string STOCK_ICON_FULLSCREEN = "gtk-fullscreen";
+	public const string STOCK_ICON_UNDO = "gtk-undo";
+	public const string STOCK_ICON_REDO = "gtk-redo";
+	public const string STOCK_ICON_PROPERTIES = "gtk-properties";
+	public const string STOCK_ICON_COPY = "gtk-copy";
+	public const string STOCK_ICON_REFRESH = "gtk-refresh";
+   	public const string STOCK_ICON_PASTE = "gtk-paste";
+   	public const string STOCK_ICON_DELETE = "gtk-delete";
+   	public const string STOCK_ICON_DIRECTORY = "gtk-directory";
+	public const string STOCK_ICON_GO_UP = "gtk-go-up";
+   	public const string STOCK_ICON_GO_DOWN = "gtk-go-down";
+   	public const string STOCK_ICON_GO_BACK = "gtk-go-back";
+   	public const string STOCK_ICON_GO_FORWARD = "gtk-go-forward";
+	public const string STOCK_ICON_CANCEL = "gtk-cancel";
 
 	public const string RPROJECT_DATA = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n<project>\n\t<current_layer>%d</current_layer>\n\t<current_map>%d</current_map>\n\t<current_scale>%d</current_scale>\n</project>";
 
